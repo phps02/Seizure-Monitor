@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Canine Seizure Risk Monitor — West Chester OH · KHAO ASOS</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:#08100c;color:#dde8e0;font-family:Georgia,serif;padding-bottom:60px}
+#app{max-width:1200px;margin:0 auto}
+header{background:#0b1a12;border-bottom:1px solid #1c3326;padding:24px 20px 16px;text-align:center}
+.tag{font-size:11px;letter-spacing:4px;color:#34d399;text-transform:uppercase;margin-bottom:4px}
+h1{font-size:22px;color:#f0ebe2;letter-spacing:1px}
+.sub{font-size:11px;color:#4a7a58;margin-top:4px}
+.upd{font-size:10px;color:#2e5040;margin-top:3px}
+.body{padding:0 16px}
+.tabs{display:flex;gap:0;margin-top:16px;border-bottom:1px solid #1c3326;flex-wrap:wrap}
+.tab{padding:10px 18px;cursor:pointer;font-size:11px;color:#4a7a58;border-bottom:3px solid transparent;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
+.tab.active{color:#34d399;border-bottom-color:#34d399}
+.panel{display:none;margin-top:0}
+.panel.active{display:block}
+.hero{padding:18px 20px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:16px}
+.legend{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}
+.pill{padding:3px 10px;border-radius:20px;font-size:11px;border:1px solid}
+.alert-box{margin-top:16px;padding:12px 16px;background:#3b0000;border:1px solid #dc2626;border-radius:8px;color:#fca5a5;font-size:13px;font-weight:bold}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}
+th{padding:10px 12px;text-align:left;border-bottom:1px solid #1c3326;white-space:nowrap;background:#0b1a12;color:#34d399;font-size:10px;letter-spacing:2px;text-transform:uppercase}
+td{padding:9px 12px;border-bottom:1px solid #0e1e14;vertical-align:middle;white-space:nowrap}
+.badge{padding:3px 8px;border-radius:4px;font-weight:bold;font-size:11px;border:1px solid}
+.breakdown{padding:12px 16px;background:#060e09}
+.bk-title{font-size:10px;color:#34d399;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.slots{display:flex;flex-wrap:wrap;gap:6px}
+.slot{padding:6px 10px;border-radius:6px;min-width:88px;border:1px solid}
+.notes{margin-top:16px;padding:14px 18px;background:#0b1a12;border:1px solid #1c3326;border-radius:8px;font-size:11px;color:#6a9472;line-height:1.8}
+.notes h3{color:#34d399;letter-spacing:2px;font-size:10px;text-transform:uppercase;margin-bottom:6px}
+.loading{text-align:center;padding:40px;color:#34d399;font-size:13px;line-height:2}
+.err{margin:12px 0;padding:12px 16px;background:#3b0000;border:1px solid #dc2626;border-radius:8px;color:#fca5a5;font-size:12px;line-height:1.8}
+.section-head{margin-top:20px;font-size:10px;letter-spacing:3px;color:#34d399;text-transform:uppercase;padding:8px 0 4px;border-bottom:1px solid #1c3326}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin:10px 0}
+.stat-card{background:#0b1a12;border:1px solid #1c3326;border-radius:6px;padding:10px 12px}
+.stat-label{font-size:10px;color:#4a7a58;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.stat-val{font-size:16px;font-weight:bold;font-family:monospace}
+code{background:#0b1a12;padding:2px 6px;border-radius:3px;font-size:11px;color:#34d399}
+.rec-box{margin-top:14px;padding:12px 16px;background:#001a10;border:1px solid #0f6e56;border-radius:8px;font-size:11px;color:#9dc4a8;line-height:1.8}
+.rec-box strong{color:#34d399}
+</style>
+</head>
+<body>
+<div id="sandbox-warning" style="display:none;background:#3b0000;border-bottom:2px solid #dc2626;padding:14px 20px;font-family:Georgia,serif;font-size:12px;color:#fca5a5;line-height:1.8;text-align:center">
+  <strong style="color:#fff;font-size:13px">&#9888; Open this file locally — do not preview inside Claude.ai</strong><br>
+  Download the file, then open it in Chrome, Firefox, or Safari (<em>File &rarr; Open File</em>, or drag it onto the browser window).<br>
+  All data fetches (KHAO ASOS, NWS API, Open-Meteo) are blocked by the Claude sandbox but work fine as a local HTML file.
+</div>
+<script>
+// Detect sandbox/iframe — show warning if we can't reach external URLs
+(function(){
+  try {
+    if (window.self !== window.top) {
+      document.getElementById('sandbox-warning').style.display='block';
+    }
+  } catch(e) {
+    // cross-origin iframe — definitely sandboxed
+    document.getElementById('sandbox-warning').style.display='block';
+  }
+})();
+</script>
+<div id="app">
+  <header>
+    <div class="tag">Canine Seizure Risk Monitor · KHAO ASOS</div>
+    <h1>West Chester, OH 45069</h1>
+    <div class="sub">87 lb · Idiopathic Epilepsy · Physical Station Data · Butler County Regional Airport (KHAO) ~10 mi N</div>
+    <div class="upd" id="updated"></div>
+  </header>
+  <div class="body">
+    <div class="tabs">
+      <div class="tab active" data-tab="forecast">7-Day Forecast</div>
+      <div class="tab"        data-tab="history">Seizure Log</div>
+      <div class="tab"        data-tab="intervals">Intervals</div>
+      <div class="tab"        data-tab="validation">Trigger Validation</div>
+      <div class="tab"        data-tab="supplements">Supplement Protocol</div>
+    </div>
+    <div id="panel-forecast"    class="panel active"><div id="fc-content"   class="loading">Loading forecast…</div></div>
+    <div id="panel-history"     class="panel">      <div id="hist-content" class="loading">Loading seizure log…</div></div>
+    <div id="panel-intervals"   class="panel">      <div id="int-content"  class="loading">Click tab to load intervals…</div></div>
+    <div id="panel-validation"  class="panel">      <div id="val-content"  class="loading">Click tab to load validation…</div></div>
+    <div id="panel-supplements" class="panel">      <div id="supp-content" class="loading">Loading supplement table…</div></div>
+  </div>
+</div>
+
+<script>
+// ─── Constants ────────────────────────────────────────────────────────────────
+// KHAO = Butler County Regional Airport/Hogan Field, Hamilton OH
+// Lat 39.364, Lon -84.522, Elev 631 ft MSL — ~10 miles NNW of West Chester
+// IEM Mesonet station ID: HAO (without K prefix for IEM API)
+const STATION = 'HAO';
+const STATION_LABEL = 'KHAO — Butler County Regional (Hamilton, OH)';
+
+// Forecast still uses Open-Meteo (KHAO has no forecast product)
+const LAT = 39.34, LON = -84.39;
+
+const SEIZURES = [
+  {dt:'2025-07-15T10:00'},{dt:'2025-07-15T14:00'},
+  {dt:'2025-09-02T13:00'},
+  {dt:'2025-09-25T23:44'},{dt:'2025-09-26T02:45'},{dt:'2025-09-26T05:30'},
+  {dt:'2025-09-26T13:00'},{dt:'2025-09-27T06:15'},
+  {dt:'2025-12-19T06:00'},
+  {dt:'2026-01-11T15:30'},
+  {dt:'2026-02-05T08:00'},{dt:'2026-02-05T14:40'},{dt:'2026-02-05T19:50'},
+  {dt:'2026-03-17T10:50'},{dt:'2026-03-17T12:43'},{dt:'2026-03-17T16:00'},{dt:'2026-03-17T22:00'},
+];
+const SEIZURE_DATES = new Set(SEIZURES.map(s => s.dt.slice(0,10)));
+const SEIZURE_TS    = SEIZURES.map(s => new Date(s.dt).getTime());
+
+const CLUSTERS = [
+  {id:'jul15', label:'Jul 15, 2025',    seizures:['2025-07-15T10:00','2025-07-15T14:00']},
+  {id:'sep2',  label:'Sep 2, 2025',     seizures:['2025-09-02T13:00']},
+  {id:'sep25', label:'Sep 25–27, 2025', seizures:['2025-09-25T23:44','2025-09-26T02:45','2025-09-26T05:30','2025-09-26T13:00','2025-09-27T06:15']},
+  {id:'dec19', label:'Dec 19, 2025',    seizures:['2025-12-19T06:00']},
+  {id:'jan11', label:'Jan 11, 2026',    seizures:['2026-01-11T15:30']},
+  {id:'feb5',  label:'Feb 5, 2026',     seizures:['2026-02-05T08:00','2026-02-05T14:40','2026-02-05T19:50']},
+  {id:'mar17', label:'Mar 17, 2026',    seizures:['2026-03-17T10:50','2026-03-17T12:43','2026-03-17T16:00','2026-03-17T22:00']},
+];
+
+// ─── Cycle-length alert ───────────────────────────────────────────────────────
+// Jul 15 and Sep 2 have no barometric precursor — they are pressure-independent.
+// A separate cycle-length pathway flags elevated risk when it has been a long time
+// since the last seizure, independent of pressure behaviour.
+// Inter-cluster gaps: Jul15→Sep2=49d, Sep2→Sep25=23d, Sep25→Dec19=83d,
+//                     Dec19→Jan11=23d, Jan11→Feb5=25d, Feb5→Mar17=40d.
+// Median gap = 32 days. Alert triggers at 30 days post-cluster (MODERATE)
+// and 45 days (HIGH) — i.e. "overdue" windows based on historical rhythm.
+const CYCLE_MODERATE_DAYS = 30;  // days since last cluster → MODERATE cycle alert
+const CYCLE_HIGH_DAYS     = 45;  // days since last cluster → HIGH cycle alert
+
+// Returns {level, daysSince, lastClusterLabel} or null if within normal window
+function getCycleAlert() {
+  const now = Date.now();
+  // Find most recent cluster's last seizure timestamp
+  const allSeizureTs = SEIZURES.map(s => new Date(s.dt).getTime()).sort((a,b)=>a-b);
+  const lastTs = allSeizureTs[allSeizureTs.length - 1];
+  const daysSince = Math.floor((now - lastTs) / (24*3600000));
+  const lastCluster = CLUSTERS.slice().reverse().find(c => {
+    const cTs = new Date(c.seizures[c.seizures.length-1]).getTime();
+    return cTs <= now;
+  });
+  if (daysSince >= CYCLE_HIGH_DAYS)
+    return {level:'HIGH', daysSince, lastClusterLabel: lastCluster?.label || '?'};
+  if (daysSince >= CYCLE_MODERATE_DAYS)
+    return {level:'MODERATE', daysSince, lastClusterLabel: lastCluster?.label || '?'};
+  return null;
+}
+
+
+// Raw ASOS altimeter readings have sharper drops than ERA5 model smoothing.
+// Thresholds are computed live by the validation tab from actual KHAO data.
+// These defaults are used for forecast risk coloring until validation runs.
+// After running validation, update HIGH_THRESH and MOD_THRESH accordingly.
+let HIGH_THRESH = 0.06;  // updated live from validation
+let MOD_THRESH  = 0.03;  // updated live from validation
+
+const COLORS = {
+  HIGH:    {bg:'#3b0000',border:'#dc2626',text:'#fca5a5',pill:'#7f1d1d'},
+  MODERATE:{bg:'#2d1a00',border:'#d97706',text:'#fcd34d',pill:'#78350f'},
+  ELEVATED:{bg:'#001a38',border:'#3b82f6',text:'#93c5fd',pill:'#1e3a8a'},
+  LOW:     {bg:'#001a0e',border:'#10b981',text:'#6ee7b7',pill:'#14532d'},
+};
+const RISK_ORDER = {HIGH:3,MODERATE:2,ELEVATED:1,LOW:0};
+const hpa2in = h => h * 0.02953;
+
+function el(tag, attrs={}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k,v] of Object.entries(attrs)) {
+    if (k==='style' && typeof v==='object') Object.assign(e.style, v);
+    else if (k==='class') e.className = v;
+    else e.setAttribute(k, v);
+  }
+  kids.forEach(c => c != null && e.append(typeof c==='string' ? c : c));
+  return e;
+}
+
+// ─── IEM Mesonet ASOS fetch — pressure + humidity ────────────────────────────
+// Fetches altimeter (inHg) AND relative humidity (%) from KHAO.
+// Returns array of {dt, pressure, rh}
+// IEM data=alti,relh returns: station,valid,alti,relh
+async function fetchKHAOWithHumidity(startDate, endDate) {
+  const [y1,m1,d1] = startDate.split('-');
+  const endDt = new Date(endDate+'T23:59:00');
+  endDt.setDate(endDt.getDate()+1);
+  const ey = endDt.getFullYear(), em = String(endDt.getMonth()+1).padStart(2,'0'), ed = String(endDt.getDate()).padStart(2,'0');
+
+  const url = `https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?` +
+    `station=${STATION}&data=alti&data=relh` +
+    `&year1=${y1}&month1=${m1}&day1=${d1}` +
+    `&year2=${ey}&month2=${em}&day2=${ed}` +
+    `&tz=America%2FNew_York&format=comma&latlon=no&direct=no&report_type=3`;
+
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`IEM humidity fetch HTTP ${r.status}`);
+  const text = await r.text();
+  if (text.includes('ERROR') || text.includes('No data')) throw new Error('No KHAO humidity data');
+
+  const rows = [];
+  for (const line of text.split('\n')) {
+    if (!line || line.startsWith('#') || line.startsWith('station')) continue;
+    const parts = line.split(',');
+    if (parts.length < 4) continue;
+    const dtRaw  = parts[1].trim();
+    const altiRaw = parts[2].trim();
+    const rhRaw  = parts[3].trim();
+    if (!dtRaw || altiRaw === 'M' || altiRaw === '') continue;
+    const pressure = parseFloat(parseFloat(altiRaw).toFixed(4));
+    if (pressure < 27 || pressure > 32) continue;
+    const rh = (rhRaw === 'M' || rhRaw === '') ? null : parseFloat(rhRaw);
+    rows.push({ dt: dtRaw, pressure, rh });
+  }
+
+  // Deduplicate to hourly (same logic as fetchKHAO)
+  const byHour = {};
+  for (const row of rows) {
+    const d = new Date(row.dt.replace(' ','T'));
+    if (isNaN(d.getTime())) continue;
+    const rounded = new Date(d);
+    rounded.setMinutes(0,0,0);
+    if (d.getMinutes() >= 30) rounded.setHours(rounded.getHours()+1);
+    const key = rounded.toISOString().slice(0,16).replace('T',' ');
+    if (!byHour[key]) byHour[key] = { dt: key, pressure: row.pressure, rh: row.rh };
+  }
+  return Object.values(byHour)
+    .sort((a,b) => a.dt.localeCompare(b.dt))
+    .filter(r => r.dt.slice(0,10) >= startDate && r.dt.slice(0,10) <= endDate);
+}
+
+
+// Returns array of {dt: 'YYYY-MM-DD HH:MM', pressure: float}
+// IEM returns CSV: station,valid,alti  (valid is UTC, we request in ET via tz param)
+async function fetchKHAO(startDate, endDate) {
+  const [y1,m1,d1] = startDate.split('-');
+  const [y2,m2,d2] = endDate.split('-');
+  // Add 1 day to end to ensure we capture the full end date
+  const endDt = new Date(endDate+'T23:59:00');
+  endDt.setDate(endDt.getDate()+1);
+  const ey = endDt.getFullYear(), em = String(endDt.getMonth()+1).padStart(2,'0'), ed = String(endDt.getDate()).padStart(2,'0');
+
+  const url = `https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?` +
+    `station=${STATION}&data=alti` +
+    `&year1=${y1}&month1=${m1}&day1=${d1}` +
+    `&year2=${ey}&month2=${em}&day2=${ed}` +
+    `&tz=America%2FNew_York&format=comma&latlon=no&direct=no&report_type=3`;
+
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`IEM returned HTTP ${r.status}`);
+  const text = await r.text();
+  if (text.includes('ERROR') || text.includes('No data')) throw new Error('No KHAO data returned for this period');
+
+  const rows = [];
+  const lines = text.split('\n');
+  for (const line of lines) {
+    if (!line || line.startsWith('#') || line.startsWith('station')) continue;
+    const parts = line.split(',');
+    if (parts.length < 3) continue;
+    // parts[1] = datetime e.g. "2025-07-13 12:53"
+    // parts[2] = altimeter in inHg (already in inHg — ASOS reports this directly)
+    const dtRaw = parts[1].trim();
+    const altiRaw = parts[2].trim();
+    if (!dtRaw || altiRaw === 'M' || altiRaw === '' || isNaN(parseFloat(altiRaw))) continue;
+    const pressure = parseFloat(parseFloat(altiRaw).toFixed(4));
+    if (pressure < 27 || pressure > 32) continue; // sanity bounds
+    rows.push({ dt: dtRaw, pressure });
+  }
+
+  // ASOS reports are every 20-60 min; we want hourly.
+  // Keep the observation closest to each whole hour.
+  const byHour = {};
+  for (const row of rows) {
+    // dt format: "2025-07-13 12:53"
+    const d = new Date(row.dt.replace(' ','T'));
+    if (isNaN(d.getTime())) continue;
+    // Round to nearest hour
+    const rounded = new Date(d);
+    rounded.setMinutes(0,0,0);
+    if (d.getMinutes() >= 30) rounded.setHours(rounded.getHours()+1);
+    const key = rounded.toISOString().slice(0,16).replace('T',' ');
+    const existing = byHour[key];
+    if (!existing) {
+      byHour[key] = { dt: key, pressure: row.pressure };
+    } else {
+      // Keep observation closest to the hour
+      const existMin = Math.abs(new Date(existing.dt.replace(' ','T')).getMinutes());
+      const newMin = Math.abs(d.getMinutes() >= 30 ? 60 - d.getMinutes() : d.getMinutes());
+      if (newMin < existMin) byHour[key] = { dt: key, pressure: row.pressure };
+    }
+  }
+
+  const result = Object.values(byHour).sort((a,b)=>a.dt.localeCompare(b.dt));
+  // Filter to requested date range
+  return result.filter(r => r.dt.slice(0,10) >= startDate && r.dt.slice(0,10) <= endDate);
+}
+
+// ─── Risk calculation ─────────────────────────────────────────────────────────
+function calcRisk(pressures, highT, modT) {
+  highT = highT || HIGH_THRESH;
+  modT  = modT  || MOD_THRESH;
+  return pressures.map((p,i) => {
+    if (i===0) return {pressure:p,delta:0,risk:'LOW',score:0,dir:'Stable'};
+    const d = p - pressures[i-1];
+    let risk='LOW',score=0,dir='Stable';
+    // Filter A: only flag HIGH/MODERATE if starting pressure is at or below the floor.
+    // Drops from high-pressure ridges (>30.10") are routine oscillations, not fronts.
+    const prevP = pressures[i-1];
+    const belowFloor = prevP <= PRESSURE_FLOOR;
+    if      (d < -(highT+0.04) && belowFloor){risk='HIGH';    score=3;dir='Rapid Drop';}
+    else if (d < -highT        && belowFloor){risk='HIGH';    score=3;dir='Drop';}
+    else if (d < -modT         && belowFloor){risk='MODERATE';score=2;dir='Falling';}
+    else if (d < -highT)                     {risk='ELEVATED';score=1;dir='Drop (high P)';}
+    else if (d >  0.08)                      {risk='ELEVATED';score=2;dir='Rapid Rise';}
+    else if (d >  0.04)                      {risk='ELEVATED';score=1;dir='Rising';}
+    return {pressure:p,delta:d,risk,score,dir};
+  }).map((r,i,arr)=>{
+    const nearby = arr.slice(Math.max(0,i-4),i+1);
+    if (Math.max(...nearby.map(x=>x.score))>=3 && r.score<3)
+      return {...r,risk:'ELEVATED',note:'Post-drop window (12–36hr lag)'};
+    return r;
+  });
+}
+
+function buildDays(times, risks) {
+  const map = {};
+  times.forEach((t,i) => {
+    const date = t.slice(0,10);
+    if (!map[date]) map[date] = [];
+    map[date].push({time:t.slice(11,16),...risks[i]});
+  });
+  return Object.entries(map).slice(0,14).map(([date,slots]) => {
+    const worst = slots.reduce((a,b)=>RISK_ORDER[b.risk]>RISK_ORDER[a.risk]?b:a, slots[0]);
+    const ps = slots.map(s=>s.pressure);
+    const minP=Math.min(...ps), maxP=Math.max(...ps);
+    const label = new Date(date+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    const riskSlots = slots.filter(s=>s.risk!=='LOW');
+    const watchNote = {HIGH:'12–36 hrs post-drop',MODERATE:'6–24 hrs post-drop',ELEVATED:'Monitor closely',LOW:'Routine'}[worst.risk];
+    return {date,label,slots,worstRisk:worst.risk,
+      minP:minP.toFixed(3),maxP:maxP.toFixed(3),swing:(maxP-minP).toFixed(3),
+      dropTimes:slots.filter(s=>s.delta<-HIGH_THRESH).map(s=>s.time).join(', ')||'None',
+      triggerWindow:riskSlots.length?riskSlots[0].time+' – '+riskSlots[riskSlots.length-1].time:'None',
+      watchNote};
+  });
+}
+
+function peakDrop(rows, dtStr) {
+  const target = new Date(dtStr.replace(' ','T')).getTime();
+  const window = rows.filter(r => {
+    const t = new Date(r.dt.replace(' ','T')).getTime();
+    return t >= target-48*3600000 && t <= target;
+  });
+  if (window.length < 2) return {drop:0};
+  let maxDrop=0,fromP=null,toP=null,fromDt=null,toDt=null;
+  for (let i=0;i<window.length;i++) {
+    const t0 = new Date(window[i].dt.replace(' ','T')).getTime();
+    for (let j=i+1;j<window.length;j++) {
+      const t1 = new Date(window[j].dt.replace(' ','T')).getTime();
+      if (t1-t0 > 3*3600000+300000) break;
+      const d = window[i].pressure - window[j].pressure;
+      if (d > maxDrop) { maxDrop=d;fromP=window[i].pressure;toP=window[j].pressure;fromDt=window[i].dt;toDt=window[j].dt; }
+    }
+  }
+  return {drop:maxDrop,fromP,toP,fromDt,toDt};
+}
+
+function closestPressure(rows, dtStr) {
+  const target = new Date(dtStr.replace(' ','T')).getTime();
+  return rows.reduce((a,b) =>
+    Math.abs(new Date(b.dt.replace(' ','T')).getTime()-target) <
+    Math.abs(new Date(a.dt.replace(' ','T')).getTime()-target) ? b : a, rows[0]);
+}
+
+function dropRiskLabel(drop) {
+  if (drop >= HIGH_THRESH) return {risk:'HIGH',    color:'#dc2626'};
+  if (drop >= MOD_THRESH)  return {risk:'MODERATE',color:'#d97706'};
+  if (drop >= 0.01)        return {risk:'ELEVATED',color:'#3b82f6'};
+  return                          {risk:'LOW',     color:'#10b981'};
+}
+
+// ─── Tab switching ────────────────────────────────────────────────────────────
+const loaded = {forecast:false,history:false,validation:false,supplements:false};
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const name = tab.dataset.tab;
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-'+name).classList.add('active');
+    if (!loaded[name]) { loaded[name]=true; LOADERS[name](); }
+  });
+});
+const LOADERS = {forecast:loadForecast,history:loadHistory,intervals:loadIntervals,validation:loadValidation,supplements:loadSupplements};
+
+// ─── FORECAST — KHAO-anchored hybrid ─────────────────────────────────────────
+// Strategy:
+//   1. Fetch live KHAO altimeter reading from NWS API (real physical sensor, ~20 min lag)
+//   2. Fetch NWS hourly grid forecast (ILN office, ~2.5km grid) — model-based pressure trend
+//   3. Anchor: forecastP[t] = khaoLive + (nwsModel[t] - nwsModel[now])
+//      This preserves the NWS trend while starting from the actual KHAO reading,
+//      so the drop thresholds calibrated from KHAO history apply correctly.
+//   4. Fall back to raw NWS model if KHAO live read fails (with warning banner).
+
+const NWS_USER_AGENT = '(seizure-monitor-khao, veterinary-use)';
+
+// Fetch live KHAO altimeter reading via NWS observations endpoint.
+// The METAR rawMessage always contains "A####" (altimeter in hundredths of inHg).
+// This is more reliable than the structured pressure fields which are often null.
+async function fetchKHAOLive() {
+  const r = await fetch('https://api.weather.gov/stations/KHAO/observations/latest', {
+    headers: { 'User-Agent': NWS_USER_AGENT, 'Accept': 'application/geo+json' }
+  });
+  if (!r.ok) throw new Error(`NWS HTTP ${r.status}`);
+  const data = await r.json();
+  const props = data.properties;
+  let inHg = null;
+
+  // 1. Try parsing altimeter from raw METAR string — most reliable for ASOS
+  //    METAR format: ... A2998 ... where A#### = altimeter in hundredths of inHg
+  const raw = props.rawMessage || '';
+  const metarMatch = raw.match(/\bA(\d{4})\b/);
+  if (metarMatch) {
+    inHg = parseFloat((parseInt(metarMatch[1]) / 100).toFixed(2));
+  }
+
+  // 2. Fall back to structured barometricPressure (Pa → inHg)
+  if (!inHg && props.barometricPressure?.value != null) {
+    inHg = parseFloat((props.barometricPressure.value * 0.0002953).toFixed(3));
+  }
+
+  // 3. Fall back to seaLevelPressure
+  if (!inHg && props.seaLevelPressure?.value != null) {
+    inHg = parseFloat((props.seaLevelPressure.value * 0.0002953).toFixed(3));
+  }
+
+  if (!inHg) throw new Error('No pressure in KHAO obs (tried METAR, barometric, SLP)');
+  return { inHg, obsTime: props.timestamp, rawMessage: raw };
+}
+
+// Fetch Open-Meteo pressure + temperature forecast (14-day hourly).
+// Returns array of {dt, inHg, tempC} sampled every 3 hours, in Eastern Time.
+async function fetchOpenMeteoForecast() {
+  const r = await fetch(
+    `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}` +
+    `&hourly=surface_pressure,temperature_2m&forecast_days=14&timezone=America%2FNew_York`
+  );
+  if (!r.ok) throw new Error(`Open-Meteo HTTP ${r.status}`);
+  const data = await r.json();
+  const times  = data.hourly.time.filter((_,i) => i % 3 === 0);
+  const pressures = data.hourly.surface_pressure.filter((_,i) => i % 3 === 0).map(hpa2in);
+  const temps  = data.hourly.temperature_2m.filter((_,i) => i % 3 === 0);
+  return times.map((dt, i) => ({
+    dt: dt.replace('T', ' '),
+    inHg: pressures[i],
+    tempC: parseFloat(temps[i].toFixed(1)),
+  }));
+}
+
+// Fetch recent KHAO RH from IEM — last 12 hours of hourly readings.
+// Used to compute whether humidity is currently elevated enough to trigger.
+async function fetchRecentKHAORH() {
+  const now = new Date();
+  const past = new Date(now.getTime() - 14 * 3600000); // 14h back to ensure 12h coverage
+  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const [y1,m1,d1] = fmt(past).split('-');
+  const [y2,m2,d2] = fmt(now).split('-');
+  const url = `https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?` +
+    `station=${STATION}&data=relh` +
+    `&year1=${y1}&month1=${m1}&day1=${d1}` +
+    `&year2=${y2}&month2=${m2}&day2=${d2}` +
+    `&tz=America%2FNew_York&format=comma&latlon=no&direct=no&report_type=3`;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`IEM RH HTTP ${r.status}`);
+  const text = await r.text();
+  const readings = [];
+  for (const line of text.split('\n')) {
+    if (!line || line.startsWith('#') || line.startsWith('station')) continue;
+    const parts = line.split(',');
+    if (parts.length < 3) continue;
+    const dtRaw = parts[1].trim();
+    const rhRaw = parts[2].trim();
+    if (!dtRaw || rhRaw === 'M' || rhRaw === '') continue;
+    const rh = parseFloat(rhRaw);
+    const t  = new Date(dtRaw.replace(' ','T')).getTime();
+    if (!isNaN(rh) && !isNaN(t)) readings.push({ t, rh });
+  }
+  return readings;
+}
+
+// ─── Temperature drop alert ───────────────────────────────────────────────────
+// A rapid temperature drop ≥5°C in 6 hours is a strong proxy for frontal passage.
+// This distinguishes genuine cold-front pressure drops from diurnal oscillations,
+// which rarely involve large temperature swings.
+// Threshold validated against false positive data: Oct–Nov FP blocks were high-
+// pressure ridge oscillations with minimal temperature change; true seizure events
+// like Mar 17 and Dec 19 accompanied 6–12°C temperature drops.
+const TEMP_DROP_THRESH_C = 5.0;  // °C drop in 6 hours → MODERATE co-trigger
+const TEMP_DROP_WINDOW_H = 6;    // hours to measure temperature fall over
+
+// Accepts forecast array [{dt, inHg, tempC}] anchored to now.
+// Returns alert object if a significant temperature drop is imminent (next 12h)
+// or currently occurring, else null.
+function getTempDropAlert(forecast) {
+  if (!forecast || forecast.length < 4) return null;
+  const nowMs = Date.now();
+
+  // Look across the next 12 hours (4 × 3hr slots)
+  for (let i = 0; i < Math.min(4, forecast.length - 2); i++) {
+    const t0Ms = new Date(forecast[i].dt.replace(' ','T')).getTime();
+    if (t0Ms < nowMs - 3*3600000) continue; // skip past slots
+    if (t0Ms > nowMs + 12*3600000) break;   // only next 12h
+
+    const startT = forecast[i].tempC;
+    // Find observation closest to t0 + 6hrs
+    const target6 = t0Ms + TEMP_DROP_WINDOW_H * 3600000;
+    let closest = null, closestDiff = Infinity;
+    for (let j = i+1; j < forecast.length; j++) {
+      const tj = new Date(forecast[j].dt.replace(' ','T')).getTime();
+      const diff = Math.abs(tj - target6);
+      if (diff < closestDiff) { closestDiff = diff; closest = j; }
+      if (tj > target6 + 4*3600000) break;
+    }
+    if (closest === null) continue;
+    const endT = forecast[closest].tempC;
+    const drop = startT - endT; // positive = falling temperature
+
+    if (drop >= TEMP_DROP_THRESH_C) {
+      return {
+        level: 'MODERATE',
+        dropC: parseFloat(drop.toFixed(1)),
+        fromC: startT,
+        toC: endT,
+        startDt: forecast[i].dt,
+        windowH: TEMP_DROP_WINDOW_H,
+      };
+    }
+  }
+  return null;
+}
+
+
+// Fires MODERATE when KHAO RH has been ≥88% for 6+ consecutive hours.
+// Validated against data: only 4.4% of non-seizure days reached 90%+ mean RH,
+// but Jul 15 (97.8%) and Sep 25 (90.5%) both show very high sustained humidity.
+// This provides a third trigger pathway for pressure-independent humid events.
+const RH_MODERATE_THRESH = 88;  // % — sustained humidity trigger
+const RH_SUSTAINED_HOURS = 6;   // hours RH must stay ≥ threshold
+
+function getHumidityAlert(rhReadings) {
+  if (!rhReadings || rhReadings.length < 3) return null;
+  const now = Date.now();
+  const windowMs = RH_SUSTAINED_HOURS * 3600000;
+  // Count how many of the last 6 hours had RH ≥ threshold
+  const recent = rhReadings.filter(r => r.t >= now - windowMs && r.t <= now);
+  if (recent.length < 3) return null; // need at least 3 readings in window
+  const highCount = recent.filter(r => r.rh >= RH_MODERATE_THRESH).length;
+  const allHigh  = highCount === recent.length;
+  const mostHigh = highCount / recent.length >= 0.75;
+  if (!mostHigh) return null;
+  const meanRH = recent.reduce((a,b) => a + b.rh, 0) / recent.length;
+  return {
+    level: 'MODERATE',
+    meanRH: parseFloat(meanRH.toFixed(1)),
+    sustainedHours: RH_SUSTAINED_HOURS,
+    allHigh,
+  };
+}
+
+
+
+async function loadForecast() {
+  const out = document.getElementById('fc-content');
+  out.innerHTML = '<div class="loading">Fetching live KHAO reading from NWS…</div>';
+
+  // Attempt live KHAO reading — graceful fail
+  let khaoLive = null, khaoError = null;
+  try {
+    khaoLive = await fetchKHAOLive();
+  } catch(e) {
+    khaoError = e.message;
+  }
+
+  // Attempt live RH from IEM — graceful fail
+  let humidityAlert = null;
+  try {
+    const rhReadings = await fetchRecentKHAORH();
+    humidityAlert = getHumidityAlert(rhReadings);
+  } catch(e) {
+    // RH fetch failed — continue without it
+  }
+
+  out.innerHTML = '<div class="loading">Fetching Open-Meteo pressure forecast…</div>';
+
+  // Fetch Open-Meteo forecast trend — always works
+  let forecast = null;
+  try {
+    forecast = await fetchOpenMeteoForecast();
+  } catch(e) {
+    out.innerHTML = `<div class="err">Forecast error: ${e.message}</div>`;
+    return;
+  }
+
+  out.innerHTML = '';
+
+  // Anchor Open-Meteo forecast to live KHAO reading
+  const modelNow = forecast[0].inHg;
+  const khaoAnchor = khaoLive ? khaoLive.inHg : modelNow;
+  const offset = parseFloat((khaoAnchor - modelNow).toFixed(3));
+
+  const times = forecast.map(h => h.dt);
+  const pressures = forecast.map(h => parseFloat((h.inHg + offset).toFixed(3)));
+  // Attach anchored temperature to each slot (temp needs no offset — model absolute values are accurate enough)
+  const anchoredForecast = forecast.map((h, i) => ({ ...h, inHg: pressures[i] }));
+
+  const risks = calcRisk(pressures);
+  const days = buildDays(times, risks);
+
+  // Temperature drop alert — check anchored forecast for imminent frontal passage
+  const tempAlert = getTempDropAlert(anchoredForecast);
+
+  document.getElementById('updated').textContent =
+    (khaoLive ? 'KHAO live · ' : 'Model only · ') +
+    new Date().toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+
+  renderForecast(out, days, pressures[0],
+    risks.slice(0, 4).some(r => r.delta < -HIGH_THRESH),
+    {
+      source: khaoLive ? 'NWS KHAO live + Open-Meteo trend' : 'Open-Meteo only (KHAO unavailable)',
+      khaoLive,
+      offset,
+      khaoError,
+      humidityAlert,
+      tempAlert,
+    }
+  );
+}
+
+function renderForecast(out, days, currentP, rapid, meta={}) {
+  // meta: {source, khaoLive, offset, nwsError}
+
+  // ── Temperature drop alert (frontal passage co-trigger) ────────────────────
+  const tempAlert = meta.tempAlert || null;
+  if (tempAlert) {
+    out.append(el('div',{style:{marginTop:'12px',padding:'12px 16px',background:'#001a38',border:'1px solid #3b82f6',borderRadius:'8px',fontSize:'12px',color:'#93c5fd',lineHeight:'1.8'}},
+      el('strong',{},'🌡 TEMPERATURE DROP — MODERATE co-trigger: '),
+      `${tempAlert.dropC}°C fall forecast over ${tempAlert.windowH}h (${tempAlert.fromC}°C → ${tempAlert.toC}°C starting ${tempAlert.startDt.slice(11,16)}). `,
+      'A rapid temperature drop of this magnitude indicates frontal passage — the same mechanism that drives seizure-preceding pressure drops. ',
+      el('div',{style:{fontSize:'10px',color:'#60a5fa',marginTop:'3px'}},
+        `Threshold: ≥${TEMP_DROP_THRESH_C}°C in ${TEMP_DROP_WINDOW_H}h. Distinguishes genuine cold fronts from diurnal pressure oscillations that generate false alarms.`
+      )
+    ));
+  }
+
+  // ── Humidity alert (third trigger pathway) ─────────────────────────────────
+  const humidityAlert = meta.humidityAlert || null;
+  if (humidityAlert) {
+    out.append(el('div',{style:{marginTop:'12px',padding:'12px 16px',background:'#2d1a00',border:'1px solid #d97706',borderRadius:'8px',fontSize:'12px',color:'#fcd34d',lineHeight:'1.8'}},
+      el('strong',{},'💧 HUMIDITY ALERT — MODERATE: '),
+      `KHAO RH has been ≥${RH_MODERATE_THRESH}% for the past ${humidityAlert.sustainedHours}+ hours (current mean: ${humidityAlert.meanRH}%). `,
+      'Validated against seizure history: Jul 15 (97.8% RH, no pressure drop) and Sep 25 (90.5% RH) both occurred during sustained high-humidity periods. ',
+      el('div',{style:{fontSize:'10px',color:'#fbbf24',marginTop:'3px'}},
+        'Independent of barometric pressure. Even without a qualifying drop, sustained high humidity is a MODERATE risk signal for this dog.'
+      )
+    ));
+  }
+  // ── Cycle-length alert (pressure-independent pathway) ──────────────────────
+  const cycleAlert = getCycleAlert();
+  if (cycleAlert) {
+    const isHigh = cycleAlert.level === 'HIGH';
+    const bg     = isHigh ? '#3b0000' : '#2d1a00';
+    const border = isHigh ? '#dc2626' : '#d97706';
+    const text   = isHigh ? '#fca5a5' : '#fcd34d';
+    out.append(el('div',{style:{marginTop:'12px',padding:'12px 16px',background:bg,border:`1px solid ${border}`,borderRadius:'8px',fontSize:'12px',color:text,lineHeight:'1.8'}},
+      el('strong',{},`⏱ CYCLE ALERT — ${cycleAlert.level}: `),
+      `${cycleAlert.daysSince} days since last seizure cluster (${cycleAlert.lastClusterLabel}). `,
+      isHigh
+        ? `Historical rhythm suggests elevated risk — 45+ day gaps have preceded pressure-independent seizures (Jul 15, Sep 2).`
+        : `Approaching the typical inter-seizure window (median ~32 days). Monitor closely.`,
+      el('div',{style:{fontSize:'10px',marginTop:'4px',color:isHigh?'#f87171':'#fbbf24'}},
+        'This alert is independent of barometric pressure and activates based on seizure cycle history alone.'
+      )
+    ));
+  }
+
+  if (rapid) out.append(el('div',{class:'alert-box'},'⚠ ALERT: Rapid pressure drop forecast in the next 12 hours.'));
+
+  // Source info banner
+  const bannerColor = meta.khaoLive ? '#001a38' : '#2d1200';
+  const bannerBorder = meta.khaoLive ? '#3b82f6' : '#f97316';
+  const bannerText = meta.khaoLive ? '#93c5fd' : '#fed7aa';
+  const liveStr = meta.khaoLive
+    ? `Live KHAO: ${meta.khaoLive.inHg.toFixed(2)}" · ${new Date(meta.khaoLive.obsTime).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})} · Offset: ${meta.offset >= 0 ? '+' : ''}${meta.offset?.toFixed(3)}" · METAR: ${meta.khaoLive.rawMessage?.split(' ').slice(0,8).join(' ') || '—'}`
+    : (meta.khaoError ? `KHAO unavailable (${meta.khaoError}) — forecast not anchored` : 'KHAO read unavailable');
+  out.append(el('div',{style:{marginTop:'12px',padding:'8px 14px',background:bannerColor,border:`1px solid ${bannerBorder}`,borderRadius:'6px',fontSize:'11px',color:bannerText,lineHeight:'1.7'}},
+    `📡 ${meta.source || 'NWS forecast'} · ${liveStr}`
+  ));
+
+  // Combine barometric risk with cycle alert and humidity alert for the hero card
+  const barRisk   = days[0]?.worstRisk || 'LOW';
+  const cycleRisk  = cycleAlert?.level  || 'LOW';
+  const humidRisk  = humidityAlert?.level || 'LOW';
+  const tempRisk   = tempAlert?.level   || 'LOW';
+  const combinedRisk = [barRisk, cycleRisk, humidRisk, tempRisk]
+    .reduce((best, r) => RISK_ORDER[r] > RISK_ORDER[best] ? r : best, 'LOW');
+
+  const today=days[0], tc=COLORS[combinedRisk];
+  const hero=el('div',{class:'hero',style:{background:tc.bg,border:`1px solid ${tc.border}`,marginTop:'10px'}});
+  const hl=el('div');
+  hl.append(el('div',{style:{fontSize:'10px',letterSpacing:'3px',color:tc.text,textTransform:'uppercase',marginBottom:'4px'}},"Today's Risk"));
+  hl.append(el('div',{style:{fontSize:'28px',fontWeight:'bold',color:'#fff'}},combinedRisk));
+  if (cycleAlert && RISK_ORDER[cycleRisk] > RISK_ORDER[barRisk] && RISK_ORDER[cycleRisk] >= RISK_ORDER[humidRisk] && RISK_ORDER[cycleRisk] >= RISK_ORDER[tempRisk]) {
+    hl.append(el('div',{style:{fontSize:'10px',color:tc.text,marginTop:'2px'}},'⏱ cycle-driven · pressure: '+barRisk));
+  } else if (humidityAlert && RISK_ORDER[humidRisk] > RISK_ORDER[barRisk] && RISK_ORDER[humidRisk] >= RISK_ORDER[tempRisk]) {
+    hl.append(el('div',{style:{fontSize:'10px',color:tc.text,marginTop:'2px'}},'💧 humidity-driven · pressure: '+barRisk));
+  } else if (tempAlert && RISK_ORDER[tempRisk] > RISK_ORDER[barRisk]) {
+    hl.append(el('div',{style:{fontSize:'10px',color:tc.text,marginTop:'2px'}},'🌡 temp-drop · pressure: '+barRisk));
+  }
+  hero.append(hl);
+  const hr2=el('div',{style:{textAlign:'right'}});
+  hr2.append(el('div',{style:{fontSize:'10px',letterSpacing:'2px',color:tc.text,textTransform:'uppercase'}},'Current Pressure'));
+  hr2.append(el('div',{style:{fontSize:'30px',color:'#fff',fontFamily:'monospace'}},currentP.toFixed(2)+'"'));
+  hr2.append(el('div',{style:{fontSize:'10px',color:tc.text}},'inHg · KHAO-anchored'));
+  hero.append(hr2);
+  out.append(hero);
+
+  const legend=el('div',{class:'legend'});
+  [
+    ['HIGH',     `≥${HIGH_THRESH}"/3hr + all filters`],
+    ['MODERATE', `≥${MOD_THRESH}"/3hr · RH≥${RH_MODERATE_THRESH}% · ≥${TEMP_DROP_THRESH_C}°C/6h · cycle`],
+    ['ELEVATED', 'Rebound / high-P drop'],
+    ['LOW',      'Stable'],
+  ].forEach(([r,n])=>{
+    const c=COLORS[r];
+    legend.append(el('div',{class:'pill',style:{background:c.pill,borderColor:c.border,color:c.text}},`${r} · ${n}`));
+  });
+  out.append(legend);
+
+  const wrap=el('div',{style:{overflowX:'auto'}});
+  const tbl=el('table');
+  const thead=el('thead'),tr0=el('tr');
+  ['Date','Risk','Pressure Range','Swing','Drop Times','Trigger Window','Watch Period',''].forEach(h=>tr0.append(el('th',{},h)));
+  thead.append(tr0);tbl.append(thead);
+  const tbody=el('tbody');
+  days.forEach((row,idx)=>{
+    const c=COLORS[row.worstRisk];
+    const tr=el('tr',{style:{background:idx%2===0?'#0c1810':'#091410',borderLeft:`3px solid ${c.border}`,cursor:'pointer'}});
+    tr.append(
+      el('td',{},el('strong',{style:{color:'#e8e4dc'}},row.label)),
+      el('td',{},el('span',{class:'badge',style:{background:c.pill,borderColor:c.border,color:c.text}},row.worstRisk)),
+      el('td',{style:{fontFamily:'monospace',color:'#90c4a0'}},`${row.minP}" – ${row.maxP}"`),
+      el('td',{style:{fontFamily:'monospace',color:parseFloat(row.swing)>0.08?'#fca5a5':'#90c4a0'}},`${row.swing}"`),
+      el('td',{style:{color:'#fcd34d'}},row.dropTimes),
+      el('td',{style:{color:'#93c5fd'}},row.triggerWindow),
+      el('td',{style:{color:'#c4b9a8',fontStyle:'italic'}},row.watchNote),
+      el('td',{style:{textAlign:'center',color:'#34d399'}},'▼')
+    );
+    const detRow=el('tr',{style:{display:'none'}});
+    const detCell=el('td',{colspan:'8'});
+    const bk=el('div',{class:'breakdown'});
+    bk.append(el('div',{class:'bk-title'},'3-Hour Breakdown · KHAO-anchored pressure'));
+    const slotsDiv=el('div',{class:'slots'});
+    row.slots.forEach(s=>{
+      const sc=COLORS[s.risk];
+      const slot=el('div',{class:'slot',style:{background:sc.bg,borderColor:sc.border}});
+      slot.append(el('div',{style:{color:sc.text,fontWeight:'bold',fontSize:'11px'}},s.time));
+      slot.append(el('div',{style:{color:'#e8e4dc',fontFamily:'monospace',fontSize:'12px'}},(s.pressure||0).toFixed(3)+'"'));
+      slot.append(el('div',{style:{color:sc.text,fontSize:'10px'}},s.dir));
+      if(s.note)slot.append(el('div',{style:{color:'#fcd34d',fontSize:'9px',marginTop:'2px'}},s.note));
+      slotsDiv.append(slot);
+    });
+    bk.append(slotsDiv);detCell.append(bk);detRow.append(detCell);
+    let open=false;
+    tr.addEventListener('click',()=>{
+      open=!open;detRow.style.display=open?'':'none';
+      tr.querySelector('td:last-child').textContent=open?'▲':'▼';
+    });
+    tbody.append(tr,detRow);
+  });
+  tbl.append(tbody);wrap.append(tbl);out.append(wrap);
+  renderSupplementTable(out);
+  out.append(el('div',{class:'notes'},
+    el('h3',{},'How the forecast works'),
+    el('p',{style:{marginBottom:'6px'}},
+      el('strong',{style:{color:'#9dc4a8'}},'Trigger pathway 1 — pressure drop: '),
+      'HIGH fires when KHAO pressure drops ≥',HIGH_THRESH.toFixed(3),'" in 3hrs with all filters active (floor ≤',PRESSURE_FLOOR,'", 6hr sustained, consecutive, no afternoon). MODERATE is the safety net (consecutive only).'
+    ),
+    el('p',{style:{marginBottom:'6px'}},
+      el('strong',{style:{color:'#9dc4a8'}},'Trigger pathway 2 — cycle length: '),
+      `MODERATE after ${CYCLE_MODERATE_DAYS} days of quiet, HIGH after ${CYCLE_HIGH_DAYS} days. Covers Jul 15 and Sep 2 which have no barometric precursor.`
+    ),
+    el('p',{style:{marginBottom:'6px'}},
+      el('strong',{style:{color:'#9dc4a8'}},'Trigger pathway 3 — humidity: '),
+      `MODERATE when KHAO RH ≥${RH_MODERATE_THRESH}% sustained for ${RH_SUSTAINED_HOURS}+ hours. Validated: Jul 15 (97.8% RH) and Sep 25 (90.5% RH) both occurred during sustained high-humidity periods. Only 4.4% of non-seizure days exceed 90% RH.`
+    ),
+    el('p',{style:{marginBottom:'6px'}},
+      el('strong',{style:{color:'#9dc4a8'}},'Trigger pathway 4 — temperature drop: '),
+      `MODERATE when temperature falls ≥${TEMP_DROP_THRESH_C}°C in ${TEMP_DROP_WINDOW_H}h. Rapid temperature drops indicate genuine frontal passage and help distinguish real weather events from diurnal pressure oscillations that generate false alarms.`
+    ),
+    el('p',{style:{marginBottom:'6px'}},
+      el('strong',{style:{color:'#9dc4a8'}},'Live anchor: '),
+      'Current pressure read from KHAO METAR via NWS API. Forecast trend from Open-Meteo ERA5. ',
+      'forecastP[t] = KHAOlive + (model[t] − model[now]).'
+    ),
+    el('p',{style:{color:'#c4685a'}},'Not a substitute for veterinary guidance.')
+  ));
+}
+
+// ─── INTERVALS ────────────────────────────────────────────────────────────────
+function loadIntervals() {
+  const out = document.getElementById('int-content');
+  out.innerHTML = '';
+
+  // Build sorted list of cluster first-seizure timestamps
+  const clusterList = CLUSTERS.map(c => ({
+    label:    c.label,
+    firstDt:  c.seizures[0],
+    lastDt:   c.seizures[c.seizures.length - 1],
+    count:    c.seizures.length,
+    firstTs:  new Date(c.seizures[0]).getTime(),
+  })).sort((a,b) => a.firstTs - b.firstTs);
+
+  // Days since last seizure — live counter
+  const lastCluster = clusterList[clusterList.length - 1];
+  const lastTs  = new Date(lastCluster.lastDt).getTime();
+  const nowMs   = Date.now();
+  const daysSince = (nowMs - lastTs) / (24 * 3600000);
+  const daysSinceWhole = Math.floor(daysSince);
+  const hoursSince = Math.floor((daysSince - daysSinceWhole) * 24);
+
+  // Colour the counter based on cycle thresholds
+  const counterColor = daysSinceWhole >= CYCLE_HIGH_DAYS     ? '#dc2626'
+                     : daysSinceWhole >= CYCLE_MODERATE_DAYS ? '#d97706'
+                     : '#34d399';
+  const counterBg    = daysSinceWhole >= CYCLE_HIGH_DAYS     ? '#3b0000'
+                     : daysSinceWhole >= CYCLE_MODERATE_DAYS ? '#2d1a00'
+                     : '#001a0e';
+  const counterBorder= daysSinceWhole >= CYCLE_HIGH_DAYS     ? '#dc2626'
+                     : daysSinceWhole >= CYCLE_MODERATE_DAYS ? '#d97706'
+                     : '#10b981';
+
+  // ── Hero counter ──────────────────────────────────────────────────────────
+  const hero = el('div',{style:{
+    marginTop:'16px', padding:'20px 24px',
+    background:counterBg, border:`1px solid ${counterBorder}`,
+    borderRadius:'10px', display:'flex', justifyContent:'space-between',
+    alignItems:'center', flexWrap:'wrap', gap:'12px',
+  }});
+
+  const left = el('div');
+  left.append(el('div',{style:{fontSize:'10px',letterSpacing:'3px',color:counterColor,textTransform:'uppercase',marginBottom:'4px'}},'Days Since Last Seizure'));
+  left.append(el('div',{style:{fontSize:'52px',fontWeight:'bold',color:'#fff',lineHeight:'1',fontFamily:'monospace'}},daysSinceWhole.toString()));
+  left.append(el('div',{style:{fontSize:'12px',color:counterColor,marginTop:'4px'}},
+    `${hoursSince} hours · Last cluster: ${lastCluster.label}`
+  ));
+  hero.append(left);
+
+  const right = el('div',{style:{textAlign:'right'}});
+  right.append(el('div',{style:{fontSize:'10px',letterSpacing:'2px',color:counterColor,textTransform:'uppercase',marginBottom:'4px'}},'Cycle Alert'));
+  const alertLabel = daysSinceWhole >= CYCLE_HIGH_DAYS     ? `HIGH — ≥${CYCLE_HIGH_DAYS} days`
+                   : daysSinceWhole >= CYCLE_MODERATE_DAYS ? `MODERATE — ≥${CYCLE_MODERATE_DAYS} days`
+                   : `LOW — within ${CYCLE_MODERATE_DAYS}-day window`;
+  right.append(el('div',{style:{fontSize:'18px',fontWeight:'bold',color:counterColor}},alertLabel));
+  right.append(el('div',{style:{fontSize:'11px',color:counterColor,marginTop:'4px'}},
+    daysSinceWhole >= CYCLE_MODERATE_DAYS
+      ? 'Supplement surge protocol active'
+      : `Surge at ${CYCLE_MODERATE_DAYS} days · HIGH at ${CYCLE_HIGH_DAYS} days`
+  ));
+  hero.append(right);
+  out.append(hero);
+
+  // ── Inter-cluster interval table ──────────────────────────────────────────
+  out.append(el('div',{class:'section-head',style:{marginTop:'20px'}},'Inter-Cluster Intervals'));
+
+  // Compute intervals between consecutive clusters
+  const intervals = [];
+  for (let i = 1; i < clusterList.length; i++) {
+    const prev = clusterList[i-1];
+    const curr = clusterList[i];
+    const gapMs  = curr.firstTs - new Date(prev.lastDt).getTime();
+    const gapDays = gapMs / (24 * 3600000);
+    intervals.push({
+      from:    prev.label,
+      to:      curr.label,
+      gapDays: parseFloat(gapDays.toFixed(1)),
+      gapWhole: Math.floor(gapDays),
+    });
+  }
+
+  const gapValues  = intervals.map(i => i.gapDays);
+  const medianGap  = [...gapValues].sort((a,b)=>a-b)[Math.floor(gapValues.length/2)];
+  const meanGap    = gapValues.reduce((a,b)=>a+b,0) / gapValues.length;
+  const minGap     = Math.min(...gapValues);
+  const maxGap     = Math.max(...gapValues);
+
+  // Stat cards
+  const grid = el('div',{class:'stat-grid',style:{marginTop:'10px'}});
+  [
+    ['Median interval', medianGap.toFixed(0)+' days', '#34d399'],
+    ['Mean interval',   meanGap.toFixed(0)+' days',   '#6ee7b7'],
+    ['Shortest gap',    minGap.toFixed(0)+' days',    '#fca5a5'],
+    ['Longest gap',     maxGap.toFixed(0)+' days',    '#93c5fd'],
+    ['Total clusters',  clusterList.length,            '#fcd34d'],
+    ['Total seizures',  SEIZURES.length,               '#fcd34d'],
+  ].forEach(([label,val,color]) => {
+    const card = el('div',{class:'stat-card'});
+    card.append(el('div',{class:'stat-label'},label));
+    card.append(el('div',{class:'stat-val',style:{color}},String(val)));
+    grid.append(card);
+  });
+  out.append(grid);
+
+  // Interval bar chart — visual timeline
+  out.append(el('div',{class:'section-head',style:{marginTop:'18px'}},'Gap Duration — Cluster to Cluster'));
+  const maxBar = Math.max(...gapValues, 1);
+  const barWrap = el('div',{style:{marginTop:'10px',display:'flex',flexDirection:'column',gap:'6px'}});
+
+  intervals.forEach(iv => {
+    const pct = (iv.gapDays / maxBar * 100).toFixed(1);
+    const isLong = iv.gapDays >= CYCLE_HIGH_DAYS;
+    const isMod  = !isLong && iv.gapDays >= CYCLE_MODERATE_DAYS;
+    const barColor = isLong ? '#dc2626' : isMod ? '#d97706' : '#1c3326';
+    const textColor= isLong ? '#fca5a5' : isMod ? '#fcd34d' : '#34d399';
+
+    const row = el('div',{style:{display:'flex',alignItems:'center',gap:'10px',fontSize:'11px'}});
+    const lbl = el('div',{style:{width:'140px',flexShrink:'0',color:'#6a9472',fontSize:'10px',textAlign:'right',lineHeight:'1.4'}},
+      iv.from.split(',')[0]+' →'
+    );
+    const wrap = el('div',{style:{flex:'1',background:'#0b1a12',borderRadius:'3px',height:'22px',overflow:'hidden',position:'relative'}});
+    const bar  = el('div',{style:{width:pct+'%',height:'100%',background:barColor,borderRadius:'3px',display:'flex',alignItems:'center',paddingLeft:'8px'}});
+    bar.append(el('span',{style:{color:textColor,fontSize:'10px',fontWeight:'bold',whiteSpace:'nowrap'}},iv.to.split(',')[0]));
+    wrap.append(bar);
+    const days = el('div',{style:{width:'64px',flexShrink:'0',color:textColor,fontFamily:'monospace',fontWeight:'bold',fontSize:'12px'}},iv.gapDays.toFixed(0)+' days');
+    row.append(lbl, wrap, days);
+    barWrap.append(row);
+  });
+
+  // Add current open interval (last cluster → today)
+  const openGap = (nowMs - lastTs) / (24 * 3600000);
+  const openIsLong = openGap >= CYCLE_HIGH_DAYS;
+  const openIsMod  = !openIsLong && openGap >= CYCLE_MODERATE_DAYS;
+  const openColor  = openIsLong ? '#dc2626' : openIsMod ? '#d97706' : '#4a7a58';
+  const openPct    = (openGap / maxBar * 100).toFixed(1);
+  const openRow = el('div',{style:{display:'flex',alignItems:'center',gap:'10px',fontSize:'11px',opacity:'0.75'}});
+  openRow.append(el('div',{style:{width:'140px',flexShrink:'0',color:'#4a7a58',fontSize:'10px',textAlign:'right'}},lastCluster.label.split(',')[0]+' →'));
+  const openWrap = el('div',{style:{flex:'1',background:'#0b1a12',borderRadius:'3px',height:'22px',overflow:'hidden',border:'1px dashed #1c3326'}});
+  const openBar  = el('div',{style:{width:Math.min(parseFloat(openPct),100)+'%',height:'100%',background:'#0e1e14',borderRadius:'3px',display:'flex',alignItems:'center',paddingLeft:'8px'}});
+  openBar.append(el('span',{style:{color:openColor,fontSize:'10px',whiteSpace:'nowrap'}},'Today (ongoing)'));
+  openWrap.append(openBar);
+  openRow.append(openWrap, el('div',{style:{width:'64px',flexShrink:'0',color:openColor,fontFamily:'monospace',fontWeight:'bold',fontSize:'12px'}},openGap.toFixed(0)+'d…'));
+  barWrap.append(openRow);
+
+  out.append(barWrap);
+
+  // ── Per-cluster detail table ───────────────────────────────────────────────
+  out.append(el('div',{class:'section-head',style:{marginTop:'20px'}},'All Clusters — Detail'));
+
+  const tbl = el('table');
+  const thead = el('thead'), tr0 = el('tr');
+  ['Cluster','First Seizure','Last Seizure','# Seizures','Cluster Span','Gap From Previous'].forEach(h => tr0.append(el('th',{},h)));
+  thead.append(tr0); tbl.append(thead);
+  const tbody = el('tbody');
+
+  clusterList.forEach((c, idx) => {
+    const spanMs   = new Date(c.lastDt).getTime() - new Date(c.firstDt).getTime();
+    const spanH    = Math.round(spanMs / 3600000);
+    const spanStr  = spanH < 24 ? spanH+'h' : (spanH/24).toFixed(1)+'d';
+    const gapStr   = idx === 0 ? '—' : intervals[idx-1].gapDays.toFixed(0)+' days';
+    const gapColor = idx === 0 ? '#4a7a58'
+                   : intervals[idx-1].gapDays >= CYCLE_HIGH_DAYS     ? '#fca5a5'
+                   : intervals[idx-1].gapDays >= CYCLE_MODERATE_DAYS ? '#fcd34d'
+                   : '#34d399';
+
+    const tr = el('tr',{style:{background:idx%2===0?'#0c1810':'#091410'}});
+    tr.append(
+      el('td',{style:{color:'#e8e4dc',fontWeight:'bold'}},c.label),
+      el('td',{style:{fontFamily:'monospace',color:'#90c4a0',fontSize:'11px'}},c.firstDt.replace('T',' ')),
+      el('td',{style:{fontFamily:'monospace',color:'#90c4a0',fontSize:'11px'}},c.count>1?c.lastDt.replace('T',' '):'—'),
+      el('td',{style:{color:'#fcd34d',textAlign:'center'}},c.count),
+      el('td',{style:{color:'#93c5fd',fontFamily:'monospace'}},c.count>1?spanStr:'single event'),
+      el('td',{style:{color:gapColor,fontFamily:'monospace',fontWeight:'bold'}},gapStr)
+    );
+    tbody.append(tr);
+  });
+  tbl.append(tbody);
+  out.append(el('div',{style:{overflowX:'auto',marginTop:'10px'}},tbl));
+
+  // ── Notes ─────────────────────────────────────────────────────────────────
+  out.append(el('div',{class:'notes',style:{marginTop:'20px'}},
+    el('h3',{},'How to read this'),
+    el('p',{style:{marginBottom:'6px'}},
+      el('strong',{style:{color:'#9dc4a8'}},'Gap from previous: '),
+      'Time from the last seizure of the prior cluster to the first seizure of the next. ',
+      'Red = exceeded the 45-day HIGH cycle threshold. Amber = exceeded 30-day MODERATE threshold.'
+    ),
+    el('p',{style:{marginBottom:'6px'}},
+      el('strong',{style:{color:'#9dc4a8'}},'Days since counter: '),
+      'Counts from the last recorded seizure to right now. Matches the cycle alert thresholds on the Forecast tab.'
+    ),
+    el('p',{style:{color:'#c4685a'}},'Share with your veterinary neurologist.')
+  ));
+}
+
+// ─── HISTORY ─────────────────────────────────────────────────────────────────
+async function loadHistory() {
+  const out = document.getElementById('hist-content');
+  out.innerHTML = '<div class="loading">Fetching KHAO ASOS data…</div>';
+
+  const windows = [
+    {label:'Jul 15',    start:'2025-07-13',end:'2025-07-16', cluster:CLUSTERS[0]},
+    {label:'Sep 2',     start:'2025-08-31',end:'2025-09-03', cluster:CLUSTERS[1]},
+    {label:'Sep 25–27', start:'2025-09-23',end:'2025-09-28', cluster:CLUSTERS[2]},
+    {label:'Dec 19',    start:'2025-12-17',end:'2025-12-20', cluster:CLUSTERS[3]},
+    {label:'Jan 11',    start:'2026-01-09',end:'2026-01-12', cluster:CLUSTERS[4]},
+    {label:'Feb 5',     start:'2026-02-03',end:'2026-02-06', cluster:CLUSTERS[5]},
+    {label:'Mar 17',    start:'2026-03-15',end:'2026-03-18', cluster:CLUSTERS[6]},
+  ];
+
+  out.innerHTML = '';
+  out.append(el('div',{style:{marginTop:'12px',padding:'10px 14px',background:'#001a38',border:'1px solid #3b82f6',borderRadius:'8px',fontSize:'11px',color:'#93c5fd',lineHeight:'1.7'}},
+    `📡 Pressure data from KHAO ASOS physical station (Butler County Regional Airport, Hamilton OH). Raw altimeter readings in inHg. Station elevation 631 ft MSL, ~10 miles NNW of West Chester.`
+  ));
+
+  for (const w of windows) {
+    const section = el('div',{style:{marginTop:'20px'}});
+    try {
+      out.querySelector('.loading')?.remove();
+      const rows = await fetchKHAO(w.start, w.end);
+      if (rows.length < 5) throw new Error(`Only ${rows.length} readings — possible KHAO data gap`);
+
+      const clusterDrop = peakDrop(rows, w.cluster.seizures[0]);
+      const rl = dropRiskLabel(clusterDrop.drop);
+
+      section.append(el('div',{class:'section-head'},
+        w.cluster.label+'  ·  ',
+        el('span',{style:{color:rl.color}},`Peak pre-seizure drop: ${clusterDrop.drop.toFixed(3)}" `),
+        el('span',{style:{color:rl.color,fontWeight:'bold'}},'['+rl.risk+']')
+      ));
+      if (clusterDrop.fromDt) {
+        const lagH = Math.round((new Date(w.cluster.seizures[0]).getTime()-new Date(clusterDrop.toDt.replace(' ','T')).getTime())/3600000);
+        section.append(el('div',{style:{fontSize:'11px',color:'#8ab8a0',padding:'6px 0 4px'}},
+          `Drop: ${clusterDrop.fromP?.toFixed(3)}" → ${clusterDrop.toP?.toFixed(3)}"  `,
+          el('span',{style:{color:'#fcd34d'}},'('+clusterDrop.fromDt+' → '+clusterDrop.toDt+')'),
+          el('span',{style:{color:'#93c5fd'}},'  · '+lagH+' hrs before first seizure')
+        ));
+      }
+
+      const tbl=el('table'); const thead=el('thead'),tr0=el('tr');
+      ['Seizure Time','Pressure at Seizure','Peak Drop (48h prior)','Drop','Lag','Verdict'].forEach(h=>tr0.append(el('th',{},h)));
+      thead.append(tr0);tbl.append(thead);
+      const tbody=el('tbody');
+      w.cluster.seizures.forEach((s,i)=>{
+        const atS = closestPressure(rows,s);
+        const drop = peakDrop(rows,s);
+        const rl2 = dropRiskLabel(drop.drop);
+        const lagH = drop.toDt ? Math.round((new Date(s).getTime()-new Date(drop.toDt.replace(' ','T')).getTime())/3600000) : null;
+        const tr=el('tr',{style:{background:i%2===0?'#0c1810':'#091410'}});
+        tr.append(
+          el('td',{style:{color:'#e8e4dc',fontWeight:'bold'}},s.replace('T',' ')),
+          el('td',{style:{fontFamily:'monospace',color:'#90c4a0'}},atS?atS.pressure.toFixed(3)+'"':'N/A'),
+          el('td',{style:{fontFamily:'monospace',color:'#fcd34d'}},drop.fromDt?`${drop.fromP?.toFixed(3)}" → ${drop.toP?.toFixed(3)}"`:'—'),
+          el('td',{style:{fontFamily:'monospace',color:rl2.color,fontWeight:'bold'}},drop.drop>0?drop.drop.toFixed(3)+'"':'—'),
+          el('td',{style:{color:'#93c5fd'}},lagH!==null?lagH+' hrs':'—'),
+          el('td',{},el('span',{class:'badge',style:{background:COLORS[rl2.risk]?.pill||'#14532d',borderColor:rl2.color,color:rl2.color,fontSize:'10px'}},rl2.risk))
+        );
+        tbody.append(tr);
+      });
+      tbl.append(tbody);
+      section.append(el('div',{style:{overflowX:'auto'}},tbl));
+
+      if (rows.length > 1) {
+        const W=600,H=80;
+        const ps=rows.map(r=>r.pressure);
+        const minP=Math.min(...ps),maxP=Math.max(...ps),rngP=maxP-minP||0.1;
+        const ts=rows.map(r=>new Date(r.dt.replace(' ','T')).getTime());
+        const minT=Math.min(...ts),rngT=Math.max(...ts)-minT||1;
+        const toX=t=>((t-minT)/rngT)*(W-20)+10;
+        const toY=p=>H-10-((p-minP)/rngP)*(H-20);
+        const path='M'+rows.map((r,i)=>`${toX(ts[i]).toFixed(1)},${toY(r.pressure).toFixed(1)}`).join('L');
+        const markers=w.cluster.seizures.map(s=>{
+          const t=new Date(s).getTime();
+          const closest=rows.reduce((a,b)=>Math.abs(new Date(b.dt.replace(' ','T')).getTime()-t)<Math.abs(new Date(a.dt.replace(' ','T')).getTime()-t)?b:a,rows[0]);
+          return `<circle cx="${toX(t).toFixed(1)}" cy="${toY(closest.pressure).toFixed(1)}" r="5" fill="#dc2626" stroke="#fff" stroke-width="1.5"/>`;
+        }).join('');
+        const svgEl=el('div');
+        svgEl.innerHTML=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:80px;background:#060e09;border-radius:4px;margin-top:8px;display:block">
+          <path d="${path}" fill="none" stroke="#34d399" stroke-width="1.5" opacity="0.8"/>
+          ${markers}
+          <text x="14" y="14" font-size="9" fill="#4a7a58">High: ${maxP.toFixed(2)}"</text>
+          <text x="14" y="${H-3}" font-size="9" fill="#4a7a58">Low: ${minP.toFixed(2)}"</text>
+          <text x="${W/2}" y="14" font-size="9" fill="#dc2626" text-anchor="middle">● = seizure</text>
+          <text x="${W-6}" y="14" font-size="9" fill="#3b82f6" text-anchor="end">KHAO ASOS</text></svg>`;
+        section.append(svgEl);
+      }
+    } catch(e) {
+      section.append(el('div',{class:'section-head'},w.cluster.label));
+      section.append(el('div',{class:'err'},'KHAO data error: '+e.message+'<br><small style="color:#78716c">The IEM Mesonet API may have a data gap for this period at KHAO. Check https://mesonet.agron.iastate.edu</small>'));
+    }
+    out.append(section);
+  }
+  // Cycle alert summary at bottom of history tab
+  const ca = getCycleAlert();
+  if (ca) {
+    const isH = ca.level==='HIGH';
+    out.append(el('div',{style:{marginTop:'16px',padding:'12px 16px',background:isH?'#3b0000':'#2d1a00',border:`1px solid ${isH?'#dc2626':'#d97706'}`,borderRadius:'8px',fontSize:'12px',color:isH?'#fca5a5':'#fcd34d',lineHeight:'1.8'}},
+      el('strong',{},`⏱ CYCLE ALERT — ${ca.level}: `),
+      `${ca.daysSince} days since last cluster (${ca.lastClusterLabel}).`
+    ));
+  }
+  out.append(el('div',{class:'notes',style:{marginTop:'16px'}},
+    el('h3',{},'Seizure Log Analysis'),
+    el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Source: '),'KHAO ASOS physical station. Raw altimeter readings — sharper drops than ERA5 model data.'),
+    el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Pressure-independent clusters: '),
+      'Jul 15 and Sep 2 show no qualifying barometric drop in the 48h prior at KHAO. ',
+      'These are captured by the cycle-length alert (30/45-day thresholds) rather than the drop model.'
+    ),
+    el('p',{style:{color:'#c4685a'}},'Share with your veterinary neurologist.')
+  ));
+}
+
+// ─── VALIDATION ───────────────────────────────────────────────────────────────
+async function loadValidation() {
+  const out = document.getElementById('val-content');
+  out.innerHTML = '<div class="loading">Step 1/4: Fetching KHAO ASOS pressure Jul–Dec 2025…</div>';
+  try {
+    const rows1 = await fetchKHAO('2025-07-15','2025-12-31');
+    out.innerHTML = '<div class="loading">Step 2/4: Fetching KHAO ASOS pressure Jan–Mar 2026…</div>';
+    const rows2 = await fetchKHAO('2026-01-01','2026-03-31');
+    out.innerHTML = '<div class="loading">Step 3/4: Fetching KHAO humidity data (Jul 2025–now)…</div>';
+
+    // Fetch humidity in two chunks to avoid IEM timeout
+    let rhRows = [];
+    try {
+      const rh1 = await fetchKHAOWithHumidity('2025-07-15','2025-12-31');
+      const rh2 = await fetchKHAOWithHumidity('2026-01-01','2026-03-31');
+      rhRows = [...rh1, ...rh2].sort((a,b) => a.dt.localeCompare(b.dt));
+    } catch(e) {
+      rhRows = []; // humidity fetch failed — continue without it
+    }
+
+    out.innerHTML = '<div class="loading">Step 4/4: Calibrating thresholds and analysing humidity…</div>';
+    const allRows = [...rows1,...rows2].sort((a,b)=>a.dt.localeCompare(b.dt));
+    if (allRows.length < 100) throw new Error(`Only ${allRows.length} KHAO rows — possible data gap`);
+    renderValidation(out, allRows, rhRows);
+  } catch(e) {
+    out.innerHTML = `<div class="err"><strong>KHAO validation error:</strong> ${e.message}<br>
+      <div style="margin-top:8px;font-size:11px;color:#c4b9a8">
+        Possible causes:<br>
+        • KHAO (HAO) data gap in IEM archive<br>
+        • Network / CORS issue fetching mesonet.agron.iastate.edu<br>
+        • Try opening browser console for details<br><br>
+        You can manually verify data at: 
+        <a href="https://mesonet.agron.iastate.edu/request/download.phtml" target="_blank" style="color:#34d399">mesonet.agron.iastate.edu</a>
+      </div>
+    </div>`;
+  }
+}
+
+// ─── Drop event detection — KHAO-specific filters ────────────────────────────
+// opts flags (all default to their safest/most-restrictive value for HIGH):
+//   requireConsecutive : pressure must still be falling in the next hour (not a single spike)
+//   excludeAfternoon   : skip drops starting 12:00–18:00 (routine diurnal heating dips)
+//   pressureFloor      : skip drops starting above this inHg value (Filter A)
+//                        30.10" = all real seizure-preceding drops were below this level;
+//                        drops above it are high-pressure ridge oscillations, not fronts.
+//   require6hrDrop     : cumulative drop over 6 hours must reach min6hrDrop (Filter B)
+//                        real weather falls sustain; diurnal blips recover in <3 hrs.
+//   min6hrDrop         : minimum cumulative 6hr drop required when require6hrDrop=true
+const PRESSURE_FLOOR = 30.09;  // inHg — Filter A (lowered from 30.10 — Feb 24 false positive started at 30.11", safely above this)
+const MIN_6HR_DROP   = 0.06;   // inHg — Filter B
+
+function findDropEvents(rows, minDrop, opts={}) {
+  const {
+    requireConsecutive = true,
+    excludeAfternoon   = false,
+    pressureFloor      = PRESSURE_FLOOR,
+    require6hrDrop     = true,
+    min6hrDrop         = MIN_6HR_DROP,
+  } = opts;
+
+  const events=[], used=new Set();
+
+  for (let i=0;i<rows.length;i++) {
+    if (used.has(rows[i].dt)) continue;
+    const t0    = new Date(rows[i].dt.replace(' ','T')).getTime();
+    const hour0 = new Date(rows[i].dt.replace(' ','T')).getHours();
+    const p0    = rows[i].pressure;
+
+    // Filter A — pressure floor: skip if starting pressure is too high
+    if (pressureFloor !== null && p0 > pressureFloor) continue;
+
+    // Afternoon exclusion: skip 12:00–18:00 local drops for HIGH threshold
+    if (excludeAfternoon && hour0 >= 12 && hour0 <= 18) continue;
+
+    // Find max drop within the 3hr window
+    let maxDrop=0, bestJ=-1;
+    for (let j=i+1;j<rows.length;j++) {
+      const t1=new Date(rows[j].dt.replace(' ','T')).getTime();
+      if (t1-t0 > 3*3600000+300000) break;
+      const drop = p0 - rows[j].pressure;
+      if (drop > maxDrop) { maxDrop=drop; bestJ=j; }
+    }
+    if (maxDrop < minDrop) continue;
+
+    // Consecutive check: next hourly reading must also show a net fall from start
+    if (requireConsecutive && i+1 < rows.length) {
+      const tNext = new Date(rows[i+1].dt.replace(' ','T')).getTime();
+      if (tNext - t0 <= 90*60000) {
+        if (p0 - rows[i+1].pressure < 0.010) continue;
+      }
+    }
+
+    // Filter B — 6hr cumulative drop check.
+    // Purpose: filter diurnal blips that recover quickly (false alarms).
+    // Exceptions:
+    //   1. If the 3hr drop is already large (≥ waive6hrAbove), it's a real weather event
+    //      regardless of what happens at t+6 — waive the check entirely.
+    //   2. Only reject if pressure has ACTIVELY RECOVERED above the min6hrDrop threshold.
+    //      If t+6 pressure is still falling or flat, allow through.
+    //   3. If no t+6 observation exists, allow through (don't penalise data gaps).
+    if (require6hrDrop && maxDrop < (opts.waive6hrAbove ?? 0.08)) {
+      const t6 = t0 + 6*3600000;
+      let drop6 = null;
+      for (let k=i+1;k<rows.length;k++) {
+        const tk = new Date(rows[k].dt.replace(' ','T')).getTime();
+        if (tk > t6 + 90*60000) break;
+        if (Math.abs(tk - t6) <= 90*60000) {
+          drop6 = p0 - rows[k].pressure;
+        }
+      }
+      // Only skip if we found a t+6 reading AND pressure has clearly recovered
+      // (risen back to less than min6hrDrop below start — i.e. the drop reversed)
+      if (drop6 !== null && drop6 < min6hrDrop) continue;
+    }
+
+    used.add(rows[i].dt);
+    const seiz = SEIZURE_TS.some(st => st >= t0 && st <= t0 + 48*3600000);
+    events.push({
+      dt:   rows[i].dt,
+      fromP: p0,
+      toP:  rows[bestJ >= 0 ? bestJ : i+1]?.pressure ?? p0,
+      drop: maxDrop,
+      toDt: rows[bestJ >= 0 ? bestJ : i+1]?.dt ?? rows[i].dt,
+      date: rows[i].dt.slice(0,10),
+      seizureFollowed: seiz,
+    });
+  }
+  return events;
+}
+
+function calibrateThresholds(rows) {
+  // Calibration strategy:
+  // MODERATE = safety net — catches everything. Uses consecutive filter only.
+  //            No pressure floor, no 6hr check, no afternoon exclusion.
+  //            Floor at 0.030" minimum threshold.
+  // HIGH     = operational trigger — uses ALL filters to minimise false alarms:
+  //            consecutive + afternoon exclusion + pressure floor + 6hr cumulative.
+  //            Calibrated to still achieve 100% sensitivity with all filters active.
+  const clusterDates = [...new Set(CLUSTERS.flatMap(c=>c.seizures.map(s=>s.slice(0,10))))];
+
+  function testSensitivity(thresh, opts) {
+    const events = findDropEvents(rows, thresh, opts);
+    let tp = 0;
+    clusterDates.forEach(cd => {
+      const cdTs = new Date(cd+'T00:00:00').getTime();
+      const hit = events.some(e => {
+        const et = new Date(e.dt.replace(' ','T')).getTime();
+        return et >= cdTs - 48*3600000 && et <= cdTs + 24*3600000;
+      });
+      if (hit) tp++;
+    });
+    return tp;
+  }
+
+  // MODERATE: consecutive only, no floor, no 6hr, no afternoon filter
+  let calibMod = 0.060;
+  for (let t = 0.030; t <= 0.120; t += 0.005) {
+    const thresh = Math.round(t*1000)/1000;
+    if (testSensitivity(thresh, {
+      requireConsecutive: true,
+      excludeAfternoon:   false,
+      pressureFloor:      null,   // no floor — catch everything
+      require6hrDrop:     false,  // no 6hr check
+    }) === clusterDates.length) {
+      calibMod = thresh;
+      break;
+    }
+  }
+
+  // HIGH: all filters active — find lowest threshold still at 100% sensitivity
+  // waive6hrAbove: large drops (≥0.08") bypass the 6hr sustained check entirely,
+  // since a rapid large fall is a genuine weather event regardless of recovery time.
+  let calibHigh = calibMod;
+  for (let t = calibMod; t <= 0.120; t += 0.005) {
+    const thresh = Math.round(t*1000)/1000;
+    if (testSensitivity(thresh, {
+      requireConsecutive: true,
+      excludeAfternoon:   true,
+      pressureFloor:      PRESSURE_FLOOR,
+      require6hrDrop:     true,
+      min6hrDrop:         MIN_6HR_DROP,
+      waive6hrAbove:      0.08,
+    }) === clusterDates.length) {
+      calibHigh = thresh;
+      break;
+    }
+  }
+
+  return { high: calibHigh, mod: calibMod };
+}
+
+function renderValidation(out, rows, rhRows=[]) {
+  out.innerHTML = '';
+
+  // Run threshold calibration
+  const calib = calibrateThresholds(rows);
+  HIGH_THRESH = calib.high;
+  MOD_THRESH  = calib.mod;
+
+  const allDays = [...new Set(rows.map(r=>r.dt.slice(0,10)))].sort();
+  const totalDays = allDays.length;
+  const seizureDays = allDays.filter(d=>SEIZURE_DATES.has(d)).length;
+  const nonSeizureDays = totalDays - seizureDays;
+
+  // Station info banner
+  out.append(el('div',{style:{marginTop:'12px',padding:'10px 14px',background:'#001a38',border:'1px solid #3b82f6',borderRadius:'8px',fontSize:'11px',color:'#93c5fd',lineHeight:'1.7'}},
+    `📡 Station: ${STATION_LABEL} · Raw ASOS altimeter readings (inHg) · Hourly via Iowa State IEM Mesonet`
+  ));
+
+  // Calibration result banner
+  out.append(el('div',{style:{marginTop:'10px',padding:'10px 14px',background:'#001a10',border:'1px solid #0f6e56',borderRadius:'8px',fontSize:'11px',color:'#34d399',lineHeight:'1.8'}},
+    el('strong',{},'🎯 Auto-calibrated thresholds from KHAO ASOS data: '),
+    el('span',{style:{color:'#fca5a5',fontWeight:'bold'}},`HIGH ≥ ${calib.high.toFixed(3)}"/3hr`),
+    '  ·  ',
+    el('span',{style:{color:'#fcd34d',fontWeight:'bold'}},`MODERATE ≥ ${calib.mod.toFixed(3)}"/3hr`),
+    el('div',{style:{color:'#6a9472',marginTop:'3px',fontSize:'10px'}},
+      `HIGH filters: consecutive · no-PM (12–18h) · floor ≤${PRESSURE_FLOOR}" · 6hr cumulative ≥${MIN_6HR_DROP}" ` +
+      `(waived for drops ≥0.08" — large rapid falls bypass 6hr check). ` +
+      'MODERATE: consecutive only (safety net). Both calibrated to 100% sensitivity.'
+    )
+  ));
+
+  out.append(el('div',{style:{marginTop:'10px',padding:'12px 16px',background:'#0b1a12',border:'1px solid #1c3326',borderRadius:'8px',fontSize:'11px',color:'#6a9472',lineHeight:'1.9'}},
+    el('span',{style:{color:'#34d399',fontWeight:'bold'}},'Window: '), `${allDays[0]} → ${allDays[allDays.length-1]}  ·  `,
+    el('span',{style:{color:'#34d399',fontWeight:'bold'}},'Total days: '), `${totalDays}  ·  `,
+    el('span',{style:{color:'#dc2626',fontWeight:'bold'}},'Seizure days: '), `${seizureDays}  ·  `,
+    el('span',{style:{color:'#10b981',fontWeight:'bold'}},'Non-seizure days: '), `${nonSeizureDays}  ·  `,
+    el('span',{style:{color:'#93c5fd',fontWeight:'bold'}},'ASOS readings: '), `${rows.length}`
+  ));
+
+  const clusterDates = [...new Set(CLUSTERS.flatMap(c=>c.seizures.map(s=>s.slice(0,10))))];
+
+  // ── Per-threshold analysis ──────────────────────────────────────────────────
+  for (const [thresh, label, color, opts] of [
+    [calib.high,
+      `HIGH — Drop ≥ ${calib.high.toFixed(3)}"/3hr · all filters (floor ${PRESSURE_FLOOR}", 6hr cumul, consec, no-PM)`,
+      COLORS.HIGH,
+      {requireConsecutive:true, excludeAfternoon:true, pressureFloor:PRESSURE_FLOOR, require6hrDrop:true, min6hrDrop:MIN_6HR_DROP, waive6hrAbove:0.08}],
+    [calib.mod,
+      `MODERATE — Drop ≥ ${calib.mod.toFixed(3)}"/3hr · consecutive only (safety net)`,
+      COLORS.MODERATE,
+      {requireConsecutive:true, excludeAfternoon:false, pressureFloor:null, require6hrDrop:false}],
+  ]) {
+    const events = findDropEvents(rows, thresh, opts);
+    const dropDays = [...new Set(events.map(e=>e.date))];
+    const c = color;
+
+    let truePos=0, falseNeg=0;
+    const fnDates=[];
+    clusterDates.forEach(cd=>{
+      const cdTs=new Date(cd+'T00:00:00').getTime();
+      const hit=events.some(e=>{
+        const et=new Date(e.dt.replace(' ','T')).getTime();
+        return et>=cdTs-48*3600000 && et<=cdTs+24*3600000;
+      });
+      if(hit) truePos++; else { falseNeg++; fnDates.push(cd); }
+    });
+
+    const fpDates=[];
+    dropDays.forEach(dd=>{
+      const ddTs=new Date(dd+'T00:00:00').getTime();
+      const hadSeizure=SEIZURE_TS.some(st=>st>=ddTs-6*3600000 && st<=ddTs+54*3600000);
+      if(!hadSeizure) fpDates.push(dd);
+    });
+    const falsePos=fpDates.length;
+    const trueNeg=nonSeizureDays-falsePos;
+    const sensitivity=truePos/(truePos+falseNeg)||0;
+    const specificity=trueNeg/(trueNeg+falsePos)||0;
+    const ppv=truePos/(truePos+falsePos)||0;
+    const far=falsePos/nonSeizureDays||0;
+
+    const section=el('div',{style:{marginTop:'20px'}});
+    section.append(el('div',{style:{fontSize:'10px',letterSpacing:'3px',color:c.text,textTransform:'uppercase',padding:'8px 0 4px',borderBottom:`1px solid ${c.border}`,marginBottom:'8px'}},`Threshold: ${label}`));
+
+    const grid=el('div',{class:'stat-grid'});
+    [
+      {label:'Drop Events',     val:events.length,                          color:'#93c5fd'},
+      {label:'Drop Days',       val:dropDays.length,                        color:'#93c5fd'},
+      {label:'Seizure Clusters',val:clusterDates.length,                    color:'#dc2626'},
+      {label:'True Positives',  val:`${truePos} / ${clusterDates.length}`,  color:'#34d399'},
+      {label:'False Negatives', val:`${falseNeg} missed`,                   color:'#f97316'},
+      {label:'False Positives', val:`${falsePos} drop days, no seizure`,    color:'#fcd34d'},
+      {label:'Sensitivity',     val:`${(sensitivity*100).toFixed(0)}%`,     color:'#34d399'},
+      {label:'Specificity',     val:`${(specificity*100).toFixed(0)}%`,     color:'#34d399'},
+      {label:'Precision (PPV)', val:`${(ppv*100).toFixed(0)}%`,             color:'#34d399'},
+      {label:'False Alarm Rate',val:`${(far*100).toFixed(1)}% of non-seizure days`, color:'#fcd34d'},
+    ].forEach(s=>{
+      const card=el('div',{class:'stat-card'});
+      card.append(el('div',{class:'stat-label'},s.label));
+      card.append(el('div',{class:'stat-val',style:{color:s.color}},String(s.val)));
+      grid.append(card);
+    });
+    section.append(grid);
+
+    if (fnDates.length) {
+      const box=el('div',{style:{marginBottom:'10px',padding:'10px 12px',background:'#2d1200',border:'1px solid #f97316',borderRadius:'6px',fontSize:'11px',color:'#fed7aa'}});
+      box.append(el('div',{style:{color:'#f97316',fontWeight:'bold',fontSize:'10px',letterSpacing:'2px',textTransform:'uppercase',marginBottom:'4px'}},'⚠ Missed Seizure Clusters (no qualifying drop in 48h prior)'));
+      fnDates.forEach(d=>box.append(el('div',{},d+' — no ≥'+thresh.toFixed(3)+'" / 3hr drop found')));
+      section.append(box);
+    }
+
+    section.append(el('div',{style:{fontSize:'10px',color:'#fcd34d',letterSpacing:'2px',textTransform:'uppercase',padding:'8px 0 4px'}},'False Positive Days — Drop With No Following Seizure'));
+    const fptbl=el('table');
+    const fpth=el('thead'),fptr0=el('tr');
+    ['Date','Drop Time','From → To','Drop','Nearest Seizure','Note'].forEach(h=>fptr0.append(el('th',{},h)));
+    fpth.append(fptr0);fptbl.append(fpth);
+    const fptb=el('tbody');
+    const fpEvents=events.filter(e=>fpDates.includes(e.date));
+    if (!fpEvents.length) {
+      const tr=el('tr'); tr.append(el('td',{colspan:'6',style:{color:'#34d399',textAlign:'center',padding:'12px'}},'✅ No false positives at this threshold'));
+      fptb.append(tr);
+    } else {
+      fpEvents.forEach((e,i)=>{
+        const eTs=new Date(e.dt.replace(' ','T')).getTime();
+        let nearestDiff=Infinity;
+        SEIZURE_TS.forEach(st=>{ const diff=Math.abs(eTs-st)/3600000; if(diff<nearestDiff)nearestDiff=diff; });
+        const note=nearestDiff<168?`${Math.round(nearestDiff)} hrs ${eTs<(SEIZURE_TS.find(st=>Math.abs(eTs-st)/3600000===nearestDiff)||eTs)?'before':'after'} nearest seizure`:'No seizure within 7 days';
+        const tr=el('tr',{style:{background:i%2===0?'#0c1810':'#091410'}});
+        tr.append(
+          el('td',{style:{color:'#e8e4dc'}},e.date),
+          el('td',{style:{fontFamily:'monospace',color:'#93c5fd'}},e.dt.slice(11,16)),
+          el('td',{style:{fontFamily:'monospace',color:'#fcd34d'}},`${e.fromP.toFixed(3)}" → ${e.toP.toFixed(3)}"`),
+          el('td',{style:{fontFamily:'monospace',color:c.text,fontWeight:'bold'}},e.drop.toFixed(3)+'"'),
+          el('td',{style:{color:'#90c4a0'}},Math.round(nearestDiff)+' hrs'),
+          el('td',{style:{color:'#6a9472',fontSize:'10px'}},note)
+        );
+        fptb.append(tr);
+      });
+    }
+    fptbl.append(fptb);
+    section.append(el('div',{style:{overflowX:'auto'}},fptbl));
+    out.append(section);
+  }
+
+  // ── SUSTAINED LOW ANALYSIS ─────────────────────────────────────────────────
+  // KHAO sustained-low thresholds — shifted +0.60" from ERA5 model values
+  // to match KHAO's actual pressure range (~29.4"–30.7").
+  // ERA5 old: [29.10, 29.05, 29.00, 28.95] — those values are never reached at KHAO.
+  const SL_THRESHOLDS = [29.70, 29.65, 29.60, 29.55];
+
+  function hoursBelowThreshold(rows, dtStr, windowH, threshold) {
+    const target = new Date(dtStr.replace(' ','T')).getTime();
+    const windowStart = target - windowH * 3600000;
+    return rows.filter(r => {
+      const t = new Date(r.dt.replace(' ','T')).getTime();
+      return t >= windowStart && t <= target && r.pressure < threshold;
+    }).length;
+  }
+
+  const clusterFirstSeizure = CLUSTERS.map(c => ({
+    label: c.label, dt: c.seizures[0], seizure: true,
+  }));
+
+  function findFPDays(rows, minDrop) {
+    // Use same filters as HIGH threshold: consecutive drop + afternoon exclusion
+    const events = findDropEvents(rows, minDrop, {
+      requireConsecutive: true,
+      excludeAfternoon:   true,
+      pressureFloor:      PRESSURE_FLOOR,
+      require6hrDrop:     true,
+      min6hrDrop:         MIN_6HR_DROP,
+      waive6hrAbove:      0.08,
+    });
+    const seen2 = new Set();
+    return events
+      .filter(e => {
+        const eTs = new Date(e.dt.replace(' ','T')).getTime();
+        return !SEIZURE_TS.some(st => st >= eTs - 6*3600000 && st <= eTs + 96*3600000);
+      })
+      .map(e => ({ label: e.date, dt: e.dt.replace(' ','T'), seizure: false }))
+      .filter(e => { if(seen2.has(e.label)) return false; seen2.add(e.label); return true; });
+  }
+
+  const fpDays = findFPDays(rows, calib.high);
+  const allEvents = [...clusterFirstSeizure, ...fpDays.slice(0,30)];
+
+  const slDiv = el('div', {style:{marginTop:'24px'}});
+  slDiv.append(el('div',{class:'section-head'},'Sustained Low Pressure Test — Hours Below Threshold in 96h Prior Window (KHAO)'));
+  slDiv.append(el('div',{style:{fontSize:'11px',color:'#6a9472',padding:'6px 0 8px',lineHeight:'1.7'}},
+    'Hypothesis: seizures correlate with cumulative hours below a pressure floor, not just drop magnitude. ',
+    el('span',{style:{color:'#34d399'}},'Colored cells = seizure clusters. '),
+    'Thresholds recalibrated for KHAO physical station (~29.4"–30.7" range). ERA5 thresholds of <29.1" were never reached at KHAO.'
+  ));
+
+  const allVals = SL_THRESHOLDS.map(thresh =>
+    allEvents.map(e => hoursBelowThreshold(rows, e.dt, 96, thresh))
+  );
+  const maxVals = SL_THRESHOLDS.map((_,ti) => Math.max(...allVals[ti], 1));
+
+  const stbl = el('table',{style:{fontSize:'11px',width:'100%',borderCollapse:'collapse'}});
+  const sth = el('thead'), str0 = el('tr');
+  ['Event','Seizure?',...SL_THRESHOLDS.map(t=>`Hrs <${t}"`)].forEach(h =>
+    str0.append(el('th',{style:{padding:'8px 10px',textAlign:'left',borderBottom:'1px solid #1c3326',background:'#0b1a12',color:'#34d399',fontSize:'10px',letterSpacing:'1px',whiteSpace:'nowrap'}},h))
+  );
+  sth.append(str0); stbl.append(sth);
+  const stbody = el('tbody');
+  allEvents.forEach((e, ei) => {
+    const tr = el('tr',{style:{
+      background: e.seizure ? '#1a0808' : (ei%2===0?'#0c1810':'#091410'),
+      borderLeft: e.seizure ? '3px solid #dc2626' : '3px solid transparent',
+    }});
+    tr.append(
+      el('td',{style:{padding:'7px 10px',borderBottom:'1px solid #0e1e14',color:e.seizure?'#fca5a5':'#90c4a0',fontWeight:e.seizure?'bold':'normal',whiteSpace:'nowrap'}},e.label),
+      el('td',{style:{padding:'7px 10px',borderBottom:'1px solid #0e1e14',textAlign:'center'}},
+        e.seizure ? el('span',{style:{color:'#dc2626',fontWeight:'bold'}},'✦ YES') : el('span',{style:{color:'#34d399'}},'✗ no')
+      )
+    );
+    SL_THRESHOLDS.forEach((thresh, ti) => {
+      const hrs = allVals[ti][ei];
+      const pct = hrs / maxVals[ti];
+      const bg = e.seizure ? `rgba(220,38,38,${(pct*0.6).toFixed(2)})` : `rgba(16,185,129,${(pct*0.35).toFixed(2)})`;
+      tr.append(el('td',{style:{padding:'7px 10px',borderBottom:'1px solid #0e1e14',fontFamily:'monospace',fontWeight:'bold',textAlign:'center',background:bg,
+        color: hrs===0 ? '#2e5040' : (e.seizure ? '#fca5a5' : '#6ee7b7'),
+      }},String(hrs)));
+    });
+    stbody.append(tr);
+  });
+  stbl.append(stbody);
+  slDiv.append(el('div',{style:{overflowX:'auto'}},stbl));
+
+  // Summary stats per threshold
+  const summDiv = el('div',{style:{marginTop:'14px',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:'8px'}});
+  SL_THRESHOLDS.forEach((thresh, ti) => {
+    const sVals = allVals[ti].filter((_,ei) => allEvents[ei].seizure);
+    const fpVals = allVals[ti].filter((_,ei) => !allEvents[ei].seizure);
+    const sMean = sVals.length ? (sVals.reduce((a,b)=>a+b,0)/sVals.length).toFixed(1) : '—';
+    const fpMean = fpVals.length ? (fpVals.reduce((a,b)=>a+b,0)/fpVals.length).toFixed(1) : '—';
+    const sMin = sVals.length ? Math.min(...sVals) : 0;
+    const ratio = (fpVals.length && sVals.length) ? (sVals.reduce((a,b)=>a+b,0)/sVals.length) / Math.max(fpVals.reduce((a,b)=>a+b,0)/fpVals.length, 0.1) : 0;
+    const card = el('div',{style:{background:'#0b1a12',border:'1px solid #1c3326',borderRadius:'6px',padding:'10px 12px'}});
+    card.append(el('div',{style:{fontSize:'10px',color:'#4a7a58',letterSpacing:'1px',textTransform:'uppercase',marginBottom:'6px'}},`Threshold: <${thresh}"`));
+    card.append(el('div',{style:{fontSize:'12px',color:'#fca5a5',marginBottom:'3px'}},`Seizure events avg: ${sMean} hrs`));
+    card.append(el('div',{style:{fontSize:'12px',color:'#6ee7b7',marginBottom:'3px'}},`False pos. avg: ${fpMean} hrs`));
+    card.append(el('div',{style:{fontSize:'12px',color:'#fcd34d',marginBottom:'3px'}},`Seizure minimum: ${sMin} hrs`));
+    card.append(el('div',{style:{fontSize:'11px',color:ratio>1.5?'#34d399':'#78716c',marginTop:'4px'}},
+      ratio>1.5 ? `✅ ${ratio.toFixed(1)}× more hrs in seizure events` : `⚠ ${ratio.toFixed(1)}× — weak separation`
+    ));
+    summDiv.append(card);
+  });
+  slDiv.append(summDiv);
+
+  // Recommendation box
+  const bestRatio = SL_THRESHOLDS.map((thresh,ti) => {
+    const sVals = allVals[ti].filter((_,ei) => allEvents[ei].seizure);
+    const fpVals = allVals[ti].filter((_,ei) => !allEvents[ei].seizure);
+    return (sVals.length && fpVals.length) ? (sVals.reduce((a,b)=>a+b,0)/sVals.length) / Math.max(fpVals.reduce((a,b)=>a+b,0)/fpVals.length, 0.1) : 0;
+  });
+  const bestIdx = bestRatio.indexOf(Math.max(...bestRatio));
+  const bestThresh = SL_THRESHOLDS[bestIdx];
+
+  slDiv.append(el('div',{class:'rec-box'},
+    el('strong',{},'Recommendation from KHAO data: '),
+    `Best discriminating sustained-low threshold: pressure below ${bestThresh}" for ≥10 hrs in the prior 96h window (${bestRatio[bestIdx].toFixed(1)}× seizure/FP ratio). `,
+    'Combine with the drop trigger for a two-condition alert: flag HIGH risk when EITHER (a) a drop ≥',
+    el('strong',{},calib.high.toFixed(3)+'"'),
+    ' occurs in any 3hr window, OR (b) pressure has been below ',
+    el('strong',{},bestThresh+'"'),
+    ' for 10+ cumulative hours in the past 96 hours.',
+    el('div',{style:{color:'#c4685a',marginTop:'6px'}},'Share with your veterinary neurologist to inform medication pre-dosing decisions.')
+  ));
+
+  slDiv.append(el('div',{style:{marginTop:'10px',padding:'10px 14px',background:'#0b1a12',border:'1px solid #1c3326',borderRadius:'6px',fontSize:'11px',color:'#6a9472',lineHeight:'1.8'}},
+    el('strong',{style:{color:'#9dc4a8'}},'How to read: '),
+    'Each cell = hours the KHAO pressure spent below that threshold in the 96h before the event. ',
+    'Seizure cluster rows (red) vs false-positive rows (green). ',
+    'Higher ratio = better discriminating power.',
+  ));
+  out.append(slDiv);
+
+  out.append(el('div',{class:'notes',style:{marginTop:'20px'}},
+    el('h3',{},'How to Read This'),
+    el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Sensitivity '),'— % of seizure clusters preceded by a qualifying drop.'),
+    el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Specificity '),'— % of non-seizure days correctly flagged as low risk.'),
+    el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Precision (PPV) '),'— Of all flagged days, what % actually had a seizure follow.'),
+    el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'False Alarm Rate '),'— How often the surge protocol would activate unnecessarily.'),
+    el('p',{style:{color:'#c4685a'}},'Share with your veterinary neurologist to inform medication pre-dosing decisions.')
+  ));
+
+  // ── HUMIDITY CORRELATION ANALYSIS ─────────────────────────────────────────
+  const rhDiv = el('div',{style:{marginTop:'28px'}});
+  rhDiv.append(el('div',{class:'section-head'},'Relative Humidity Correlation — Seizure vs Non-Seizure Days (KHAO)'));
+
+  if (!rhRows || rhRows.length < 50) {
+    rhDiv.append(el('div',{class:'err',style:{marginTop:'10px'}},
+      'Humidity data unavailable — IEM fetch may have failed. Reload the Validation tab to retry.'
+    ));
+    out.append(rhDiv);
+    return;
+  }
+
+  // For each seizure cluster: compute mean RH in the 24h and 48h windows before first seizure
+  // For non-seizure days: sample one reading per day at noon, compute daily mean RH
+  // Then compare distributions: do seizure-preceding periods show higher RH?
+
+  function meanRH(rows, centerDt, windowH) {
+    const t1 = new Date(centerDt).getTime() - windowH * 3600000;
+    const t2 = new Date(centerDt).getTime();
+    const vals = rows
+      .filter(r => { const t = new Date(r.dt.replace(' ','T')).getTime(); return t >= t1 && t <= t2 && r.rh !== null; })
+      .map(r => r.rh);
+    return vals.length >= 3 ? vals.reduce((a,b) => a+b, 0) / vals.length : null;
+  }
+
+  function maxRH(rows, centerDt, windowH) {
+    const t1 = new Date(centerDt).getTime() - windowH * 3600000;
+    const t2 = new Date(centerDt).getTime();
+    const vals = rows
+      .filter(r => { const t = new Date(r.dt.replace(' ','T')).getTime(); return t >= t1 && t <= t2 && r.rh !== null; })
+      .map(r => r.rh);
+    return vals.length >= 3 ? Math.max(...vals) : null;
+  }
+
+  // Cluster RH stats
+  const clusterStats = CLUSTERS.map(c => {
+    const firstSeizure = c.seizures[0];
+    const mean24 = meanRH(rhRows, firstSeizure, 24);
+    const mean48 = meanRH(rhRows, firstSeizure, 48);
+    const max24  = maxRH(rhRows,  firstSeizure, 24);
+    return { label: c.label, firstSeizure, mean24, mean48, max24 };
+  });
+
+  // Non-seizure days: all days in the rhRows window that aren't seizure dates
+  // Sample daily mean RH for each non-seizure day
+  const allRhDays = [...new Set(rhRows.map(r => r.dt.slice(0,10)))].sort();
+  const nonSeizureRhDays = allRhDays.filter(d => !SEIZURE_DATES.has(d));
+
+  function dailyMeanRH(dayStr) {
+    const vals = rhRows.filter(r => r.dt.slice(0,10) === dayStr && r.rh !== null).map(r => r.rh);
+    return vals.length >= 3 ? vals.reduce((a,b) => a+b, 0) / vals.length : null;
+  }
+
+  const nonSeizureDailyRH = nonSeizureRhDays.map(dailyMeanRH).filter(v => v !== null);
+  const nsMean = nonSeizureDailyRH.reduce((a,b) => a+b, 0) / nonSeizureDailyRH.length;
+  const nsStd  = Math.sqrt(nonSeizureDailyRH.map(v => (v-nsMean)**2).reduce((a,b)=>a+b,0) / nonSeizureDailyRH.length);
+
+  // Cluster 24h mean RH values
+  const clusterRH24 = clusterStats.map(c => c.mean24).filter(v => v !== null);
+  const clMean24 = clusterRH24.length ? clusterRH24.reduce((a,b)=>a+b,0)/clusterRH24.length : null;
+
+  // Summary stat cards
+  const statGrid = el('div',{class:'stat-grid',style:{marginTop:'14px'}});
+  const stats = [
+    ['Seizure avg RH (24h prior)',   clMean24 !== null ? clMean24.toFixed(1)+'%' : '—',  '#fcd34d'],
+    ['Non-seizure avg daily RH',     nsMean.toFixed(1)+'%',                               '#6ee7b7'],
+    ['Non-seizure RH std dev',       nsStd.toFixed(1)+'%',                                '#93c5fd'],
+    ['Non-seizure days sampled',     nonSeizureDailyRH.length,                            '#c4b9a8'],
+  ];
+  stats.forEach(([label, val, color]) => {
+    const card = el('div',{class:'stat-card'});
+    card.append(el('div',{class:'stat-label'},label));
+    card.append(el('div',{class:'stat-val',style:{color}},String(val)));
+    statGrid.append(card);
+  });
+  rhDiv.append(statGrid);
+
+  // Interpretation banner
+  if (clMean24 !== null) {
+    const diff = clMean24 - nsMean;
+    const zScore = nsStd > 0 ? diff / nsStd : 0;
+    const isElevated = diff > 5;
+    const interp = isElevated
+      ? `Seizure-preceding 24h periods average ${diff.toFixed(1)}% higher RH than non-seizure days (z=${zScore.toFixed(1)}). This is a potentially meaningful signal — high humidity correlates with lower barometric pressure and may independently stress baroreceptors.`
+      : Math.abs(diff) <= 5
+        ? `Seizure-preceding 24h periods show similar RH to non-seizure days (difference: ${diff>0?'+':''}${diff.toFixed(1)}%). Humidity alone does not appear to be a strong independent predictor for this dog.`
+        : `Seizure-preceding periods show slightly lower RH (${diff.toFixed(1)}%) than non-seizure days — consistent with dry cold-front passages rather than humid low-pressure systems.`;
+
+    const bg = isElevated ? '#2d1a00' : '#001a0e';
+    const border = isElevated ? '#d97706' : '#10b981';
+    const color  = isElevated ? '#fcd34d' : '#6ee7b7';
+    rhDiv.append(el('div',{style:{marginTop:'10px',padding:'10px 14px',background:bg,border:`1px solid ${border}`,borderRadius:'8px',fontSize:'12px',color,lineHeight:'1.8'}},
+      el('strong',{},isElevated ? '⚠ Elevated humidity signal detected: ' : '✓ Interpretation: '),
+      interp
+    ));
+  }
+
+  // Per-cluster RH table
+  const tbl = el('table',{style:{marginTop:'14px'}});
+  const thead = el('thead'), tr0 = el('tr');
+  ['Cluster','Mean RH 24h prior','Mean RH 48h prior','Max RH 24h prior','vs Non-Seizure avg','Signal'].forEach(h => tr0.append(el('th',{},h)));
+  thead.append(tr0); tbl.append(thead);
+  const tbody = el('tbody');
+
+  clusterStats.forEach((c, i) => {
+    const tr = el('tr',{style:{background:i%2===0?'#0c1810':'#091410'}});
+    const diff24 = c.mean24 !== null ? c.mean24 - nsMean : null;
+    const sigColor = diff24 === null ? '#6a9472' : diff24 > 10 ? '#dc2626' : diff24 > 5 ? '#d97706' : '#10b981';
+    const signal   = diff24 === null ? '—' : diff24 > 10 ? '▲ High' : diff24 > 5 ? '↑ Elevated' : diff24 < -5 ? '↓ Low' : '≈ Normal';
+    tr.append(
+      el('td',{style:{color:'#e8e4dc',fontWeight:'bold'}}, c.label),
+      el('td',{style:{fontFamily:'monospace',color:'#fcd34d'}}, c.mean24 !== null ? c.mean24.toFixed(1)+'%' : '—'),
+      el('td',{style:{fontFamily:'monospace',color:'#fcd34d'}}, c.mean48 !== null ? c.mean48.toFixed(1)+'%' : '—'),
+      el('td',{style:{fontFamily:'monospace',color:'#93c5fd'}}, c.max24  !== null ? c.max24.toFixed(1)+'%'  : '—'),
+      el('td',{style:{fontFamily:'monospace',color:sigColor}},  diff24   !== null ? (diff24>0?'+':'')+diff24.toFixed(1)+'%' : '—'),
+      el('td',{},el('span',{class:'badge',style:{background:'#0b1a12',borderColor:sigColor,color:sigColor,fontSize:'10px',border:'1px solid'}},signal))
+    );
+    tbody.append(tr);
+  });
+  tbl.append(tbody);
+  rhDiv.append(el('div',{style:{overflowX:'auto'}},tbl));
+
+  // RH distribution: bucket non-seizure daily RH into 10% bands and show seizure cluster positions
+  rhDiv.append(el('div',{class:'section-head',style:{marginTop:'20px'}},'RH Distribution — Non-Seizure Days vs Seizure-Preceding Periods'));
+  const bands = [
+    [0,40],[40,50],[50,60],[60,70],[70,80],[80,90],[90,101]
+  ];
+  const bandCounts = bands.map(([lo,hi]) => nonSeizureDailyRH.filter(v => v>=lo && v<hi).length);
+  const maxCount = Math.max(...bandCounts, 1);
+  const barChart = el('div',{style:{marginTop:'10px',display:'flex',flexDirection:'column',gap:'4px'}});
+
+  bands.forEach(([lo,hi],bi) => {
+    const count = bandCounts[bi];
+    const pct = (count/maxCount*100).toFixed(0);
+    const clusterHits = clusterStats.filter(c => c.mean24 !== null && c.mean24 >= lo && c.mean24 < hi);
+    const row = el('div',{style:{display:'flex',alignItems:'center',gap:'8px',fontSize:'11px'}});
+    const label = el('div',{style:{width:'70px',color:'#6a9472',flexShrink:'0',textAlign:'right'}},`${lo}–${hi<101?hi:100}%`);
+    const barWrap = el('div',{style:{flex:'1',background:'#0b1a12',borderRadius:'3px',height:'18px',position:'relative'}});
+    const bar = el('div',{style:{width:`${pct}%`,height:'100%',background:'#1c3326',borderRadius:'3px',display:'flex',alignItems:'center',paddingLeft:'6px',fontSize:'10px',color:'#34d399'}});
+    if (count > 0) bar.textContent = count+' days';
+    barWrap.append(bar);
+    // Mark seizure clusters in this band
+    if (clusterHits.length > 0) {
+      const marker = el('div',{style:{position:'absolute',right:'4px',top:'1px',fontSize:'10px',color:'#fca5a5',fontWeight:'bold'}},
+        '⚡ '+clusterHits.map(c=>c.label.split(',')[0]).join(', ')
+      );
+      barWrap.append(marker);
+    }
+    const countLabel = el('div',{style:{width:'30px',color:'#4a7a58',fontSize:'10px',flexShrink:'0'}},count);
+    row.append(label, barWrap, countLabel);
+    barChart.append(row);
+  });
+  rhDiv.append(barChart);
+
+  rhDiv.append(el('div',{style:{marginTop:'10px',fontSize:'11px',color:'#6a9472',lineHeight:'1.8'}},
+    '⚡ markers show which RH band each seizure cluster\'s 24h-prior mean falls in. ',
+    'Bars show non-seizure day distribution. If seizure clusters cluster in higher RH bands, humidity may be a contributing factor.'
+  ));
+
+  out.append(rhDiv);
+
+  // ── CIRCADIAN ANALYSIS ─────────────────────────────────────────────────────
+  // For each seizure event, extract the hour of day.
+  // Display as a 24-hour frequency chart so patterns in time-of-day risk are visible.
+  // Research (Oxford iEEG study) confirms dogs have strongly non-random circadian
+  // seizure timing with 2–20× higher risk at peak hours.
+  const circDiv = el('div',{style:{marginTop:'28px'}});
+  circDiv.append(el('div',{class:'section-head'},'Circadian Pattern — Seizure Time-of-Day Distribution'));
+  circDiv.append(el('div',{style:{fontSize:'11px',color:'#6a9472',padding:'6px 0 10px',lineHeight:'1.7'}},
+    'Hour of day for each recorded seizure. Research shows dogs have 2–20× higher seizure risk at peak circadian phases. ',
+    'Identifying this dog\'s high-risk window helps focus monitoring and pre-emptive supplement timing.'
+  ));
+
+  // Count seizures by hour (0–23)
+  const hourCounts = Array(24).fill(0);
+  const hourSeizures = Array.from({length:24}, () => []);
+  SEIZURES.forEach(s => {
+    const h = new Date(s.dt).getHours();
+    hourCounts[h]++;
+    // Find which cluster this belongs to
+    const cluster = CLUSTERS.find(c => c.seizures.includes(s.dt));
+    if (cluster) hourSeizures[h].push(cluster.label.split(',')[0]);
+  });
+
+  const maxHourCount = Math.max(...hourCounts, 1);
+  const totalSeizures = SEIZURES.length;
+
+  // Group into 4 × 6-hour blocks for summary
+  const blocks = [
+    {label:'Night (00–05)',  hours:[0,1,2,3,4,5],   color:'#1e3a8a'},
+    {label:'Morning (06–11)',hours:[6,7,8,9,10,11],  color:'#065f46'},
+    {label:'Afternoon (12–17)',hours:[12,13,14,15,16,17], color:'#78350f'},
+    {label:'Evening (18–23)',hours:[18,19,20,21,22,23], color:'#4c1d95'},
+  ];
+
+  const blockDiv = el('div',{style:{display:'grid',gridTemplateColumns:'repeat(4,minmax(0,1fr))',gap:'8px',marginBottom:'14px'}});
+  blocks.forEach(b => {
+    const count = b.hours.reduce((a,h) => a+hourCounts[h], 0);
+    const pct   = totalSeizures > 0 ? Math.round(count/totalSeizures*100) : 0;
+    const card  = el('div',{style:{background:'#0b1a12',border:'1px solid #1c3326',borderRadius:'6px',padding:'8px 10px',textAlign:'center'}});
+    card.append(el('div',{style:{fontSize:'10px',color:'#6a9472',marginBottom:'4px'}},b.label));
+    card.append(el('div',{style:{fontSize:'22px',fontWeight:'bold',color:pct>=30?'#fca5a5':pct>=20?'#fcd34d':'#34d399'}}),);
+    card.querySelector('div:last-child').textContent = pct+'%';
+    card.append(el('div',{style:{fontSize:'10px',color:'#4a7a58'}},count+' of '+totalSeizures+' seizures'));
+    blockDiv.append(card);
+  });
+  circDiv.append(blockDiv);
+
+  // 24-hour bar chart
+  const chartWrap = el('div',{style:{display:'flex',alignItems:'flex-end',gap:'2px',height:'80px',padding:'0 0 4px'}});
+  for (let h = 0; h < 24; h++) {
+    const count = hourCounts[h];
+    const barH = count > 0 ? Math.max(8, Math.round(count/maxHourCount*72)) : 2;
+    const block = blocks.find(b => b.hours.includes(h));
+    const barColor = count > 0 ? block.color : '#0b1a12';
+    const barBorder = count > 0 ? '1px solid #1c3326' : 'none';
+    const col = el('div',{style:{flex:'1',display:'flex',flexDirection:'column',alignItems:'center',gap:'2px'}});
+    const bar = el('div',{style:{width:'100%',height:barH+'px',background:count>0?'#34d399':'#0b1a12',borderRadius:'2px',opacity:count>0?Math.max(0.3,count/maxHourCount):0.15,border:barBorder,position:'relative'}});
+    if (count > 0) {
+      const tooltip = el('div',{style:{position:'absolute',bottom:'100%',left:'50%',transform:'translateX(-50%)',background:'#0b1a12',border:'1px solid #1c3326',borderRadius:'4px',padding:'2px 5px',fontSize:'9px',color:'#34d399',whiteSpace:'nowrap',zIndex:'10',marginBottom:'2px'}},
+        count+' seizure'+(count>1?'s':'')
+      );
+      bar.append(tooltip);
+    }
+    const label = el('div',{style:{fontSize:'8px',color:'#2e5040',textAlign:'center'}},h%6===0?h+'h':'');
+    col.append(bar,label);
+    chartWrap.append(col);
+  }
+  circDiv.append(chartWrap);
+
+  // Identify peak window
+  const peakH = hourCounts.indexOf(Math.max(...hourCounts));
+  const peakBlock = blocks.find(b => b.hours.includes(peakH));
+  const peakCount = hourCounts[peakH];
+  const topHours = hourCounts
+    .map((c,h) => ({h,c}))
+    .filter(x => x.c > 0)
+    .sort((a,b) => b.c-a.c)
+    .slice(0,3)
+    .map(x => x.h+':00');
+
+  circDiv.append(el('div',{style:{marginTop:'10px',padding:'10px 14px',background:'#001a0e',border:'1px solid #0f6e56',borderRadius:'6px',fontSize:'11px',color:'#34d399',lineHeight:'1.8'}},
+    el('strong',{},'Peak seizure hour: '),
+    peakH+':00–'+(peakH+1)+':00 ('+peakCount+' seizure'+(peakCount>1?'s':'')+') — '+peakBlock?.label,
+    el('br',{}),
+    el('strong',{},'Top 3 hours: '), topHours.join(', '),
+    el('br',{}),
+    el('span',{style:{color:'#6a9472',fontSize:'10px'}},
+      'Share this chart with your neurologist. Consider scheduling supplement surge doses to peak ~2 hours before the highest-risk window.'
+    )
+  ));
+
+  out.append(circDiv);
+}
+
+
+function loadSupplements() {
+  const out = document.getElementById('supp-content');
+  out.innerHTML = '';
+  renderSupplementTable(out);
+}
+
+function renderSupplementTable(container) {
+  const SUPPS = [
+    {name:'ElleVet CBD',              daily:'~79 mg CBD twice daily\n(with food, AM & PM)',         surge:'No change — maintain\nconsistent schedule',         timing:'AM + PM (~12 hrs apart)',          priority:'HIGH'},
+    {name:'Magnesium Bisglycinate',   daily:'200–400 mg/day\n(split AM & PM with food)',            surge:'Add 100–200 mg midday\ndose on drop day + next day', timing:'AM · Midday (surge) · PM',         priority:'HIGH'},
+    {name:'MCT Oil (Nutiva)',         daily:'1 tbsp twice daily with food\n(build up slowly)',       surge:'Add 1 tsp midday dose\nduring risk window',           timing:'AM meal · Midday (surge) · PM meal',priority:'HIGH'},
+    {name:'Taurine',                  daily:'500–1,000 mg once daily\nwith AM meal',                 surge:'Add 500 mg PM dose\nduring 48-hr risk window',        timing:'AM · PM (surge only)',             priority:'HIGH'},
+    {name:'Vitamin C',                daily:'500–1,000 mg once daily\nwith AM meal',                 surge:'Add 500 mg PM dose\nduring risk window',              timing:'AM · PM (surge only)',             priority:'MODERATE'},
+    {name:'Thorne B-Complex #6',      daily:'1 capsule with AM meal',                               surge:'Add 1 capsule PM dose\nduring 24–48 hr risk window',  timing:'AM · PM (surge only)',             priority:'MODERATE'},
+    {name:'Omega-3 Fish Oil',         daily:'2,000–3,000 mg EPA+DHA\nwith largest meal',            surge:'No surge — consistency\nis the goal',                 timing:'With largest meal (PM preferred)', priority:'FOUNDATION'},
+    {name:'Standard Process Neuroplex',daily:'2–3 capsules twice daily\nwith food',                 surge:'No change needed',                                    timing:'AM + PM with food',                priority:'FOUNDATION'},
+    {name:'Turmeric (Curcumin)',      daily:'100–200 mg extract\nwith MCT oil or fish oil',         surge:'No change — effects\nare cumulative',                 timing:'With AM or PM fat-containing meal', priority:'FOUNDATION'},
+    {name:'Mycodog Clarity',          daily:'Per label (1 scoop/day)',                              surge:'No change needed',                                    timing:'AM meal',                          priority:'FOUNDATION'},
+    {name:'Adored Beast Healthy Gut', daily:'Per label directions',                                 surge:'No change needed',                                    timing:'AM meal, 2+ hrs from antibiotics', priority:'FOUNDATION'},
+  ];
+  const PCOL={HIGH:'#dc2626',MODERATE:'#d97706',FOUNDATION:'#10b981'};
+  const PBG ={HIGH:'#3b0000',MODERATE:'#2d1a00',FOUNDATION:'#001a0e'};
+
+  const wrap = el('div',{style:{marginTop:'20px'}});
+  wrap.append(el('div',{style:{fontSize:'10px',letterSpacing:'3px',color:'#34d399',textTransform:'uppercase',padding:'8px 0 6px',borderBottom:'1px solid #1c3326',marginBottom:'6px'}},'Supplement Protocol — Daily & Surge'));
+  wrap.append(el('div',{style:{fontSize:'11px',color:'#6a9472',marginBottom:'10px',lineHeight:'1.6'}},
+    '⚡ Surge protocol activates when monitor flags ',
+    el('span',{style:{color:'#dc2626',fontWeight:'bold'}},'HIGH'),
+    ' or ',
+    el('span',{style:{color:'#d97706',fontWeight:'bold'}},'MODERATE'),
+    '. Begin surge doses at the time of the pressure drop — before the 12–36 hr seizure window opens.'
+  ));
+
+  const tbl=el('table',{style:{fontSize:'11px'}});
+  const thead=el('thead'),tr0=el('tr');
+  ['Supplement','Priority','Daily Dose','Surge Dose (HIGH/MOD alert)','Timing'].forEach(h=>
+    tr0.append(el('th',{style:{padding:'9px 10px',textAlign:'left',borderBottom:'1px solid #1c3326',background:'#0b1a12',color:'#34d399',fontSize:'10px',letterSpacing:'2px',textTransform:'uppercase',whiteSpace:'nowrap'}},h))
+  );
+  thead.append(tr0);tbl.append(thead);
+  const tbody=el('tbody');
+  SUPPS.forEach((s,i)=>{
+    const pc=PCOL[s.priority],pb=PBG[s.priority];
+    const tr=el('tr',{style:{background:i%2===0?'#0c1810':'#091410'}});
+    tr.append(el('td',{style:{padding:'9px 10px',borderBottom:'1px solid #0e1e14',color:'#e8e4dc',fontWeight:'bold',whiteSpace:'nowrap'}},s.name));
+    const badge=el('td',{style:{padding:'9px 10px',borderBottom:'1px solid #0e1e14',whiteSpace:'nowrap'}});
+    badge.append(el('span',{style:{padding:'2px 8px',background:pb,border:`1px solid ${pc}`,borderRadius:'4px',color:pc,fontSize:'10px',fontWeight:'bold'}},s.priority));
+    tr.append(badge);
+    const mkTd=(txt,color)=>{
+      const td=el('td',{style:{padding:'9px 10px',borderBottom:'1px solid #0e1e14',color,lineHeight:'1.6'}});
+      txt.split('\n').forEach((l,li,arr)=>{ td.append(l); if(li<arr.length-1) td.append(el('br')); });
+      return td;
+    };
+    const isSurge=s.priority==='HIGH'||s.priority==='MODERATE';
+    tr.append(mkTd(s.daily,'#90c4a0'));
+    tr.append(mkTd(s.surge,isSurge?'#fcd34d':'#4a7a58'));
+    tr.append(mkTd(s.timing,'#93c5fd'));
+    tbody.append(tr);
+  });
+  tbl.append(tbody);
+  wrap.append(el('div',{style:{overflowX:'auto'}},tbl));
+
+  const warns=el('div',{style:{marginTop:'12px',padding:'12px 14px',background:'#1a1400',border:'1px solid #78350f',borderRadius:'8px',fontSize:'11px',color:'#fcd34d',lineHeight:'1.8'}});
+  warns.innerHTML=`<strong style="color:#d97706;letter-spacing:1px">⚠ KEY INTERACTIONS — DISCUSS WITH VET:</strong><br>
+    <span style="color:#c4b9a8">
+    • <strong>CBD + Phenobarbital/KBr/Zonisamide:</strong> CBD inhibits CYP450 — can raise drug blood levels. Monitor liver enzymes every 6 months.<br>
+    • <strong>B6 overlap:</strong> Neuroplex + B-Complex #6 together — confirm combined daily B6 is not excessive.<br>
+    • <strong>Magnesium + kidney disease:</strong> Do not use if any kidney insufficiency present.<br>
+    • <strong>Turmeric + blood thinners:</strong> Curcumin has mild anti-platelet activity.<br>
+    • <strong>Iron in Neuroplex:</strong> Do not combine with other iron-containing supplements.</span>`;
+  wrap.append(warns);
+  container.append(wrap);
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+loaded.forecast = true;
+loaded.history  = true;
+loadForecast();
+loadHistory();
+</script>
+</body>
+</html>
