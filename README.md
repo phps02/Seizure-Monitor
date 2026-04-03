@@ -1,2 +1,2 @@
 # Seizure-Monitor
-Theo's Seizure monitot
+Theo's Seizure monitor
