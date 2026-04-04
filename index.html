@@ -1121,25 +1121,60 @@ async function loadHistory() {
 // ─── VALIDATION ───────────────────────────────────────────────────────────────
 async function loadValidation() {
   const out = document.getElementById('val-content');
-  out.innerHTML = '<div class="loading">Step 1/4: Fetching KHAO ASOS pressure Jul–Dec 2025…</div>';
-  try {
-    const rows1 = await fetchKHAO('2025-07-15','2025-12-31');
-    out.innerHTML = '<div class="loading">Step 2/4: Fetching KHAO ASOS pressure Jan–Mar 2026…</div>';
-    const rows2 = await fetchKHAO('2026-01-01','2026-03-31');
-    out.innerHTML = '<div class="loading">Step 3/4: Fetching KHAO humidity data (Jul 2025–now)…</div>';
 
-    // Fetch humidity in two chunks to avoid IEM timeout
+  // Always fetch from first seizure date through TODAY — no hardcoded end date.
+  // This means non-seizure days accumulate automatically as time passes.
+  const START_DATE = '2025-07-15';
+  const todayStr = new Date().toLocaleDateString('en-CA', {timeZone:'America/New_York'}); // YYYY-MM-DD
+
+  // Split into 6-month chunks so IEM doesn't timeout on large requests
+  function dateChunks(start, end) {
+    const chunks = [];
+    let cur = new Date(start + 'T00:00:00');
+    const endDt = new Date(end + 'T00:00:00');
+    while (cur <= endDt) {
+      const chunkEnd = new Date(cur);
+      chunkEnd.setMonth(chunkEnd.getMonth() + 6);
+      chunkEnd.setDate(chunkEnd.getDate() - 1);
+      const actualEnd = chunkEnd > endDt ? endDt : chunkEnd;
+      chunks.push([
+        cur.toLocaleDateString('en-CA'),
+        actualEnd.toLocaleDateString('en-CA')
+      ]);
+      cur = new Date(actualEnd);
+      cur.setDate(cur.getDate() + 1);
+    }
+    return chunks;
+  }
+
+  const chunks = dateChunks(START_DATE, todayStr);
+  out.innerHTML = `<div class="loading">Fetching KHAO ASOS pressure data (${START_DATE} → ${todayStr}, ${chunks.length} chunks)…</div>`;
+
+  try {
+    let allRows = [];
+    for (let i = 0; i < chunks.length; i++) {
+      const [s, e] = chunks[i];
+      out.innerHTML = `<div class="loading">Step ${i+1}/${chunks.length}: Fetching pressure ${s} → ${e}…</div>`;
+      const chunk = await fetchKHAO(s, e);
+      allRows = allRows.concat(chunk);
+    }
+    allRows.sort((a,b) => a.dt.localeCompare(b.dt));
+
+    out.innerHTML = `<div class="loading">Step ${chunks.length+1}/${chunks.length+2}: Fetching humidity data…</div>`;
+
+    // Fetch humidity in matching chunks
     let rhRows = [];
     try {
-      const rh1 = await fetchKHAOWithHumidity('2025-07-15','2025-12-31');
-      const rh2 = await fetchKHAOWithHumidity('2026-01-01','2026-03-31');
-      rhRows = [...rh1, ...rh2].sort((a,b) => a.dt.localeCompare(b.dt));
+      for (const [s, e] of chunks) {
+        const rh = await fetchKHAOWithHumidity(s, e);
+        rhRows = rhRows.concat(rh);
+      }
+      rhRows.sort((a,b) => a.dt.localeCompare(b.dt));
     } catch(e) {
-      rhRows = []; // humidity fetch failed — continue without it
+      rhRows = [];
     }
 
-    out.innerHTML = '<div class="loading">Step 4/4: Calibrating thresholds and analysing humidity…</div>';
-    const allRows = [...rows1,...rows2].sort((a,b)=>a.dt.localeCompare(b.dt));
+    out.innerHTML = `<div class="loading">Step ${chunks.length+2}/${chunks.length+2}: Calibrating thresholds…</div>`;
     if (allRows.length < 100) throw new Error(`Only ${allRows.length} KHAO rows — possible data gap`);
     renderValidation(out, allRows, rhRows);
   } catch(e) {
