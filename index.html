@@ -155,8 +155,10 @@ function getCycleAlert() {
 // Thresholds are computed live by the validation tab from actual KHAO data.
 // These defaults are used for forecast risk coloring until validation runs.
 // After running validation, update HIGH_THRESH and MOD_THRESH accordingly.
-let HIGH_THRESH = 0.06;  // updated live from validation
-let MOD_THRESH  = 0.03;  // updated live from validation
+// Initial values set to last known calibrated result from KHAO data so the
+// Forecast tab is correct on first load without needing to run Validation first.
+let HIGH_THRESH = 0.030;  // updated live from validation
+let MOD_THRESH  = 0.030;  // updated live from validation
 
 const COLORS = {
   HIGH:    {bg:'#3b0000',border:'#dc2626',text:'#fca5a5',pill:'#7f1d1d'},
