@@ -919,10 +919,11 @@ function loadIntervals() {
 
   intervals.forEach(iv => {
     const pct = (iv.gapDays / maxBar * 100).toFixed(1);
-    const isLong = iv.gapDays >= CYCLE_HIGH_DAYS;
-    const isMod  = !isLong && iv.gapDays >= CYCLE_MODERATE_DAYS;
-    const barColor = isLong ? '#dc2626' : isMod ? '#d97706' : '#1c3326';
-    const textColor= isLong ? '#fca5a5' : isMod ? '#fcd34d' : '#34d399';
+    // Longer gaps are good (green), shorter gaps are concerning (red/amber)
+    const isShort = iv.gapDays < CYCLE_MODERATE_DAYS;
+    const isMed   = !isShort && iv.gapDays < CYCLE_HIGH_DAYS;
+    const barColor  = isShort ? '#3b0000' : isMed ? '#2d1a00' : '#0a1f0e';
+    const textColor = isShort ? '#fca5a5' : isMed ? '#fcd34d' : '#34d399';
 
     const row = el('div',{style:{display:'flex',alignItems:'center',gap:'10px',fontSize:'11px'}});
     const lbl = el('div',{style:{width:'140px',flexShrink:'0',color:'#6a9472',fontSize:'10px',textAlign:'right',lineHeight:'1.4'}},
@@ -939,9 +940,9 @@ function loadIntervals() {
 
   // Add current open interval (last cluster → today)
   const openGap = (nowMs - lastTs) / (24 * 3600000);
-  const openIsLong = openGap >= CYCLE_HIGH_DAYS;
-  const openIsMod  = !openIsLong && openGap >= CYCLE_MODERATE_DAYS;
-  const openColor  = openIsLong ? '#dc2626' : openIsMod ? '#d97706' : '#4a7a58';
+  const openIsShort = openGap < CYCLE_MODERATE_DAYS;
+  const openIsMed   = !openIsShort && openGap < CYCLE_HIGH_DAYS;
+  const openColor   = openIsShort ? '#fca5a5' : openIsMed ? '#fcd34d' : '#34d399';
   const openPct    = (openGap / maxBar * 100).toFixed(1);
   const openRow = el('div',{style:{display:'flex',alignItems:'center',gap:'10px',fontSize:'11px',opacity:'0.75'}});
   openRow.append(el('div',{style:{width:'140px',flexShrink:'0',color:'#4a7a58',fontSize:'10px',textAlign:'right'}},lastCluster.label.split(',')[0]+' →'));
@@ -969,8 +970,8 @@ function loadIntervals() {
     const spanStr  = spanH < 24 ? spanH+'h' : (spanH/24).toFixed(1)+'d';
     const gapStr   = idx === 0 ? '—' : intervals[idx-1].gapDays.toFixed(0)+' days';
     const gapColor = idx === 0 ? '#4a7a58'
-                   : intervals[idx-1].gapDays >= CYCLE_HIGH_DAYS     ? '#fca5a5'
-                   : intervals[idx-1].gapDays >= CYCLE_MODERATE_DAYS ? '#fcd34d'
+                   : intervals[idx-1].gapDays < CYCLE_MODERATE_DAYS ? '#fca5a5'
+                   : intervals[idx-1].gapDays < CYCLE_HIGH_DAYS     ? '#fcd34d'
                    : '#34d399';
 
     const tr = el('tr',{style:{background:idx%2===0?'#0c1810':'#091410'}});
@@ -993,7 +994,7 @@ function loadIntervals() {
     el('p',{style:{marginBottom:'6px'}},
       el('strong',{style:{color:'#9dc4a8'}},'Gap from previous: '),
       'Time from the last seizure of the prior cluster to the first seizure of the next. ',
-      'Red = exceeded the 45-day HIGH cycle threshold. Amber = exceeded 30-day MODERATE threshold.'
+      'Green = long gap (≥45 days, historically safe window). Amber = moderate gap (30–44 days). Red = short gap (<30 days, higher recurrence risk).'
     ),
     el('p',{style:{marginBottom:'6px'}},
       el('strong',{style:{color:'#9dc4a8'}},'Days since counter: '),
@@ -1162,7 +1163,7 @@ async function loadValidation() {
     }
     allRows.sort((a,b) => a.dt.localeCompare(b.dt));
 
-    out.innerHTML = `<div class="loading">Step ${chunks.length+1}/${chunks.length+2}: Fetching humidity data…</div>`;
+    out.innerHTML = `<div class="loading">Step ${chunks.length+1}/${chunks.length+3}: Fetching humidity data…</div>`;
 
     // Fetch humidity in matching chunks
     let rhRows = [];
@@ -1176,9 +1177,33 @@ async function loadValidation() {
       rhRows = [];
     }
 
-    out.innerHTML = `<div class="loading">Step ${chunks.length+2}/${chunks.length+2}: Calibrating thresholds…</div>`;
+    out.innerHTML = `<div class="loading">Step ${chunks.length+2}/${chunks.length+3}: Fetching temperature archive (Open-Meteo ERA5)…</div>`;
+
+    // Fetch hourly temperature from Open-Meteo ERA5 archive for pathway 4 validation
+    // IEM doesn't serve temperature, so we use Open-Meteo archive which has CORS support
+    let tempRows = [];
+    try {
+      const tUrl = `https://archive-api.open-meteo.com/v1/archive` +
+        `?latitude=${LAT}&longitude=${LON}` +
+        `&start_date=${START_DATE}&end_date=${todayStr}` +
+        `&hourly=temperature_2m&timezone=America%2FNew_York`;
+      const tResp = await fetch(tUrl);
+      if (tResp.ok) {
+        const tData = await tResp.json();
+        if (tData.hourly && tData.hourly.time) {
+          tempRows = tData.hourly.time.map((dt, i) => ({
+            dt: dt.replace('T', ' '),
+            tempC: tData.hourly.temperature_2m[i],
+          })).filter(r => r.tempC != null);
+        }
+      }
+    } catch(e) {
+      tempRows = [];
+    }
+
+    out.innerHTML = `<div class="loading">Step ${chunks.length+3}/${chunks.length+3}: Calibrating thresholds…</div>`;
     if (allRows.length < 100) throw new Error(`Only ${allRows.length} KHAO rows — possible data gap`);
-    renderValidation(out, allRows, rhRows);
+    renderValidation(out, allRows, rhRows, tempRows);
   } catch(e) {
     out.innerHTML = `<div class="err"><strong>KHAO validation error:</strong> ${e.message}<br>
       <div style="margin-top:8px;font-size:11px;color:#c4b9a8">
@@ -1346,7 +1371,7 @@ function calibrateThresholds(rows) {
   return { high: calibHigh, mod: calibMod };
 }
 
-function renderValidation(out, rows, rhRows=[]) {
+function renderValidation(out, rows, rhRows=[], tempRows=[]) {
   out.innerHTML = '';
 
   // Run threshold calibration
@@ -1386,6 +1411,233 @@ function renderValidation(out, rows, rhRows=[]) {
   ));
 
   const clusterDates = [...new Set(CLUSTERS.flatMap(c=>c.seizures.map(s=>s.slice(0,10))))];
+
+  // ── FOUR-PATHWAY UNIFIED VALIDATION ─────────────────────────────────────────
+  // For each day in the dataset, check which pathways would have fired.
+  // A "fire" means the pathway would have generated a MODERATE or HIGH alert
+  // in the 48h window before that day. Compare against seizure days.
+
+  // Helper: get all hourly readings in a time window
+  function rowsInWindow(dataRows, dtStr, lookbackHours) {
+    const t0 = new Date(dtStr.replace(' ','T')).getTime();
+    return dataRows.filter(r => {
+      const t = new Date(r.dt.replace(' ','T')).getTime();
+      return t >= t0 - lookbackHours*3600000 && t <= t0;
+    });
+  }
+
+  // Pathway 1: pressure drop (HIGH or MODERATE) in 48h before day
+  function p1FiredBeforeDay(dayStr, pressureRows) {
+    const dayEnd = dayStr + ' 23:59';
+    const window = rowsInWindow(pressureRows, dayEnd, 48);
+    if (window.length < 2) return false;
+    // Check for any qualifying HIGH drop
+    const highEvents = findDropEvents(window, HIGH_THRESH, {
+      requireConsecutive:true, excludeAfternoon:true,
+      pressureFloor:PRESSURE_FLOOR, require6hrDrop:true,
+      min6hrDrop:MIN_6HR_DROP, waive6hrAbove:0.08
+    });
+    if (highEvents.length > 0) return 'HIGH';
+    // Check for MODERATE
+    const modEvents = findDropEvents(window, MOD_THRESH, {
+      requireConsecutive:true, excludeAfternoon:false,
+      pressureFloor:null, require6hrDrop:false
+    });
+    if (modEvents.length > 0) return 'MODERATE';
+    return false;
+  }
+
+  // Pathway 2: cycle length — was it ≥30 days since the previous cluster
+  function p2FiredBeforeDay(dayStr) {
+    const dayTs = new Date(dayStr + 'T00:00:00').getTime();
+    // Find the most recent cluster BEFORE this day
+    const prevClusters = CLUSTERS.filter(c => {
+      const lastTs = new Date(c.seizures[c.seizures.length-1]).getTime();
+      return lastTs < dayTs && !c.seizures.some(s => s.slice(0,10) === dayStr);
+    });
+    if (prevClusters.length === 0) return false;
+    const lastCluster = prevClusters.reduce((a,b) => {
+      const aTs = new Date(a.seizures[a.seizures.length-1]).getTime();
+      const bTs = new Date(b.seizures[b.seizures.length-1]).getTime();
+      return bTs > aTs ? b : a;
+    });
+    const lastTs = new Date(lastCluster.seizures[lastCluster.seizures.length-1]).getTime();
+    const daysSince = (dayTs - lastTs) / (24*3600000);
+    if (daysSince >= CYCLE_HIGH_DAYS)     return 'HIGH';
+    if (daysSince >= CYCLE_MODERATE_DAYS) return 'MODERATE';
+    return false;
+  }
+
+  // Pathway 3: humidity — RH ≥88% for 6+ sustained hours in 14h before day
+  function p3FiredBeforeDay(dayStr, humidRows) {
+    if (humidRows.length === 0) return null; // data unavailable
+    const dayEnd = dayStr + ' 23:59';
+    const window = rowsInWindow(humidRows, dayEnd, 14);
+    const highRH = window.filter(r => r.rh !== null && r.rh >= RH_MODERATE_THRESH);
+    if (highRH.length >= RH_SUSTAINED_HOURS) return 'MODERATE';
+    return false;
+  }
+
+  // Pathway 4: temperature drop ≥5°C in any 6h window in 48h before day
+  function p4FiredBeforeDay(dayStr, tRows) {
+    if (tRows.length === 0) return null; // data unavailable
+    const dayEnd = dayStr + ' 23:59';
+    const window = rowsInWindow(tRows, dayEnd, 48);
+    for (let i = 0; i < window.length - 1; i++) {
+      const t0Ms = new Date(window[i].dt.replace(' ','T')).getTime();
+      // Find reading closest to t0 + 6hrs
+      const target = t0Ms + TEMP_DROP_WINDOW_H * 3600000;
+      let closest = null, minDiff = Infinity;
+      for (let j = i+1; j < window.length; j++) {
+        const tj = new Date(window[j].dt.replace(' ','T')).getTime();
+        const diff = Math.abs(tj - target);
+        if (diff < minDiff) { minDiff = diff; closest = j; }
+        if (tj > target + 2*3600000) break;
+      }
+      if (closest !== null && minDiff < 2*3600000) {
+        const drop = window[i].tempC - window[closest].tempC;
+        if (drop >= TEMP_DROP_THRESH_C) return 'MODERATE';
+      }
+    }
+    return false;
+  }
+
+  // Evaluate all pathways for every day in dataset
+  const allDaysList = [...new Set(rows.map(r=>r.dt.slice(0,10)))].sort();
+  const dayResults = allDaysList.map(day => {
+    const isSeizureDay = SEIZURE_DATES.has(day);
+    const p1 = p1FiredBeforeDay(day, rows);
+    const p2 = p2FiredBeforeDay(day);
+    const p3 = p3FiredBeforeDay(day, rhRows);
+    const p4 = p4FiredBeforeDay(day, tempRows);
+    const anyFired = p1 || p2 || p3 || p4;
+    const combined = [p1,p2,p3,p4].reduce((best, r) => {
+      if (!r) return best;
+      return RISK_ORDER[r] > RISK_ORDER[best||'LOW'] ? r : best;
+    }, null);
+    return { day, isSeizureDay, p1, p2, p3, p4, combined };
+  });
+
+  // Per-pathway stats
+  function pathwayStats(results, pKey) {
+    const available = results.filter(r => r[pKey] !== null);
+    const fired     = available.filter(r => r[pKey]);
+    const tp        = fired.filter(r => r.isSeizureDay);
+    const fp        = fired.filter(r => !r.isSeizureDay);
+    const seizDays  = available.filter(r => r.isSeizureDay);
+    const nonSeiz   = available.filter(r => !r.isSeizureDay);
+    return {
+      available: available.length,
+      fired: fired.length,
+      tp: tp.length,
+      fp: fp.length,
+      seizDays: seizDays.length,
+      nonSeizDays: nonSeiz.length,
+      sensitivity: seizDays.length ? (tp.length / seizDays.length * 100).toFixed(0) : '—',
+      farRate:     nonSeiz.length  ? (fp.length / nonSeiz.length * 100).toFixed(1)  : '—',
+    };
+  }
+
+  const stats = {
+    p1: pathwayStats(dayResults, 'p1'),
+    p2: pathwayStats(dayResults, 'p2'),
+    p3: pathwayStats(dayResults, 'p3'),
+    p4: pathwayStats(dayResults, 'p4'),
+    combined: pathwayStats(dayResults, 'combined'),
+  };
+
+  // ── Render unified matrix ──────────────────────────────────────────────────
+  const matrixDiv = el('div',{style:{marginTop:'20px'}});
+  matrixDiv.append(el('div',{class:'section-head'},'Four-Pathway Trigger Validation — All Clusters'));
+  matrixDiv.append(el('div',{style:{fontSize:'11px',color:'#6a9472',padding:'6px 0 10px',lineHeight:'1.7'}},
+    'Did each trigger pathway fire in the 48h before each seizure day? ',
+    el('span',{style:{color:'#34d399'}},'✓ fired'),
+    ' · ',
+    el('span',{style:{color:'#4a7a58'}},'✗ did not fire'),
+    ' · ',
+    el('span',{style:{color:'#6b7280'}},'— data unavailable'),
+    '. Combined = any pathway fired.'
+  ));
+
+  const mTbl = el('table');
+  const mHead = el('thead');
+  const mHr = el('tr');
+  ['Seizure Day','Cluster','P1 Pressure','P2 Cycle','P3 Humidity','P4 Temp Drop','Combined'].forEach((h,i) => {
+    const colors = ['#6a9472','#6a9472','#fca5a5','#93c5fd','#fcd34d','#86efac','#e2e8f0'];
+    mHr.append(el('th',{style:{color:colors[i],fontSize:'10px'}},h));
+  });
+  mHead.append(mHr); mTbl.append(mHead);
+  const mBody = el('tbody');
+
+  // Show seizure days first, then notable false positive days
+  const seizureDayResults = dayResults.filter(r => r.isSeizureDay);
+  seizureDayResults.forEach((r, idx) => {
+    const cluster = CLUSTERS.find(c => c.seizures.some(s => s.slice(0,10) === r.day));
+    const tr = el('tr',{style:{background:idx%2===0?'#0c1810':'#091410'}});
+
+    function cell(val, pathway) {
+      if (val === null) return el('td',{style:{color:'#6b7280',textAlign:'center'}},'—');
+      if (!val) return el('td',{style:{color:'#4a7a58',textAlign:'center'}},'✗');
+      const c = val === 'HIGH' ? '#fca5a5' : '#fcd34d';
+      return el('td',{style:{color:c,textAlign:'center',fontWeight:'bold'}},val==='HIGH'?'✓ HIGH':'✓ MOD');
+    }
+
+    const combinedColor = !r.combined ? '#4a7a58' : r.combined === 'HIGH' ? '#fca5a5' : '#fcd34d';
+    tr.append(
+      el('td',{style:{fontFamily:'monospace',color:'#e8e4dc',fontSize:'11px'}},r.day),
+      el('td',{style:{color:'#90c4a0',fontSize:'10px'}},cluster?.label.split(',')[0]||''),
+      cell(r.p1,'p1'),
+      cell(r.p2,'p2'),
+      cell(r.p3,'p3'),
+      cell(r.p4,'p4'),
+      el('td',{style:{color:combinedColor,textAlign:'center',fontWeight:'bold'}},r.combined?'✓ '+r.combined:'✗')
+    );
+    mBody.append(tr);
+  });
+  mTbl.append(mBody);
+  matrixDiv.append(el('div',{style:{overflowX:'auto'}},mTbl));
+
+  // ── Per-pathway summary stats ──────────────────────────────────────────────
+  matrixDiv.append(el('div',{class:'section-head',style:{marginTop:'18px'}},'Per-Pathway Performance Summary'));
+  const statGrid = el('div',{style:{display:'grid',gridTemplateColumns:'repeat(5,minmax(0,1fr))',gap:'8px',marginTop:'10px'}});
+
+  [
+    {key:'p1', label:'P1 — Pressure Drop', color:'#fca5a5'},
+    {key:'p2', label:'P2 — Cycle Length',  color:'#93c5fd'},
+    {key:'p3', label:'P3 — Humidity',       color:'#fcd34d'},
+    {key:'p4', label:'P4 — Temp Drop',      color:'#86efac'},
+    {key:'combined', label:'Combined (any)', color:'#e2e8f0'},
+  ].forEach(({key, label, color}) => {
+    const s = stats[key];
+    const card = el('div',{style:{background:'#0b1a12',border:'1px solid #1c3326',borderRadius:'6px',padding:'10px 12px'}});
+    card.append(el('div',{style:{fontSize:'10px',color,fontWeight:'bold',marginBottom:'6px',lineHeight:'1.4'}},label));
+    if (s.available === 0) {
+      card.append(el('div',{style:{color:'#6b7280',fontSize:'11px'}},'No data'));
+    } else {
+      [
+        ['Sensitivity', s.sensitivity+'%', s.sensitivity==='100'?'#34d399':parseInt(s.sensitivity)>=75?'#fcd34d':'#fca5a5'],
+        ['True Pos',    s.tp+' / '+s.seizDays, '#34d399'],
+        ['False Alarms',s.farRate+'%', parseFloat(s.farRate)<15?'#34d399':parseFloat(s.farRate)<30?'#fcd34d':'#fca5a5'],
+        ['FP days',     s.fp+' of '+s.nonSeizDays, '#6a9472'],
+      ].forEach(([lbl,val,c]) => {
+        const row = el('div',{style:{display:'flex',justifyContent:'space-between',fontSize:'11px',marginBottom:'2px'}});
+        row.append(el('span',{style:{color:'#6a9472'}},lbl), el('span',{style:{color:c,fontWeight:'bold'}},val));
+        card.append(row);
+      });
+    }
+    statGrid.append(card);
+  });
+  matrixDiv.append(statGrid);
+
+  matrixDiv.append(el('div',{style:{marginTop:'10px',fontSize:'11px',color:'#6a9472',lineHeight:'1.8'}},
+    'P1 = pressure drop ≥'+HIGH_THRESH.toFixed(3)+'"/3hr (HIGH filters) or ≥'+MOD_THRESH.toFixed(3)+'"/3hr (MODERATE). ',
+    'P2 = ≥'+CYCLE_MODERATE_DAYS+' days since last cluster. ',
+    'P3 = RH ≥'+RH_MODERATE_THRESH+'% for '+RH_SUSTAINED_HOURS+'+ hours in prior 14h. ',
+    'P4 = temperature drop ≥'+TEMP_DROP_THRESH_C+'°C in '+TEMP_DROP_WINDOW_H+'h (Open-Meteo ERA5 archive). ',
+    'Combined fires if ANY pathway fires.'
+  ));
+
+  out.append(matrixDiv);
 
   // ── Per-threshold analysis ──────────────────────────────────────────────────
   for (const [thresh, label, color, opts] of [
@@ -1433,8 +1685,8 @@ function renderValidation(out, rows, rhRows=[]) {
     [
       {label:'Drop Events',     val:events.length,                          color:'#93c5fd'},
       {label:'Drop Days',       val:dropDays.length,                        color:'#93c5fd'},
-      {label:'Seizure Clusters',val:clusterDates.length,                    color:'#dc2626'},
-      {label:'True Positives',  val:`${truePos} / ${clusterDates.length}`,  color:'#34d399'},
+      {label:'Seizure Days',   val:clusterDates.length,                    color:'#dc2626'},
+      {label:'True Positives', val:`${truePos} / ${clusterDates.length}`,  color:'#34d399'},
       {label:'False Negatives', val:`${falseNeg} missed`,                   color:'#f97316'},
       {label:'False Positives', val:`${falsePos} drop days, no seizure`,    color:'#fcd34d'},
       {label:'Sensitivity',     val:`${(sensitivity*100).toFixed(0)}%`,     color:'#34d399'},
@@ -1451,7 +1703,7 @@ function renderValidation(out, rows, rhRows=[]) {
 
     if (fnDates.length) {
       const box=el('div',{style:{marginBottom:'10px',padding:'10px 12px',background:'#2d1200',border:'1px solid #f97316',borderRadius:'6px',fontSize:'11px',color:'#fed7aa'}});
-      box.append(el('div',{style:{color:'#f97316',fontWeight:'bold',fontSize:'10px',letterSpacing:'2px',textTransform:'uppercase',marginBottom:'4px'}},'⚠ Missed Seizure Clusters (no qualifying drop in 48h prior)'));
+      box.append(el('div',{style:{color:'#f97316',fontWeight:'bold',fontSize:'10px',letterSpacing:'2px',textTransform:'uppercase',marginBottom:'4px'}},'⚠ Missed Seizure Days (no qualifying drop in 48h prior)'));
       fnDates.forEach(d=>box.append(el('div',{},d+' — no ≥'+thresh.toFixed(3)+'" / 3hr drop found')));
       section.append(box);
     }
@@ -1535,7 +1787,7 @@ function renderValidation(out, rows, rhRows=[]) {
   slDiv.append(el('div',{class:'section-head'},'Sustained Low Pressure Test — Hours Below Threshold in 96h Prior Window (KHAO)'));
   slDiv.append(el('div',{style:{fontSize:'11px',color:'#6a9472',padding:'6px 0 8px',lineHeight:'1.7'}},
     'Hypothesis: seizures correlate with cumulative hours below a pressure floor, not just drop magnitude. ',
-    el('span',{style:{color:'#34d399'}},'Colored cells = seizure clusters. '),
+    el('span',{style:{color:'#34d399'}},'Colored cells = seizure days. '),
     'Thresholds recalibrated for KHAO physical station (~29.4"–30.7" range). ERA5 thresholds of <29.1" were never reached at KHAO.'
   ));
 
@@ -1626,7 +1878,7 @@ function renderValidation(out, rows, rhRows=[]) {
 
   out.append(el('div',{class:'notes',style:{marginTop:'20px'}},
     el('h3',{},'How to Read This'),
-    el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Sensitivity '),'— % of seizure clusters preceded by a qualifying drop.'),
+    el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Sensitivity '),'— % of seizure days preceded by a qualifying drop.'),
     el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Specificity '),'— % of non-seizure days correctly flagged as low risk.'),
     el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Precision (PPV) '),'— Of all flagged days, what % actually had a seizure follow.'),
     el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'False Alarm Rate '),'— How often the surge protocol would activate unnecessarily.'),
@@ -1695,20 +1947,20 @@ function renderValidation(out, rows, rhRows=[]) {
   const clMean24 = clusterRH24.length ? clusterRH24.reduce((a,b)=>a+b,0)/clusterRH24.length : null;
 
   // Summary stat cards
-  const statGrid = el('div',{class:'stat-grid',style:{marginTop:'14px'}});
-  const stats = [
+  const rhStatGrid = el('div',{class:'stat-grid',style:{marginTop:'14px'}});
+  const rhStats = [
     ['Seizure avg RH (24h prior)',   clMean24 !== null ? clMean24.toFixed(1)+'%' : '—',  '#fcd34d'],
     ['Non-seizure avg daily RH',     nsMean.toFixed(1)+'%',                               '#6ee7b7'],
     ['Non-seizure RH std dev',       nsStd.toFixed(1)+'%',                                '#93c5fd'],
     ['Non-seizure days sampled',     nonSeizureDailyRH.length,                            '#c4b9a8'],
   ];
-  stats.forEach(([label, val, color]) => {
+  rhStats.forEach(([label, val, color]) => {
     const card = el('div',{class:'stat-card'});
     card.append(el('div',{class:'stat-label'},label));
     card.append(el('div',{class:'stat-val',style:{color}},String(val)));
-    statGrid.append(card);
+    rhStatGrid.append(card);
   });
-  rhDiv.append(statGrid);
+  rhDiv.append(rhStatGrid);
 
   // Interpretation banner
   if (clMean24 !== null) {
@@ -1789,7 +2041,7 @@ function renderValidation(out, rows, rhRows=[]) {
 
   rhDiv.append(el('div',{style:{marginTop:'10px',fontSize:'11px',color:'#6a9472',lineHeight:'1.8'}},
     '⚡ markers show which RH band each seizure cluster\'s 24h-prior mean falls in. ',
-    'Bars show non-seizure day distribution. If seizure clusters cluster in higher RH bands, humidity may be a contributing factor.'
+    'Bars show non-seizure day distribution. If seizure days cluster in higher RH bands, humidity may be a contributing factor.'
   ));
 
   out.append(rhDiv);
