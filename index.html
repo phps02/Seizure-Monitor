@@ -112,8 +112,8 @@ const SEIZURE_DATES = new Set(SEIZURES.map(s => s.dt.slice(0,10)));
 const SEIZURE_TS    = SEIZURES.map(s => new Date(s.dt).getTime());
 
 const CLUSTERS = [
-  {id:'jul15', label:'Jul 15, 2025',    seizures:['2025-07-15T10:00','2025-07-15T14:00']},
-  {id:'sep2',  label:'Sep 2, 2025',     seizures:['2025-09-02T13:00']},
+  {id:'jul15', label:'Jul 15, 2025',    seizures:['2025-07-15T10:00','2025-07-15T14:00'],          pressureIndependent:true},
+  {id:'sep2',  label:'Sep 2, 2025',     seizures:['2025-09-02T13:00'],                             pressureIndependent:true},
   {id:'sep25', label:'Sep 25–27, 2025', seizures:['2025-09-25T23:44','2025-09-26T02:45','2025-09-26T05:30','2025-09-26T13:00','2025-09-27T06:15']},
   {id:'dec19', label:'Dec 19, 2025',    seizures:['2025-12-19T06:00']},
   {id:'jan11', label:'Jan 11, 2026',    seizures:['2026-01-11T15:30']},
@@ -441,7 +441,7 @@ async function fetchKHAOLive() {
 }
 
 // Fetch Open-Meteo pressure + temperature forecast (14-day hourly).
-// Returns array of {dt, inHg, tempC} sampled every 3 hours, in Eastern Time.
+// Returns array of {dt, inHg, tempC} at hourly resolution, in Eastern Time.
 async function fetchOpenMeteoForecast() {
   const r = await fetch(
     `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}` +
@@ -449,9 +449,9 @@ async function fetchOpenMeteoForecast() {
   );
   if (!r.ok) throw new Error(`Open-Meteo HTTP ${r.status}`);
   const data = await r.json();
-  const times  = data.hourly.time.filter((_,i) => i % 3 === 0);
-  const pressures = data.hourly.surface_pressure.filter((_,i) => i % 3 === 0).map(hpa2in);
-  const temps  = data.hourly.temperature_2m.filter((_,i) => i % 3 === 0);
+  const times    = data.hourly.time;
+  const pressures = data.hourly.surface_pressure.map(hpa2in);
+  const temps    = data.hourly.temperature_2m;
   return times.map((dt, i) => ({
     dt: dt.replace('T', ' '),
     inHg: pressures[i],
@@ -1312,12 +1312,11 @@ function findDropEvents(rows, minDrop, opts={}) {
 
 function calibrateThresholds(rows) {
   // Calibration strategy:
-  // MODERATE = safety net — catches everything. Uses consecutive filter only.
-  //            No pressure floor, no 6hr check, no afternoon exclusion.
-  //            Floor at 0.030" minimum threshold.
-  // HIGH     = operational trigger — uses ALL filters to minimise false alarms:
-  //            consecutive + afternoon exclusion + pressure floor + 6hr cumulative.
-  //            Calibrated to still achieve 100% sensitivity with all filters active.
+  // Find the HIGHEST threshold that still achieves 100% sensitivity on seizure days.
+  // This gives the most selective threshold the data supports — not the floor.
+  // MODERATE = safety net — consecutive filter only, no floor/6hr/afternoon filter.
+  // HIGH     = all filters active (floor, 6hr cumul, consecutive, no-afternoon).
+  // Both scan from 0.030" to 0.200" and return the highest value still at 100%.
   const clusterDates = [...new Set(CLUSTERS.flatMap(c=>c.seizures.map(s=>s.slice(0,10))))];
 
   function testSensitivity(thresh, opts) {
@@ -1334,38 +1333,29 @@ function calibrateThresholds(rows) {
     return tp;
   }
 
-  // MODERATE: consecutive only, no floor, no 6hr, no afternoon filter
-  let calibMod = 0.060;
-  for (let t = 0.030; t <= 0.120; t += 0.005) {
-    const thresh = Math.round(t*1000)/1000;
-    if (testSensitivity(thresh, {
-      requireConsecutive: true,
-      excludeAfternoon:   false,
-      pressureFloor:      null,   // no floor — catch everything
-      require6hrDrop:     false,  // no 6hr check
-    }) === clusterDates.length) {
-      calibMod = thresh;
-      break;
-    }
-  }
+  // Scan full range and find the HIGHEST threshold still at 100% sensitivity
+  const modOpts = {
+    requireConsecutive: true,
+    excludeAfternoon:   false,
+    pressureFloor:      null,
+    require6hrDrop:     false,
+  };
+  const highOpts = {
+    requireConsecutive: true,
+    excludeAfternoon:   true,
+    pressureFloor:      PRESSURE_FLOOR,
+    require6hrDrop:     true,
+    min6hrDrop:         MIN_6HR_DROP,
+    waive6hrAbove:      0.08,
+  };
 
-  // HIGH: all filters active — find lowest threshold still at 100% sensitivity
-  // waive6hrAbove: large drops (≥0.08") bypass the 6hr sustained check entirely,
-  // since a rapid large fall is a genuine weather event regardless of recovery time.
-  let calibHigh = calibMod;
-  for (let t = calibMod; t <= 0.120; t += 0.005) {
-    const thresh = Math.round(t*1000)/1000;
-    if (testSensitivity(thresh, {
-      requireConsecutive: true,
-      excludeAfternoon:   true,
-      pressureFloor:      PRESSURE_FLOOR,
-      require6hrDrop:     true,
-      min6hrDrop:         MIN_6HR_DROP,
-      waive6hrAbove:      0.08,
-    }) === clusterDates.length) {
-      calibHigh = thresh;
-      break;
-    }
+  let calibMod  = 0.030; // fallback floor
+  let calibHigh = 0.030; // fallback floor
+
+  for (let t = 0.030; t <= 0.200; t += 0.005) {
+    const thresh = Math.round(t * 1000) / 1000;
+    if (testSensitivity(thresh, modOpts)  === clusterDates.length) calibMod  = thresh;
+    if (testSensitivity(thresh, highOpts) === clusterDates.length) calibHigh = thresh;
   }
 
   return { high: calibHigh, mod: calibMod };
