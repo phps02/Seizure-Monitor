@@ -113,7 +113,7 @@ const SEIZURE_TS    = SEIZURES.map(s => new Date(s.dt).getTime());
 
 const CLUSTERS = [
   {id:'jul15', label:'Jul 15, 2025',    seizures:['2025-07-15T10:00','2025-07-15T14:00'],          pressureIndependent:true},
-  {id:'sep2',  label:'Sep 2, 2025',     seizures:['2025-09-02T13:00'],                             pressureIndependent:true},
+  {id:'sep2',  label:'Sep 2, 2025',     seizures:['2025-09-02T13:00']},
   {id:'sep25', label:'Sep 25–27, 2025', seizures:['2025-09-25T23:44','2025-09-26T02:45','2025-09-26T05:30','2025-09-26T13:00','2025-09-27T06:15']},
   {id:'dec19', label:'Dec 19, 2025',    seizures:['2025-12-19T06:00']},
   {id:'jan11', label:'Jan 11, 2026',    seizures:['2026-01-11T15:30']},
@@ -157,8 +157,8 @@ function getCycleAlert() {
 // After running validation, update HIGH_THRESH and MOD_THRESH accordingly.
 // Initial values set to last known calibrated result from KHAO data so the
 // Forecast tab is correct on first load without needing to run Validation first.
-let HIGH_THRESH = 0.030;  // updated live from validation
-let MOD_THRESH  = 0.030;  // updated live from validation
+let HIGH_THRESH = 0.030;  // updated live from validation — set to last known calibrated value
+let MOD_THRESH  = 0.050;  // updated live from validation — set to last known calibrated value
 
 const COLORS = {
   HIGH:    {bg:'#3b0000',border:'#dc2626',text:'#fca5a5',pill:'#7f1d1d'},
@@ -728,7 +728,7 @@ function renderForecast(out, days, currentP, rapid, meta={}) {
 
   const legend=el('div',{class:'legend'});
   [
-    ['HIGH',     `≥${HIGH_THRESH}"/3hr + all filters`],
+    ['HIGH',     `≥${HIGH_THRESH.toFixed(3)}"/3hr · floor ≤${PRESSURE_FLOOR}" · consecutive · 6hr cumul`],
     ['MODERATE', `≥${MOD_THRESH}"/3hr · RH≥${RH_MODERATE_THRESH}% · ≥${TEMP_DROP_THRESH_C}°C/6h · cycle`],
     ['ELEVATED', 'Rebound / high-P drop'],
     ['LOW',      'Stable'],
@@ -1342,7 +1342,7 @@ function calibrateThresholds(rows) {
   };
   const highOpts = {
     requireConsecutive: true,
-    excludeAfternoon:   true,
+    excludeAfternoon:   false,
     pressureFloor:      PRESSURE_FLOOR,
     require6hrDrop:     true,
     min6hrDrop:         MIN_6HR_DROP,
@@ -1386,8 +1386,8 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
     '  ·  ',
     el('span',{style:{color:'#fcd34d',fontWeight:'bold'}},`MODERATE ≥ ${calib.mod.toFixed(3)}"/3hr`),
     el('div',{style:{color:'#6a9472',marginTop:'3px',fontSize:'10px'}},
-      `HIGH filters: consecutive · no-PM (12–18h) · floor ≤${PRESSURE_FLOOR}" · 6hr cumulative ≥${MIN_6HR_DROP}" ` +
-      `(waived for drops ≥0.08" — large rapid falls bypass 6hr check). ` +
+      `HIGH filters: consecutive · floor ≤${PRESSURE_FLOOR}" · 6hr cumulative ≥${MIN_6HR_DROP}" (waived for drops ≥0.08"). ` +
+      'Afternoon exclusion removed — 3/5 real seizure drops started in afternoon window. ' +
       'MODERATE: consecutive only (safety net). Both calibrated to 100% sensitivity.'
     )
   ));
@@ -1423,7 +1423,7 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
     if (window.length < 2) return false;
     // Check for any qualifying HIGH drop
     const highEvents = findDropEvents(window, HIGH_THRESH, {
-      requireConsecutive:true, excludeAfternoon:true,
+      requireConsecutive:true, excludeAfternoon:false,
       pressureFloor:PRESSURE_FLOOR, require6hrDrop:true,
       min6hrDrop:MIN_6HR_DROP, waive6hrAbove:0.08
     });
@@ -1632,9 +1632,9 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
   // ── Per-threshold analysis ──────────────────────────────────────────────────
   for (const [thresh, label, color, opts] of [
     [calib.high,
-      `HIGH — Drop ≥ ${calib.high.toFixed(3)}"/3hr · all filters (floor ${PRESSURE_FLOOR}", 6hr cumul, consec, no-PM)`,
+      `HIGH — Drop ≥ ${calib.high.toFixed(3)}"/3hr · floor ≤${PRESSURE_FLOOR}" · consecutive · 6hr cumul`,
       COLORS.HIGH,
-      {requireConsecutive:true, excludeAfternoon:true, pressureFloor:PRESSURE_FLOOR, require6hrDrop:true, min6hrDrop:MIN_6HR_DROP, waive6hrAbove:0.08}],
+      {requireConsecutive:true, excludeAfternoon:false, pressureFloor:PRESSURE_FLOOR, require6hrDrop:true, min6hrDrop:MIN_6HR_DROP, waive6hrAbove:0.08}],
     [calib.mod,
       `MODERATE — Drop ≥ ${calib.mod.toFixed(3)}"/3hr · consecutive only (safety net)`,
       COLORS.MODERATE,
@@ -1754,7 +1754,7 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
     // Use same filters as HIGH threshold: consecutive drop + afternoon exclusion
     const events = findDropEvents(rows, minDrop, {
       requireConsecutive: true,
-      excludeAfternoon:   true,
+      excludeAfternoon:   false,
       pressureFloor:      PRESSURE_FLOOR,
       require6hrDrop:     true,
       min6hrDrop:         MIN_6HR_DROP,
