@@ -601,19 +601,23 @@ function getHumidityAlert(rhReadings) {
   if (!rhReadings || rhReadings.length < 3) return null;
   const now = Date.now();
   const windowMs = RH_SUSTAINED_HOURS * 3600000;
-  // Count how many of the last 6 hours had RH ≥ threshold
-  const recent = rhReadings.filter(r => r.t >= now - windowMs && r.t <= now);
-  if (recent.length < 3) return null; // need at least 3 readings in window
-  const highCount = recent.filter(r => r.rh >= RH_MODERATE_THRESH).length;
-  const allHigh  = highCount === recent.length;
-  const mostHigh = highCount / recent.length >= 0.75;
-  if (!mostHigh) return null;
+  // Check for RH_SUSTAINED_HOURS consecutive hours ≥ RH_MODERATE_THRESH in window
+  const recent = rhReadings.filter(r => r.t >= now - windowMs && r.t <= now)
+    .sort((a,b) => a.t - b.t);
+  if (recent.length < 3) return null;
+  // Count max consecutive hours above threshold
+  let maxConsec = 0, cur = 0;
+  recent.forEach(r => {
+    if (r.rh >= RH_MODERATE_THRESH) { cur++; maxConsec = Math.max(maxConsec, cur); }
+    else cur = 0;
+  });
+  if (maxConsec < RH_SUSTAINED_HOURS) return null;
   const meanRH = recent.reduce((a,b) => a + b.rh, 0) / recent.length;
   return {
     level: 'MODERATE',
     meanRH: parseFloat(meanRH.toFixed(1)),
     sustainedHours: RH_SUSTAINED_HOURS,
-    allHigh,
+    allHigh: maxConsec === recent.length,
   };
 }
 
@@ -1396,8 +1400,14 @@ async function loadHistory() {
     el('h3',{},'Seizure Log Analysis'),
     el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Source: '),'KHAO ASOS physical station. Raw altimeter readings — sharper drops than ERA5 model data.'),
     el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Pressure-independent clusters: '),
-      'Jul 15 and Sep 2 show no qualifying barometric drop in the 48h prior at KHAO. ',
-      'These are captured by the cycle-length alert (30/45-day thresholds) rather than the drop model.'
+      'Sep 2 shows no qualifying barometric drop in the 48h prior at KHAO independent of the afternoon filter removal. ',
+      'Captured by the cycle-length and humidity pathways rather than the drop model.'
+    ),
+    el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Jul 15 clinical note: '),
+      'First recorded seizure. Dog was in Dayton (45417) Jul 13–14, returned West Chester Jul 14 ~19:00. ',
+      'KDAY and KHAO both showed stable/rising pressure — no frontal drop preceded the seizure. ',
+      'Pressure peaked at 30.10" at seizure time (10:00), with a qualifying drop on the afternoon of Jul 15 (0.060"). ',
+      'RH was extreme (97.8% mean, 100% max in 14h prior). Classified as pressure-dependent with extreme humidity co-trigger.'
     ),
     el('p',{style:{color:'#c4685a'}},'Share with your veterinary neurologist.')
   ));
@@ -1458,11 +1468,8 @@ async function loadValidation() {
       allRows = allRows.filter(r => !(r.dt >= KDAY_START && r.dt <= KDAY_END));
       allRows = allRows.concat(kdaySplice);
       allRows.sort((a,b) => a.dt.localeCompare(b.dt));
-      // Debug: log KDAY rows to console
-      console.log('KDAY splice: ' + kdaySplice.length + ' rows');
-      kdaySplice.forEach(r => console.log('  KDAY: ' + r.dt + ' → ' + r.pressure.toFixed(3) + '"'));
     } catch(e) {
-      console.error('KDAY fetch failed for Jul 13-14 splice:', e.message);
+      // KDAY fetch failed — KHAO data remains for that window (fallback)
     }
 
     out.innerHTML = `<div class="loading">Step ${chunks.length+1}/${chunks.length+3}: Fetching humidity data…</div>`;
@@ -1619,7 +1626,10 @@ function calibrateThresholds(rows) {
   // MODERATE = safety net — consecutive filter only, no floor/6hr/afternoon filter.
   // HIGH     = all filters active (floor, 6hr cumul, consecutive, no-afternoon).
   // Both scan from 0.030" to 0.200" and return the highest value still at 100%.
-  const clusterDates = [...new Set(CLUSTERS.flatMap(c=>c.seizures.map(s=>s.slice(0,10))))];
+  // Use only the first seizure date of each pressure-sensitive cluster.
+  // Later days in a multi-day cluster don't need their own qualifying drop.
+  const pressureClusters = CLUSTERS.filter(c => !c.pressureIndependent);
+  const clusterDates = pressureClusters.map(c => c.seizures[0].slice(0,10));
 
   function testSensitivity(thresh, opts) {
     const events = findDropEvents(rows, thresh, opts);
@@ -1702,7 +1712,9 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
     el('span',{style:{color:'#93c5fd',fontWeight:'bold'}},'ASOS readings: '), `${rows.length}`
   ));
 
-  const clusterDates = [...new Set(CLUSTERS.flatMap(c=>c.seizures.map(s=>s.slice(0,10))))];
+  // Use first seizure date of each pressure-sensitive cluster only.
+  // Pressure-independent clusters (Jul 15) have no qualifying drop by definition.
+  const clusterDates = CLUSTERS.filter(c => !c.pressureIndependent).map(c => c.seizures[0].slice(0,10));
 
   // ── FOUR-PATHWAY UNIFIED VALIDATION ─────────────────────────────────────────
   // For each day in the dataset, check which pathways would have fired.
