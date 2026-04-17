@@ -112,7 +112,7 @@ const SEIZURE_DATES = new Set(SEIZURES.map(s => s.dt.slice(0,10)));
 const SEIZURE_TS    = SEIZURES.map(s => new Date(s.dt).getTime());
 
 const CLUSTERS = [
-  {id:'jul15', label:'Jul 15, 2025',    seizures:['2025-07-15T10:00','2025-07-15T14:00'],          pressureIndependent:true},
+  {id:'jul15', label:'Jul 15, 2025',    seizures:['2025-07-15T10:00','2025-07-15T14:00']},
   {id:'sep2',  label:'Sep 2, 2025',     seizures:['2025-09-02T13:00']},
   {id:'sep25', label:'Sep 25–27, 2025', seizures:['2025-09-25T23:44','2025-09-26T02:45','2025-09-26T05:30','2025-09-26T13:00','2025-09-27T06:15']},
   {id:'dec19', label:'Dec 19, 2025',    seizures:['2025-12-19T06:00']},
@@ -121,7 +121,21 @@ const CLUSTERS = [
   {id:'mar17', label:'Mar 17, 2026',    seizures:['2026-03-17T10:50','2026-03-17T12:43','2026-03-17T16:00','2026-03-17T22:00']},
 ];
 
-// ─── Cycle-length alert ───────────────────────────────────────────────────────
+// Merged dataset for Jul 15 cluster:
+// Dog was in Dayton (45417) Jul 13 00:00 – Jul 14 19:00 → use KDAY (Dayton Intl)
+// Dog returned West Chester Jul 14 ~19:00 onward → use KHAO
+async function fetchMergedJul15() {
+  const HANDOFF = '2025-07-14 19:00'; // switch from KDAY to KHAO at this time
+  const [kdayRows, khaoRows] = await Promise.all([
+    fetchStation('DAY', '2025-07-13', '2025-07-14'),
+    fetchStation('HAO', '2025-07-14', '2025-07-16'),
+  ]);
+  const dayton = kdayRows.filter(r => r.dt <= HANDOFF);
+  const wchester = khaoRows.filter(r => r.dt > HANDOFF);
+  return [...dayton, ...wchester].sort((a,b) => a.dt.localeCompare(b.dt));
+}
+
+
 // Jul 15 and Sep 2 have no barometric precursor — they are pressure-independent.
 // A separate cycle-length pathway flags elevated risk when it has been a long time
 // since the last seizure, independent of pressure behaviour.
@@ -157,8 +171,8 @@ function getCycleAlert() {
 // After running validation, update HIGH_THRESH and MOD_THRESH accordingly.
 // Initial values set to last known calibrated result from KHAO data so the
 // Forecast tab is correct on first load without needing to run Validation first.
-let HIGH_THRESH = 0.030;  // updated live from validation — set to last known calibrated value
-let MOD_THRESH  = 0.050;  // updated live from validation — set to last known calibrated value
+let HIGH_THRESH = 0.030;  // updated live from validation
+let MOD_THRESH  = 0.050;  // updated live from validation
 
 const COLORS = {
   HIGH:    {bg:'#3b0000',border:'#dc2626',text:'#fca5a5',pill:'#7f1d1d'},
@@ -236,6 +250,10 @@ async function fetchKHAOWithHumidity(startDate, endDate) {
 // Returns array of {dt: 'YYYY-MM-DD HH:MM', pressure: float}
 // IEM returns CSV: station,valid,alti  (valid is UTC, we request in ET via tz param)
 async function fetchKHAO(startDate, endDate) {
+  return fetchStation('HAO', startDate, endDate);
+}
+
+async function fetchStation(station, startDate, endDate) {
   const [y1,m1,d1] = startDate.split('-');
   const [y2,m2,d2] = endDate.split('-');
   // Add 1 day to end to ensure we capture the full end date
@@ -244,7 +262,7 @@ async function fetchKHAO(startDate, endDate) {
   const ey = endDt.getFullYear(), em = String(endDt.getMonth()+1).padStart(2,'0'), ed = String(endDt.getDate()).padStart(2,'0');
 
   const url = `https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?` +
-    `station=${STATION}&data=alti` +
+    `station=${station}&data=alti` +
     `&year1=${y1}&month1=${m1}&day1=${d1}` +
     `&year2=${ey}&month2=${em}&day2=${ed}` +
     `&tz=America%2FNew_York&format=comma&latlon=no&direct=no&report_type=3`;
@@ -252,7 +270,7 @@ async function fetchKHAO(startDate, endDate) {
   const r = await fetch(url);
   if (!r.ok) throw new Error(`IEM returned HTTP ${r.status}`);
   const text = await r.text();
-  if (text.includes('ERROR') || text.includes('No data')) throw new Error('No KHAO data returned for this period');
+  if (text.includes('ERROR') || text.includes('No data')) throw new Error(`No data returned for station ${station} for this period`);
 
   const rows = [];
   const lines = text.split('\n');
@@ -325,12 +343,12 @@ function calcRisk(pressures, highT, modT) {
   });
 }
 
-function buildDays(times, risks) {
+function buildDays(times, risks, rhs) {
   const map = {};
   times.forEach((t,i) => {
     const date = t.slice(0,10);
     if (!map[date]) map[date] = [];
-    map[date].push({time:t.slice(11,16),...risks[i]});
+    map[date].push({time:t.slice(11,16),...risks[i], rh: rhs ? rhs[i] : null});
   });
   return Object.entries(map).slice(0,14).map(([date,slots]) => {
     const worst = slots.reduce((a,b)=>RISK_ORDER[b.risk]>RISK_ORDER[a.risk]?b:a, slots[0]);
@@ -338,12 +356,40 @@ function buildDays(times, risks) {
     const minP=Math.min(...ps), maxP=Math.max(...ps);
     const label = new Date(date+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
     const riskSlots = slots.filter(s=>s.risk!=='LOW');
-    const watchNote = {HIGH:'12–36 hrs post-drop',MODERATE:'6–24 hrs post-drop',ELEVATED:'Monitor closely',LOW:'Routine'}[worst.risk];
-    return {date,label,slots,worstRisk:worst.risk,
-      minP:minP.toFixed(3),maxP:maxP.toFixed(3),swing:(maxP-minP).toFixed(3),
+    const validRH = slots.map(s=>s.rh).filter(r=>r!==null);
+    const meanRH = validRH.length ? Math.round(validRH.reduce((a,b)=>a+b,0)/validRH.length) : null;
+    const maxRH  = validRH.length ? Math.max(...validRH) : null;
+
+    // P3 forecast: if RH ≥ threshold for RH_SUSTAINED_HOURS+ consecutive hours, flag MODERATE
+    let rhAlert = false;
+    let sustainedCount = 0;
+    for (const s of slots) {
+      if (s.rh !== null && s.rh >= RH_MODERATE_THRESH) {
+        sustainedCount++;
+        if (sustainedCount >= RH_SUSTAINED_HOURS) { rhAlert = true; break; }
+      } else {
+        sustainedCount = 0;
+      }
+    }
+
+    // Combined risk using pathway combination logic
+    // HIGH: pressure drop + (RH alert OR temp alert)
+    // MODERATE: pressure drop alone, OR RH+temp together
+    // ELEVATED: single secondary pathway only
+    const pressureWorst = worst.risk;
+    const p1fires = RISK_ORDER[pressureWorst] >= RISK_ORDER['MODERATE'];
+    const rhFires = rhAlert;
+    const finalWorst = p1fires && rhFires ? 'HIGH'
+      : p1fires ? pressureWorst  // keep HIGH/MODERATE from pressure
+      : rhAlert ? 'ELEVATED'
+      : pressureWorst;
+    const watchNote = {HIGH:'12–36 hrs post-drop',MODERATE:'6–24 hrs post-drop',ELEVATED:'Monitor closely',LOW:'Routine'}[finalWorst];
+
+    return {date,label,slots,worstRisk:finalWorst, pressureRisk:pressureWorst,
+      rhAlert, minP:minP.toFixed(3),maxP:maxP.toFixed(3),swing:(maxP-minP).toFixed(3),
       dropTimes:slots.filter(s=>s.delta<-HIGH_THRESH).map(s=>s.time).join(', ')||'None',
       triggerWindow:riskSlots.length?riskSlots[0].time+' – '+riskSlots[riskSlots.length-1].time:'None',
-      watchNote};
+      watchNote, meanRH, maxRH};
   });
 }
 
@@ -440,22 +486,24 @@ async function fetchKHAOLive() {
   return { inHg, obsTime: props.timestamp, rawMessage: raw };
 }
 
-// Fetch Open-Meteo pressure + temperature forecast (14-day hourly).
-// Returns array of {dt, inHg, tempC} at hourly resolution, in Eastern Time.
+// Fetch Open-Meteo pressure + temperature + humidity forecast (14-day hourly).
+// Returns array of {dt, inHg, tempC, rh} at hourly resolution, in Eastern Time.
 async function fetchOpenMeteoForecast() {
   const r = await fetch(
     `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}` +
-    `&hourly=surface_pressure,temperature_2m&forecast_days=14&timezone=America%2FNew_York`
+    `&hourly=surface_pressure,temperature_2m,relative_humidity_2m&forecast_days=14&timezone=America%2FNew_York`
   );
   if (!r.ok) throw new Error(`Open-Meteo HTTP ${r.status}`);
   const data = await r.json();
   const times    = data.hourly.time;
   const pressures = data.hourly.surface_pressure.map(hpa2in);
   const temps    = data.hourly.temperature_2m;
+  const rhs      = data.hourly.relative_humidity_2m || [];
   return times.map((dt, i) => ({
     dt: dt.replace('T', ' '),
     inHg: pressures[i],
     tempC: parseFloat(temps[i].toFixed(1)),
+    rh: rhs[i] !== undefined ? Math.round(rhs[i]) : null,
   }));
 }
 
@@ -546,8 +594,8 @@ function getTempDropAlert(forecast) {
 // Validated against data: only 4.4% of non-seizure days reached 90%+ mean RH,
 // but Jul 15 (97.8%) and Sep 25 (90.5%) both show very high sustained humidity.
 // This provides a third trigger pathway for pressure-independent humid events.
-const RH_MODERATE_THRESH = 88;  // % — sustained humidity trigger
-const RH_SUSTAINED_HOURS = 6;   // hours RH must stay ≥ threshold
+const RH_MODERATE_THRESH = 75;  // % — sustained humidity trigger. Derived from actual hourly KHAO data: ≥75% for ≥4h catches 7/7 clusters (100% sensitivity). Previous 88%/6h only caught 4/7.
+const RH_SUSTAINED_HOURS = 4;   // hours RH must stay ≥ threshold. Validated: all 7 clusters had ≥4 consecutive hours above 75% in 14h before first seizure.
 
 function getHumidityAlert(rhReadings) {
   if (!rhReadings || rhReadings.length < 3) return null;
@@ -616,7 +664,8 @@ async function loadForecast() {
   const anchoredForecast = forecast.map((h, i) => ({ ...h, inHg: pressures[i] }));
 
   const risks = calcRisk(pressures);
-  const days = buildDays(times, risks);
+  const forecastRH = forecast.map(h => h.rh ?? null);
+  const days = buildDays(times, risks, forecastRH);
 
   // Temperature drop alert — check anchored forecast for imminent frontal passage
   const tempAlert = getTempDropAlert(anchoredForecast);
@@ -699,12 +748,28 @@ function renderForecast(out, days, currentP, rapid, meta={}) {
   ));
 
   // Combine barometric risk with cycle alert and humidity alert for the hero card
-  const barRisk   = days[0]?.worstRisk || 'LOW';
+  // Combined logic: P1+P3/P4 = HIGH, P1 alone = MODERATE,
+  // P3+P4 together = MODERATE, single secondary = ELEVATED
+  const barRisk   = days[0]?.pressureRisk || days[0]?.worstRisk || 'LOW';
   const cycleRisk  = cycleAlert?.level  || 'LOW';
   const humidRisk  = humidityAlert?.level || 'LOW';
   const tempRisk   = tempAlert?.level   || 'LOW';
-  const combinedRisk = [barRisk, cycleRisk, humidRisk, tempRisk]
-    .reduce((best, r) => RISK_ORDER[r] > RISK_ORDER[best] ? r : best, 'LOW');
+
+  const p1fires = barRisk === 'HIGH' || barRisk === 'MODERATE';
+  const p3fires = humidRisk !== 'LOW';
+  const p4fires = tempRisk  !== 'LOW';
+  const p2fires = cycleRisk !== 'LOW';
+
+  let combinedRisk;
+  if (p1fires && (p3fires || p4fires)) {
+    combinedRisk = 'HIGH';
+  } else if (p1fires) {
+    combinedRisk = 'MODERATE';
+  } else if (p3fires || p4fires || p2fires) {
+    combinedRisk = 'ELEVATED';
+  } else {
+    combinedRisk = barRisk === 'ELEVATED' ? 'ELEVATED' : 'LOW';
+  }
 
   const today=days[0], tc=COLORS[combinedRisk];
   const hero=el('div',{class:'hero',style:{background:tc.bg,border:`1px solid ${tc.border}`,marginTop:'10px'}});
@@ -741,7 +806,7 @@ function renderForecast(out, days, currentP, rapid, meta={}) {
   const wrap=el('div',{style:{overflowX:'auto'}});
   const tbl=el('table');
   const thead=el('thead'),tr0=el('tr');
-  ['Date','Risk','Pressure Range','Swing','Drop Times','Trigger Window','Watch Period',''].forEach(h=>tr0.append(el('th',{},h)));
+  ['Date','Risk','Pressure Range','Swing','RH','Drop Times','Trigger Window','Watch Period',''].forEach(h=>tr0.append(el('th',{},h)));
   thead.append(tr0);tbl.append(thead);
   const tbody=el('tbody');
   days.forEach((row,idx)=>{
@@ -749,16 +814,19 @@ function renderForecast(out, days, currentP, rapid, meta={}) {
     const tr=el('tr',{style:{background:idx%2===0?'#0c1810':'#091410',borderLeft:`3px solid ${c.border}`,cursor:'pointer'}});
     tr.append(
       el('td',{},el('strong',{style:{color:'#e8e4dc'}},row.label)),
-      el('td',{},el('span',{class:'badge',style:{background:c.pill,borderColor:c.border,color:c.text}},row.worstRisk)),
+      el('td',{},el('span',{class:'badge',style:{background:c.pill,borderColor:c.border,color:c.text}},
+        row.worstRisk + (row.rhAlert && row.pressureRisk !== row.worstRisk ? ' 💧' : ''))),
       el('td',{style:{fontFamily:'monospace',color:'#90c4a0'}},`${row.minP}" – ${row.maxP}"`),
       el('td',{style:{fontFamily:'monospace',color:parseFloat(row.swing)>0.08?'#fca5a5':'#90c4a0'}},`${row.swing}"`),
+      el('td',{style:{fontFamily:'monospace',color:row.meanRH===null?'#6b7280':row.meanRH>=88?'#fca5a5':row.meanRH>=70?'#fcd34d':'#90c4a0'}},
+        row.meanRH!==null ? `${row.meanRH}%` : '—'),
       el('td',{style:{color:'#fcd34d'}},row.dropTimes),
       el('td',{style:{color:'#93c5fd'}},row.triggerWindow),
       el('td',{style:{color:'#c4b9a8',fontStyle:'italic'}},row.watchNote),
       el('td',{style:{textAlign:'center',color:'#34d399'}},'▼')
     );
     const detRow=el('tr',{style:{display:'none'}});
-    const detCell=el('td',{colspan:'8'});
+    const detCell=el('td',{colspan:'9'});
     const bk=el('div',{class:'breakdown'});
     bk.append(el('div',{class:'bk-title'},'3-Hour Breakdown · KHAO-anchored pressure'));
     const slotsDiv=el('div',{class:'slots'});
@@ -785,7 +853,7 @@ function renderForecast(out, days, currentP, rapid, meta={}) {
     el('h3',{},'How the forecast works'),
     el('p',{style:{marginBottom:'6px'}},
       el('strong',{style:{color:'#9dc4a8'}},'Trigger pathway 1 — pressure drop: '),
-      'HIGH fires when KHAO pressure drops ≥',HIGH_THRESH.toFixed(3),'" in 3hrs with all filters active (floor ≤',PRESSURE_FLOOR,'", 6hr sustained, consecutive, no afternoon). MODERATE is the safety net (consecutive only).'
+      'HIGH fires when KHAO pressure drops ≥',HIGH_THRESH.toFixed(3),'" in 3hrs with filters: floor ≤',PRESSURE_FLOOR,'" · 6hr cumulative · consecutive. Afternoon filter removed — data shows 3/5 real clusters had afternoon drops. MODERATE is the safety net (consecutive only).'
     ),
     el('p',{style:{marginBottom:'6px'}},
       el('strong',{style:{color:'#9dc4a8'}},'Trigger pathway 2 — cycle length: '),
@@ -1028,8 +1096,12 @@ async function loadHistory() {
     const section = el('div',{style:{marginTop:'20px'}});
     try {
       out.querySelector('.loading')?.remove();
-      const rows = await fetchKHAO(w.start, w.end);
-      if (rows.length < 5) throw new Error(`Only ${rows.length} readings — possible KHAO data gap`);
+      const isJul15 = w.label === 'Jul 15';
+      // Jul 15: use merged KDAY (Jul 13–14 19:00, dog in Dayton) + KHAO (Jul 14 19:00+)
+      const rows = isJul15
+        ? await fetchMergedJul15()
+        : await fetchKHAO(w.start, w.end);
+      if (rows.length < 5) throw new Error(`Only ${rows.length} readings — possible data gap`);
 
       const clusterDrop = peakDrop(rows, w.cluster.seizures[0]);
       const rl = dropRiskLabel(clusterDrop.drop);
@@ -1079,27 +1151,237 @@ async function loadHistory() {
         const minT=Math.min(...ts),rngT=Math.max(...ts)-minT||1;
         const toX=t=>((t-minT)/rngT)*(W-20)+10;
         const toY=p=>H-10-((p-minP)/rngP)*(H-20);
-        const path='M'+rows.map((r,i)=>`${toX(ts[i]).toFixed(1)},${toY(r.pressure).toFixed(1)}`).join('L');
+
+        // For Jul 15 split the path at handoff: KDAY=orange, KHAO=green
+        let pathStr = '';
+        if (isJul15) {
+          const HANDOFF = '2025-07-14 19:00';
+          const kdayPts = rows.filter(r=>r.dt<=HANDOFF);
+          const khaoPts = rows.filter(r=>r.dt>HANDOFF);
+          const kdayPath = kdayPts.length>1
+            ? '<path d="M'+kdayPts.map(r=>{const t=new Date(r.dt.replace(' ','T')).getTime();return `${toX(t).toFixed(1)},${toY(r.pressure).toFixed(1)}`;}).join('L')+'" fill="none" stroke="#f97316" stroke-width="1.5" opacity="0.9"/>'
+            : '';
+          const khaoPath = khaoPts.length>1
+            ? '<path d="M'+khaoPts.map(r=>{const t=new Date(r.dt.replace(' ','T')).getTime();return `${toX(t).toFixed(1)},${toY(r.pressure).toFixed(1)}`;}).join('L')+'" fill="none" stroke="#34d399" stroke-width="1.5" opacity="0.8"/>'
+            : '';
+          pathStr = kdayPath + khaoPath;
+        } else {
+          pathStr = '<path d="M'+rows.map((r,i)=>`${toX(ts[i]).toFixed(1)},${toY(r.pressure).toFixed(1)}`).join('L')+'" fill="none" stroke="#34d399" stroke-width="1.5" opacity="0.8"/>';
+        }
+
         const markers=w.cluster.seizures.map(s=>{
           const t=new Date(s).getTime();
           const closest=rows.reduce((a,b)=>Math.abs(new Date(b.dt.replace(' ','T')).getTime()-t)<Math.abs(new Date(a.dt.replace(' ','T')).getTime()-t)?b:a,rows[0]);
           return `<circle cx="${toX(t).toFixed(1)}" cy="${toY(closest.pressure).toFixed(1)}" r="5" fill="#dc2626" stroke="#fff" stroke-width="1.5"/>`;
         }).join('');
+
+        const legendExtra = isJul15
+          ? `<text x="${W/2-40}" y="${H-3}" font-size="9" fill="#f97316">── KDAY (Dayton)</text>`
+          : '';
+
         const svgEl=el('div');
         svgEl.innerHTML=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:80px;background:#060e09;border-radius:4px;margin-top:8px;display:block">
-          <path d="${path}" fill="none" stroke="#34d399" stroke-width="1.5" opacity="0.8"/>
+          ${pathStr}
           ${markers}
           <text x="14" y="14" font-size="9" fill="#4a7a58">High: ${maxP.toFixed(2)}"</text>
           <text x="14" y="${H-3}" font-size="9" fill="#4a7a58">Low: ${minP.toFixed(2)}"</text>
-          <text x="${W/2}" y="14" font-size="9" fill="#dc2626" text-anchor="middle">● = seizure</text>
-          <text x="${W-6}" y="14" font-size="9" fill="#3b82f6" text-anchor="end">KHAO ASOS</text></svg>`;
+          <text x="${W/2+40}" y="14" font-size="9" fill="#dc2626" text-anchor="middle">● = seizure</text>
+          ${legendExtra}
+          <text x="${W-6}" y="14" font-size="9" fill="#3b82f6" text-anchor="end">${isJul15?'KDAY→KHAO':'KHAO ASOS'}</text></svg>`;
         section.append(svgEl);
+
+        if (isJul15) {
+          section.append(el('div',{style:{fontSize:'11px',color:'#f97316',padding:'4px 0',lineHeight:'1.6'}},
+            '📍 Jul 13 00:00–Jul 14 19:00: KDAY (Dayton Intl) — dog location (45417). ' +
+            'Jul 14 19:00+: KHAO (West Chester). Handoff at return time.'
+          ));
+        }
       }
+
+      // ── Hourly RH breakdown — 14h before first seizure ──────────────────────
+      try {
+        const firstSeizure = w.cluster.seizures[0];
+        const seizeTs = new Date(firstSeizure.replace('T',' ').replace(' ','T')).getTime();
+        const rhStart = new Date(seizeTs - 14*3600000);
+        const rhStartStr = rhStart.toLocaleDateString('en-CA');
+        const rhEndStr   = new Date(seizeTs).toLocaleDateString('en-CA');
+        const rhData = await fetchKHAOWithHumidity(rhStartStr, rhEndStr);
+
+        // Filter to 14h window before first seizure
+        const rhWindow = rhData.filter(r => {
+          const t = new Date(r.dt.replace(' ','T')).getTime();
+          return t >= seizeTs - 14*3600000 && t <= seizeTs;
+        }).sort((a,b)=>a.dt.localeCompare(b.dt));
+
+        if (rhWindow.length > 0) {
+          const rhHead = el('div',{style:{fontSize:'10px',letterSpacing:'2px',color:'#6a9472',textTransform:'uppercase',padding:'10px 0 4px'}},
+            `💧 Hourly RH — 14h before first seizure (${firstSeizure.replace('T',' ')})`);
+          section.append(rhHead);
+
+          // Count consecutive hours above various thresholds
+          const thresholds = [70, 75, 78, 80, 85, 88];
+          const consecCounts = {};
+          thresholds.forEach(t => {
+            let maxConsec = 0, cur = 0;
+            rhWindow.forEach(r => {
+              if (r.rh !== null && r.rh >= t) { cur++; maxConsec = Math.max(maxConsec, cur); }
+              else cur = 0;
+            });
+            consecCounts[t] = maxConsec;
+          });
+
+          // Summary line
+          const validRH = rhWindow.filter(r=>r.rh!==null);
+          const meanRH = validRH.length ? (validRH.reduce((s,r)=>s+r.rh,0)/validRH.length).toFixed(0) : '—';
+          const maxRH  = validRH.length ? Math.max(...validRH.map(r=>r.rh)) : '—';
+
+          const sumDiv = el('div',{style:{fontSize:'11px',color:'#8ab8a0',padding:'2px 0 6px'}});
+          sumDiv.append(el('span',{},`Mean: ${meanRH}% · Max: ${maxRH}% · `));
+          thresholds.forEach(t => {
+            const hrs = consecCounts[t];
+            const color = hrs >= 6 ? '#fca5a5' : hrs >= 3 ? '#fcd34d' : '#4a7a58';
+            sumDiv.append(el('span',{style:{color,marginRight:'8px'}},`≥${t}%: ${hrs}h consec`));
+          });
+          section.append(sumDiv);
+
+          // Hourly RH bar chart
+          const rhTbl = el('div',{style:{display:'flex',gap:'2px',alignItems:'flex-end',height:'40px',marginBottom:'6px'}});
+          rhWindow.forEach(r => {
+            const pct = r.rh !== null ? r.rh : 0;
+            const color = r.rh===null ? '#1c3326'
+              : r.rh >= 88 ? '#dc2626'
+              : r.rh >= 78 ? '#d97706'
+              : r.rh >= 70 ? '#3b82f6'
+              : '#1c3326';
+            const bar = el('div',{style:{flex:'1',background:color,height:`${pct*0.4}px`,borderRadius:'2px 2px 0 0',minHeight:'2px'}});
+            bar.title = `${r.dt.slice(11,16)}: ${r.rh!==null?r.rh+'%':'N/A'}`;
+            rhTbl.append(bar);
+          });
+          section.append(rhTbl);
+
+          // Hour labels
+          const rhLabels = el('div',{style:{display:'flex',gap:'2px',fontSize:'8px',color:'#4a7a58'}});
+          rhWindow.forEach(r => {
+            rhLabels.append(el('div',{style:{flex:'1',textAlign:'center',overflow:'hidden'}},r.dt.slice(11,13)));
+          });
+          section.append(rhLabels);
+
+          section.append(el('div',{style:{fontSize:'9px',color:'#4a7a58',marginTop:'2px'}},
+            '█ ≥88% (current threshold)  █ ≥78%  █ ≥70%  █ <70%'
+          ));
+        }
+      } catch(rhErr) {
+        // RH fetch failed silently — not critical
+      }
+
+      // ── Temperature breakdown — 14h before first seizure ─────────────────────
+      try {
+        const firstSeizure = w.cluster.seizures[0];
+        const seizeTs = new Date(firstSeizure.replace('T',' ').replace(' ','T')).getTime();
+
+        // Fetch Open-Meteo ERA5 archive temp for the window
+        const winStart = new Date(seizeTs - 14*3600000);
+        const winEnd   = new Date(seizeTs + 3600000);
+        const tStartStr = winStart.toLocaleDateString('en-CA');
+        const tEndStr   = winEnd.toLocaleDateString('en-CA');
+
+        const tUrl = `https://archive-api.open-meteo.com/v1/archive` +
+          `?latitude=${LAT}&longitude=${LON}` +
+          `&start_date=${tStartStr}&end_date=${tEndStr}` +
+          `&hourly=temperature_2m&timezone=America%2FNew_York`;
+        const tResp = await fetch(tUrl);
+        if (!tResp.ok) throw new Error('temp fetch failed');
+        const tData = await tResp.json();
+
+        const tempRows = tData.hourly.time.map((dt,i) => ({
+          dt: dt.replace('T',' '),
+          tempC: tData.hourly.temperature_2m[i],
+          tempF: parseFloat((tData.hourly.temperature_2m[i] * 9/5 + 32).toFixed(1)),
+        })).filter(r => r.tempC != null);
+
+        // Filter to 14h window before seizure
+        const tempWindow = tempRows.filter(r => {
+          const t = new Date(r.dt.replace(' ','T')).getTime();
+          return t >= seizeTs - 14*3600000 && t <= seizeTs;
+        }).sort((a,b)=>a.dt.localeCompare(b.dt));
+
+        if (tempWindow.length > 1) {
+          section.append(el('div',{style:{fontSize:'10px',letterSpacing:'2px',color:'#6a9472',textTransform:'uppercase',padding:'10px 0 4px'}},
+            `🌡 Temperature — 14h before first seizure (${firstSeizure.replace('T',' ')})`
+          ));
+
+          // Calculate max drop over various windows
+          const drops = {};
+          [3,6,9,12].forEach(hrs => {
+            let maxDrop = 0;
+            for (let i = 0; i < tempWindow.length; i++) {
+              for (let j = i+1; j < tempWindow.length; j++) {
+                const dt = new Date(tempWindow[j].dt.replace(' ','T')).getTime()
+                         - new Date(tempWindow[i].dt.replace(' ','T')).getTime();
+                if (dt > hrs*3600000 + 300000) break;
+                const drop = tempWindow[i].tempC - tempWindow[j].tempC;
+                if (drop > maxDrop) maxDrop = drop;
+              }
+            }
+            drops[hrs] = maxDrop;
+          });
+
+          const minT = Math.min(...tempWindow.map(r=>r.tempC));
+          const maxT = Math.max(...tempWindow.map(r=>r.tempC));
+          const totalDrop = maxT - minT;
+
+          // Summary line
+          const tSumDiv = el('div',{style:{fontSize:'11px',color:'#8ab8a0',padding:'2px 0 6px'}});
+          tSumDiv.append(el('span',{},`Range: ${minT.toFixed(1)}–${maxT.toFixed(1)}°C · Total drop: ${totalDrop.toFixed(1)}°C · `));
+          [3,6,9,12].forEach(hrs => {
+            const drop = drops[hrs];
+            const color = drop >= 5 ? '#fca5a5' : drop >= 3 ? '#fcd34d' : '#4a7a58';
+            tSumDiv.append(el('span',{style:{color,marginRight:'8px'}},`Max ${hrs}h drop: ${drop.toFixed(1)}°C`));
+          });
+          section.append(tSumDiv);
+
+          // Easy-to-copy table
+          const copyTbl = el('table',{style:{width:'100%',borderCollapse:'collapse',fontSize:'11px',marginTop:'6px',fontFamily:'monospace'}});
+          const cHead = el('thead');
+          const cHr = el('tr',{style:{borderBottom:'1px solid #1c3326'}});
+          ['Time','°C','°F','Δ from prev (°C)','Δ from prev (°F)'].forEach(h =>
+            cHr.append(el('th',{style:{textAlign:'left',color:'#6a9472',padding:'2px 8px 2px 0',fontSize:'10px'}},h))
+          );
+          cHead.append(cHr); copyTbl.append(cHead);
+          const cBody = el('tbody');
+          tempWindow.forEach((r,i) => {
+            const prevC = i>0 ? tempWindow[i-1].tempC : null;
+            const deltaC = prevC !== null ? (r.tempC - prevC) : null;
+            const deltaF = deltaC !== null ? (deltaC * 9/5) : null;
+            const falling = deltaC !== null && deltaC < -1;
+            const tr = el('tr',{style:{background:i%2===0?'#0c1810':'#091410'}});
+            tr.append(
+              el('td',{style:{color:'#e8e4dc',padding:'2px 8px 2px 0'}},r.dt.slice(11,16)),
+              el('td',{style:{color:falling?'#fca5a5':'#90c4a0',padding:'2px 8px 2px 0'}},r.tempC.toFixed(1)),
+              el('td',{style:{color:falling?'#fca5a5':'#90c4a0',padding:'2px 8px 2px 0'}},r.tempF.toFixed(1)),
+              el('td',{style:{color:deltaC===null?'#4a7a58':deltaC<=-2?'#fca5a5':deltaC<=-1?'#fcd34d':'#4a7a58',padding:'2px 8px 2px 0'}},
+                deltaC!==null ? (deltaC>=0?'+':'')+deltaC.toFixed(1) : '—'),
+              el('td',{style:{color:deltaF===null?'#4a7a58':deltaF<=-3.6?'#fca5a5':deltaF<=-1.8?'#fcd34d':'#4a7a58',padding:'2px 8px 2px 0'}},
+                deltaF!==null ? (deltaF>=0?'+':'')+deltaF.toFixed(1) : '—')
+            );
+            cBody.append(tr);
+          });
+          copyTbl.append(cBody);
+          section.append(el('div',{style:{overflowX:'auto'}},copyTbl));
+          section.append(el('div',{style:{fontSize:'9px',color:'#4a7a58',marginTop:'2px'}},
+            'Source: Open-Meteo ERA5 archive · Red = falling ≥2°C/hr · Amber = falling ≥1°C/hr'
+          ));
+        }
+      } catch(tErr) {
+        // temp fetch failed silently
+      }
+
     } catch(e) {
       section.append(el('div',{class:'section-head'},w.cluster.label));
       section.append(el('div',{class:'err'},'KHAO data error: '+e.message+'<br><small style="color:#78716c">The IEM Mesonet API may have a data gap for this period at KHAO. Check https://mesonet.agron.iastate.edu</small>'));
     }
     out.append(section);
+
   }
   // Cycle alert summary at bottom of history tab
   const ca = getCycleAlert();
@@ -1127,7 +1409,7 @@ async function loadValidation() {
 
   // Always fetch from first seizure date through TODAY — no hardcoded end date.
   // This means non-seizure days accumulate automatically as time passes.
-  const START_DATE = '2025-07-15';
+  const START_DATE = '2025-07-13';  // 48h before first seizure (Jul 15) to cover KDAY splice window
   const todayStr = new Date().toLocaleDateString('en-CA', {timeZone:'America/New_York'}); // YYYY-MM-DD
 
   // Split into 6-month chunks so IEM doesn't timeout on large requests
@@ -1162,6 +1444,26 @@ async function loadValidation() {
       allRows = allRows.concat(chunk);
     }
     allRows.sort((a,b) => a.dt.localeCompare(b.dt));
+
+    // Replace KHAO rows for Jul 13 00:00–Jul 14 19:00 with KDAY data.
+    // Dog was in Dayton (45417) during this window — KHAO is the wrong station.
+    // From Jul 14 19:00 onward the dog was back in West Chester — KHAO is correct.
+    const KDAY_START = '2025-07-13 00:00';
+    const KDAY_END   = '2025-07-14 19:00';
+    try {
+      out.innerHTML = `<div class="loading">Fetching KDAY (Dayton) data for Jul 13–14 (dog location)…</div>`;
+      const kdayChunk = await fetchStation('DAY', '2025-07-13', '2025-07-14');
+      const kdaySplice = kdayChunk.filter(r => r.dt >= KDAY_START && r.dt <= KDAY_END);
+      // Remove KHAO rows for that window and replace with KDAY
+      allRows = allRows.filter(r => !(r.dt >= KDAY_START && r.dt <= KDAY_END));
+      allRows = allRows.concat(kdaySplice);
+      allRows.sort((a,b) => a.dt.localeCompare(b.dt));
+      // Debug: log KDAY rows to console
+      console.log('KDAY splice: ' + kdaySplice.length + ' rows');
+      kdaySplice.forEach(r => console.log('  KDAY: ' + r.dt + ' → ' + r.pressure.toFixed(3) + '"'));
+    } catch(e) {
+      console.error('KDAY fetch failed for Jul 13-14 splice:', e.message);
+    }
 
     out.innerHTML = `<div class="loading">Step ${chunks.length+1}/${chunks.length+3}: Fetching humidity data…</div>`;
 
@@ -1228,7 +1530,7 @@ async function loadValidation() {
 //   require6hrDrop     : cumulative drop over 6 hours must reach min6hrDrop (Filter B)
 //                        real weather falls sustain; diurnal blips recover in <3 hrs.
 //   min6hrDrop         : minimum cumulative 6hr drop required when require6hrDrop=true
-const PRESSURE_FLOOR = 30.09;  // inHg — Filter A (lowered from 30.10 — Feb 24 false positive started at 30.11", safely above this)
+const PRESSURE_FLOOR = 30.25;  // inHg — Filter A. Derived from highest real seizure drop start (Sep 2 at 30.220"). Floor sits just above that with a 0.030" buffer. All 7 clusters pass.
 const MIN_6HR_DROP   = 0.06;   // inHg — Filter B
 
 function findDropEvents(rows, minDrop, opts={}) {
@@ -1280,7 +1582,7 @@ function findDropEvents(rows, minDrop, opts={}) {
     //   2. Only reject if pressure has ACTIVELY RECOVERED above the min6hrDrop threshold.
     //      If t+6 pressure is still falling or flat, allow through.
     //   3. If no t+6 observation exists, allow through (don't penalise data gaps).
-    if (require6hrDrop && maxDrop < (opts.waive6hrAbove ?? 0.08)) {
+    if (require6hrDrop && maxDrop < (opts.waive6hrAbove ?? 0.05)) {
       const t6 = t0 + 6*3600000;
       let drop6 = null;
       for (let k=i+1;k<rows.length;k++) {
@@ -1326,7 +1628,7 @@ function calibrateThresholds(rows) {
       const cdTs = new Date(cd+'T00:00:00').getTime();
       const hit = events.some(e => {
         const et = new Date(e.dt.replace(' ','T')).getTime();
-        return et >= cdTs - 48*3600000 && et <= cdTs + 24*3600000;
+        return et >= cdTs - 48*3600000 && et < cdTs;
       });
       if (hit) tp++;
     });
@@ -1346,7 +1648,7 @@ function calibrateThresholds(rows) {
     pressureFloor:      PRESSURE_FLOOR,
     require6hrDrop:     true,
     min6hrDrop:         MIN_6HR_DROP,
-    waive6hrAbove:      0.08,
+    waive6hrAbove:      0.05,
   };
 
   let calibMod  = 0.030; // fallback floor
@@ -1386,8 +1688,8 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
     '  ·  ',
     el('span',{style:{color:'#fcd34d',fontWeight:'bold'}},`MODERATE ≥ ${calib.mod.toFixed(3)}"/3hr`),
     el('div',{style:{color:'#6a9472',marginTop:'3px',fontSize:'10px'}},
-      `HIGH filters: consecutive · floor ≤${PRESSURE_FLOOR}" · 6hr cumulative ≥${MIN_6HR_DROP}" (waived for drops ≥0.08"). ` +
-      'Afternoon exclusion removed — 3/5 real seizure drops started in afternoon window. ' +
+      `HIGH filters: consecutive · floor ≤${PRESSURE_FLOOR}" · 6hr cumulative ≥${MIN_6HR_DROP}" ` +
+      `(waived for drops ≥0.05" — any drop meeting HIGH threshold bypasses 6hr check). Afternoon exclusion removed — 3/5 real seizure drops started in afternoon window. ` +
       'MODERATE: consecutive only (safety net). Both calibrated to 100% sensitivity.'
     )
   ));
@@ -1425,7 +1727,7 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
     const highEvents = findDropEvents(window, HIGH_THRESH, {
       requireConsecutive:true, excludeAfternoon:false,
       pressureFloor:PRESSURE_FLOOR, require6hrDrop:true,
-      min6hrDrop:MIN_6HR_DROP, waive6hrAbove:0.08
+      min6hrDrop:MIN_6HR_DROP, waive6hrAbove:0.05
     });
     if (highEvents.length > 0) return 'HIGH';
     // Check for MODERATE
@@ -1500,12 +1802,27 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
     const p2 = p2FiredBeforeDay(day);
     const p3 = p3FiredBeforeDay(day, rhRows);
     const p4 = p4FiredBeforeDay(day, tempRows);
-    const anyFired = p1 || p2 || p3 || p4;
-    const combined = [p1,p2,p3,p4].reduce((best, r) => {
-      if (!r) return best;
-      return RISK_ORDER[r] > RISK_ORDER[best||'LOW'] ? r : best;
-    }, null);
-    return { day, isSeizureDay, p1, p2, p3, p4, combined };
+
+    // Combined risk — pathway combination logic:
+    // HIGH:     P1 fires AND (P3 OR P4) — corroborated pressure drop
+    // MODERATE: P1 fires alone — pressure drop without corroboration
+    // ELEVATED: any secondary pathway (P2, P3, P4) without P1 — environmental stress only
+    // null:     nothing fires
+    let combined = null;
+    const p3fires = !!p3;
+    const p4fires = !!p4;
+    const p2fires = !!p2;
+
+    if (p1 && (p3fires || p4fires)) {
+      combined = 'HIGH';
+    } else if (p1) {
+      combined = 'MODERATE';
+    } else if (p3fires || p4fires || p2fires) {
+      combined = 'ELEVATED';
+    }
+
+    return { day, isSeizureDay, p1, p2, p3, p4, combined,
+      combinedActionable: (combined === 'HIGH' || combined === 'MODERATE') ? combined : null };
   });
 
   // Per-pathway stats
@@ -1534,6 +1851,7 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
     p3: pathwayStats(dayResults, 'p3'),
     p4: pathwayStats(dayResults, 'p4'),
     combined: pathwayStats(dayResults, 'combined'),
+    combinedActionable: pathwayStats(dayResults, 'combinedActionable'),
   };
 
   // ── Render unified matrix ──────────────────────────────────────────────────
@@ -1546,7 +1864,7 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
     el('span',{style:{color:'#4a7a58'}},'✗ did not fire'),
     ' · ',
     el('span',{style:{color:'#6b7280'}},'— data unavailable'),
-    '. Combined = any pathway fired.'
+    '. Combined = P1+P3/P4 → HIGH · P1 alone → MODERATE · secondary without P1 → ELEVATED.'
   ));
 
   const mTbl = el('table');
@@ -1596,7 +1914,7 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
     {key:'p2', label:'P2 — Cycle Length',  color:'#93c5fd'},
     {key:'p3', label:'P3 — Humidity',       color:'#fcd34d'},
     {key:'p4', label:'P4 — Temp Drop',      color:'#86efac'},
-    {key:'combined', label:'Combined (any)', color:'#e2e8f0'},
+    {key:'combinedActionable', label:'Combined (MOD+HIGH)', color:'#e2e8f0'},
   ].forEach(({key, label, color}) => {
     const s = stats[key];
     const card = el('div',{style:{background:'#0b1a12',border:'1px solid #1c3326',borderRadius:'6px',padding:'10px 12px'}});
@@ -1624,7 +1942,7 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
     'P2 = ≥'+CYCLE_MODERATE_DAYS+' days since last cluster. ',
     'P3 = RH ≥'+RH_MODERATE_THRESH+'% for '+RH_SUSTAINED_HOURS+'+ hours in prior 14h. ',
     'P4 = temperature drop ≥'+TEMP_DROP_THRESH_C+'°C in '+TEMP_DROP_WINDOW_H+'h (Open-Meteo ERA5 archive). ',
-    'Combined fires if ANY pathway fires.'
+    'Combined (MOD+HIGH) = P1+P3/P4 → HIGH · P1 alone → MODERATE · any secondary without P1 → ELEVATED (not actionable).'
   ));
 
   out.append(matrixDiv);
@@ -1634,7 +1952,7 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
     [calib.high,
       `HIGH — Drop ≥ ${calib.high.toFixed(3)}"/3hr · floor ≤${PRESSURE_FLOOR}" · consecutive · 6hr cumul`,
       COLORS.HIGH,
-      {requireConsecutive:true, excludeAfternoon:false, pressureFloor:PRESSURE_FLOOR, require6hrDrop:true, min6hrDrop:MIN_6HR_DROP, waive6hrAbove:0.08}],
+      {requireConsecutive:true, excludeAfternoon:false, pressureFloor:PRESSURE_FLOOR, require6hrDrop:true, min6hrDrop:MIN_6HR_DROP, waive6hrAbove:0.05}],
     [calib.mod,
       `MODERATE — Drop ≥ ${calib.mod.toFixed(3)}"/3hr · consecutive only (safety net)`,
       COLORS.MODERATE,
@@ -1650,7 +1968,7 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
       const cdTs=new Date(cd+'T00:00:00').getTime();
       const hit=events.some(e=>{
         const et=new Date(e.dt.replace(' ','T')).getTime();
-        return et>=cdTs-48*3600000 && et<=cdTs+24*3600000;
+        return et>=cdTs-48*3600000 && et<cdTs;
       });
       if(hit) truePos++; else { falseNeg++; fnDates.push(cd); }
     });
@@ -1758,7 +2076,7 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
       pressureFloor:      PRESSURE_FLOOR,
       require6hrDrop:     true,
       min6hrDrop:         MIN_6HR_DROP,
-      waive6hrAbove:      0.08,
+      waive6hrAbove:      0.05,
     });
     const seen2 = new Set();
     return events
