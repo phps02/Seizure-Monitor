@@ -1625,7 +1625,7 @@ function calibrateThresholds(rows) {
     const events = findDropEvents(rows, thresh, opts);
     let tp = 0;
     clusterDates.forEach(cd => {
-      const cdTs = new Date(cd+'T00:00:00').getTime();
+      const cdTs = new Date(cd+'T23:59:00').getTime();
       const hit = events.some(e => {
         const et = new Date(e.dt.replace(' ','T')).getTime();
         return et >= cdTs - 48*3600000 && et < cdTs;
@@ -1965,7 +1965,7 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
     let truePos=0, falseNeg=0;
     const fnDates=[];
     clusterDates.forEach(cd=>{
-      const cdTs=new Date(cd+'T00:00:00').getTime();
+      const cdTs=new Date(cd+'T23:59:00').getTime();
       const hit=events.some(e=>{
         const et=new Date(e.dt.replace(' ','T')).getTime();
         return et>=cdTs-48*3600000 && et<cdTs;
