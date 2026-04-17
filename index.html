@@ -78,12 +78,14 @@ code{background:#0b1a12;padding:2px 6px;border-radius:3px;font-size:11px;color:#
       <div class="tab"        data-tab="intervals">Intervals</div>
       <div class="tab"        data-tab="validation">Trigger Validation</div>
       <div class="tab"        data-tab="supplements">Supplement Protocol</div>
+      <div class="tab"        data-tab="summary">Model Summary</div>
     </div>
     <div id="panel-forecast"    class="panel active"><div id="fc-content"   class="loading">Loading forecast…</div></div>
     <div id="panel-history"     class="panel">      <div id="hist-content" class="loading">Loading seizure log…</div></div>
     <div id="panel-intervals"   class="panel">      <div id="int-content"  class="loading">Click tab to load intervals…</div></div>
     <div id="panel-validation"  class="panel">      <div id="val-content"  class="loading">Click tab to load validation…</div></div>
     <div id="panel-supplements" class="panel">      <div id="supp-content" class="loading">Loading supplement table…</div></div>
+    <div id="panel-summary"     class="panel">      <div id="sum-content"  class="loading">Click tab to load model summary…</div></div>
   </div>
 </div>
 
@@ -439,7 +441,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     if (!loaded[name]) { loaded[name]=true; LOADERS[name](); }
   });
 });
-const LOADERS = {forecast:loadForecast,history:loadHistory,intervals:loadIntervals,validation:loadValidation,supplements:loadSupplements};
+const LOADERS = {forecast:loadForecast,history:loadHistory,intervals:loadIntervals,validation:loadValidation,supplements:loadSupplements,summary:loadSummary};
 
 // ─── FORECAST — KHAO-anchored hybrid ─────────────────────────────────────────
 // Strategy:
@@ -622,6 +624,151 @@ function getHumidityAlert(rhReadings) {
 }
 
 
+
+function loadSummary() {
+  const out = document.getElementById('sum-content');
+  out.innerHTML = '';
+
+  function section(title) {
+    const d = el('div',{class:'section-head',style:{marginTop:'20px'}},title);
+    out.append(d);
+  }
+
+  function row(label, value, status, note) {
+    const statusColors = {
+      '✅ Validated': '#34d399',
+      '⚠ Partial':   '#fcd34d',
+      '❌ Judgment':  '#fca5a5',
+    };
+    const tr = el('tr');
+    tr.append(
+      el('td',{style:{color:'#e8e4dc',fontWeight:'500',padding:'6px 10px 6px 0',verticalAlign:'top'}},label),
+      el('td',{style:{fontFamily:'monospace',color:'#93c5fd',padding:'6px 10px',verticalAlign:'top'}},value),
+      el('td',{style:{color:statusColors[status]||'#6a9472',padding:'6px 10px',verticalAlign:'top',fontSize:'11px'}},status),
+      el('td',{style:{color:'#6a9472',padding:'6px 0',verticalAlign:'top',fontSize:'11px',lineHeight:'1.5'}},note)
+    );
+    return tr;
+  }
+
+  function table(rows) {
+    const tbl = el('table',{style:{width:'100%',borderCollapse:'collapse',fontSize:'12px',marginTop:'8px'}});
+    const thead = el('thead');
+    const hr = el('tr');
+    ['Parameter','Value','Validation','Basis'].forEach(h =>
+      hr.append(el('th',{style:{textAlign:'left',color:'#6a9472',fontSize:'10px',letterSpacing:'2px',padding:'4px 10px 4px 0',borderBottom:'1px solid #1c3326',textTransform:'uppercase'}},h))
+    );
+    thead.append(hr); tbl.append(thead);
+    const tbody = el('tbody');
+    rows.forEach((r,i) => {
+      const tr = row(...r);
+      tr.style.background = i%2===0 ? '#0c1810' : '#091410';
+      tbody.append(tr);
+    });
+    tbl.append(tbody);
+    out.append(el('div',{style:{overflowX:'auto'}},tbl));
+  }
+
+  // Header
+  out.append(el('div',{style:{padding:'10px 14px',background:'#001a38',border:'1px solid #3b82f6',borderRadius:'8px',fontSize:'11px',color:'#93c5fd',lineHeight:'1.8'}},
+    `📋 Model Summary — Canine Seizure Risk Monitor · KHAO ASOS · West Chester OH 45069 · 87lb dog · Idiopathic epilepsy · `,
+    el('strong',{},'7 seizure clusters · 17 seizures · Jul 2025–present')
+  ));
+
+  // P1
+  section('P1 — Pressure Drop');
+  table([
+    ['Detection window','3 hours','✅ Validated','ASOS is hourly; all real seizure drops captured within 3hr window'],
+    ['HIGH threshold','≥ '+HIGH_THRESH.toFixed(3)+'" / 3hr (auto-calibrated)','✅ Validated','Auto-calibrated to highest value achieving 100% sensitivity on 7 pressure-sensitive cluster onsets'],
+    ['MODERATE threshold','≥ '+MOD_THRESH.toFixed(3)+'" / 3hr (safety net)','✅ Validated','Same calibration — consecutive only, no floor'],
+    ['Pressure floor','≤ '+PRESSURE_FLOOR+'"','✅ Validated','Derived from highest real seizure drop start (Sep 2 at 30.220"). 0.030" buffer. All 7 clusters pass'],
+    ['Consecutive check','Next hourly reading must also fall','⚠ Partial','Logical — filters single-hour blips. Not explicitly hour-by-hour validated against seizure data'],
+    ['6hr recovery filter','Pressure at t+6h must still be ≥'+MIN_6HR_DROP+'" below start','✅ Validated','All 7 real seizure drops still falling at t+6h — none reversed. 0.06" threshold conservative but safe'],
+    ['waive6hrAbove','6hr check waived for drops ≥0.05"','✅ Validated','Any drop meeting HIGH threshold (≥0.050") bypasses check — consistent with calibration'],
+    ['48h lookback','Drop must occur in 48h before seizure day end','✅ Validated','Longest real lag was 42h (Mar 17). 48h provides 6h buffer above longest observed lag'],
+    ['Afternoon exclusion','Removed','✅ Validated','3 of 5 real seizure-preceding drops started in afternoon window (Dec 19, Feb 5, Mar 17)'],
+    ['Calibration scope','First seizure date of each pressure-sensitive cluster','✅ Validated','Multi-day cluster later days (Sep 26-27) do not need independent drops. Jul 15 included as pressure-dependent'],
+  ]);
+
+  // P2
+  section('P2 — Cycle Length');
+  table([
+    ['MODERATE trigger','≥ '+CYCLE_MODERATE_DAYS+' days since last cluster','⚠ Partial','Median inter-cluster gap is 32 days — data-informed. Round number, not optimized'],
+    ['HIGH trigger','≥ '+CYCLE_HIGH_DAYS+' days since last cluster','❌ Judgment','Only one data point (Jul 15 gap was 49 days). Insufficient data to validate 45-day threshold'],
+  ]);
+
+  // P3
+  section('P3 — Humidity');
+  table([
+    ['RH threshold','≥ '+RH_MODERATE_THRESH+'%','✅ Validated','Derived from actual hourly KHAO data. ≥75% for ≥4h catches 7/7 clusters. Previous 88%/6h caught only 4/7'],
+    ['Sustained hours','≥ '+RH_SUSTAINED_HOURS+' consecutive hours','✅ Validated','All 7 clusters had ≥4 consecutive hours above 75% in 14h before first seizure'],
+    ['Lookback window','14h before seizure','⚠ Partial','Chosen to capture pre-seizure window. Not explicitly optimized — 14h covers all observed RH patterns'],
+    ['Live alert logic','Consecutive hours check','✅ Validated','Matches p3FiredBeforeDay validation logic. Fixed from previous proportion-based check'],
+  ]);
+
+  // P4
+  section('P4 — Temperature Drop');
+  table([
+    ['Threshold','≥ '+TEMP_DROP_THRESH_C+'°C in '+TEMP_DROP_WINDOW_H+'h','⚠ Partial','5.0°C catches only Dec 19 and Feb 5 (2/7, 29%). Data supports 4.0°C which catches 6/7 (86%). Not yet updated'],
+    ['Window','6 hours','✅ Validated','Actual temp data confirms 6h is the optimal window — jump from 3h to 6h adds 4 clusters, 6h to 9h adds none at ≥4°C'],
+    ['Data source','Open-Meteo ERA5 archive (historical) / forecast','⚠ Partial','Different source from KHAO pressure. Model data — smoother than physical station readings'],
+  ]);
+
+  // Combined
+  section('Combined Risk Logic');
+  table([
+    ['HIGH','P1 fires AND (P3 or P4 fires)','✅ Validated','Every seizure cluster had P1+P3 or P1+P4. Requires corroborated pressure drop'],
+    ['MODERATE','P1 fires alone','✅ Validated','Pressure drop without humidity/temp corroboration — still actionable'],
+    ['ELEVATED','Any secondary pathway without P1','✅ Validated','Environmental stress without pressure signal — monitor but not actionable'],
+    ['Combined FAR','52.4% of non-seizure days fire MODERATE or HIGH','—','Irreducible floor given Ohio frontal frequency. P1 alone drives this — ~1 qualifying drop every 2 days'],
+  ]);
+
+  // Cluster notes
+  section('Cluster Classification Notes');
+  const notesTbl = el('table',{style:{width:'100%',borderCollapse:'collapse',fontSize:'12px',marginTop:'8px'}});
+  const nHead = el('thead'), nHr = el('tr');
+  ['Cluster','Classification','Primary trigger','Notes'].forEach(h =>
+    nHr.append(el('th',{style:{textAlign:'left',color:'#6a9472',fontSize:'10px',letterSpacing:'2px',padding:'4px 10px 4px 0',borderBottom:'1px solid #1c3326',textTransform:'uppercase'}},h))
+  );
+  nHead.append(nHr); notesTbl.append(nHead);
+  const nBody = el('tbody');
+  [
+    ['Jul 15, 2025',   'Pressure-dependent','P1+P3+P4','First seizure. Dog in Dayton Jul 13-14 — KDAY confirmed no frontal drop. Qualifies via Jul 15 afternoon KHAO drop (0.060"). Extreme RH (97.8%) co-trigger. Mechanism partially uncertain.'],
+    ['Sep 2, 2025',    'Pressure-dependent','P1+P2',   '0.070" frontal drop Sep 1 16:00. Afternoon filter removal was key — previously excluded. RH low (65.1% mean) but max 96.3%.'],
+    ['Sep 25–27, 2025','Pressure-dependent','P1+P3',   '0.050" drop Sep 25 04:00. Sustained low pressure. Very high RH (90.5%). Multi-day cluster — only onset date used in calibration.'],
+    ['Dec 19, 2025',   'Pressure-dependent','P1+P4',   'Strongest cluster — 0.160" drop, 13.3°C temp drop, 1.060" excursion. Seized at pressure trough.'],
+    ['Jan 11, 2026',   'Pressure-dependent','P1',      '0.110" drop Jan 10 07:00. Low RH (max 78%). Seized well into pressure recovery (+119h post-trough). Pressure-only cluster.'],
+    ['Feb 5, 2026',    'Pressure-dependent','P1+P3+P4','Weakest pressure signal (0.050"). Strong temp drop (7.0°C/6h). waive6hrAbove fix was required to detect this cluster.'],
+    ['Mar 17, 2026',   'Pressure-dependent','P1',      '0.130" drop, largest front (0.880" excursion). Low RH, weak temp signal. Seized strongly into recovery (+35h post-trough).'],
+  ].forEach((r,i) => {
+    const tr = el('tr',{style:{background:i%2===0?'#0c1810':'#091410'}});
+    tr.append(
+      el('td',{style:{color:'#e8e4dc',fontWeight:'500',padding:'6px 10px 6px 0',verticalAlign:'top'}},r[0]),
+      el('td',{style:{color:'#34d399',padding:'6px 10px',verticalAlign:'top',fontSize:'11px'}},r[1]),
+      el('td',{style:{color:'#93c5fd',padding:'6px 10px',verticalAlign:'top',fontFamily:'monospace',fontSize:'11px'}},r[2]),
+      el('td',{style:{color:'#6a9472',padding:'6px 0',verticalAlign:'top',fontSize:'11px',lineHeight:'1.5'}},r[3])
+    );
+    nBody.append(tr);
+  });
+  notesTbl.append(nBody);
+  out.append(el('div',{style:{overflowX:'auto'}},notesTbl));
+
+  // Pending
+  section('Pending Validation Items');
+  const pendDiv = el('div',{style:{marginTop:'8px',padding:'12px 14px',background:'#2d1a00',border:'1px solid #d97706',borderRadius:'6px',fontSize:'11px',color:'#fcd34d',lineHeight:'1.9'}});
+  [
+    '⚠ P4 threshold: 5.0°C catches only 2/7 clusters. Data supports updating to 4.0°C (6/7 clusters). Not yet applied.',
+    '⚠ P2 HIGH at 45 days: only one data point. Insufficient history to validate.',
+    '⚠ 6hr recovery filter 0.06": conservative and safe, but threshold is judgment not data-derived.',
+    '⚠ P3 14h lookback window: functional but not optimized from data.',
+    '⚠ Jul 15 classification: pressure-dependent via post-seizure drop. Mechanism partially uncertain — first seizure, extreme humidity, no pre-seizure frontal drop confirmed at KDAY or KHAO.',
+  ].forEach(t => pendDiv.append(el('div',{},t)));
+  out.append(pendDiv);
+
+  out.append(el('div',{style:{marginTop:'14px',fontSize:'11px',color:'#4a7a58',lineHeight:'1.7'}},
+    '📋 Last updated Apr 2026. Share with veterinary neurologist. Data source: KHAO ASOS (Butler County Regional Airport, Hamilton OH). ',
+    'Threshold derivation based on 9 months of seizure history (17 seizures, 7 clusters).'
+  ));
+}
 
 async function loadForecast() {
   const out = document.getElementById('fc-content');
