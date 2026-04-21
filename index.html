@@ -44,6 +44,134 @@ code{background:#0b1a12;padding:2px 6px;border-radius:3px;font-size:11px;color:#
 .rec-box{margin-top:14px;padding:12px 16px;background:#001a10;border:1px solid #0f6e56;border-radius:8px;font-size:11px;color:#9dc4a8;line-height:1.8}
 .rec-box strong{color:#34d399}
 </style>
+
+<style id="ref-supp-styles">
+  #ref-supp-content { background:#f8f9fc; color:#1a1f2e; font-family:'DM Sans',Georgia,sans-serif; padding:20px 16px 48px; }
+  #ref-supp-content .rs-header { max-width:1280px; margin:0 auto 22px; border-bottom:1px solid #dce0eb; padding-bottom:18px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:14px; }
+  #ref-supp-content .rs-title { font-size:clamp(1.4rem,4vw,2rem); font-style:italic; color:#1a1f2e; font-family:Georgia,serif; }
+  #ref-supp-content .rs-title span { color:#1a7a30; font-style:normal; }
+  #ref-supp-content .rs-subtitle { font-size:0.72rem; color:#8891aa; font-family:monospace; letter-spacing:0.06em; text-transform:uppercase; margin-top:4px; }
+  #ref-supp-content .rs-disclaimer { background:rgba(184,26,26,0.06); border:1px solid rgba(184,26,26,0.2); border-radius:6px; padding:10px 14px; font-size:0.8rem; color:#8a1010; line-height:1.55; max-width:460px; }
+  #ref-supp-content .rs-controls { max-width:1280px; margin:0 auto 16px; display:flex; gap:7px; flex-wrap:wrap; align-items:center; }
+  #ref-supp-content .rs-flabel { font-size:0.72rem; color:#8891aa; font-family:monospace; text-transform:uppercase; letter-spacing:0.08em; margin-right:2px; }
+  #ref-supp-content .rs-fbtn { padding:5px 13px; border-radius:20px; border:1px solid #dce0eb; background:#fff; color:#4a5470; font-size:0.78rem; cursor:pointer; transition:all 0.13s; white-space:nowrap; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+  #ref-supp-content .rs-fbtn:hover { border-color:#b8becc; color:#1a1f2e; background:#f0f2f7; }
+  #ref-supp-content .rs-fbtn.rs-active { color:#fff; border-color:transparent; font-weight:500; }
+  #ref-supp-content .rs-fbtn[data-cat="all"].rs-active  { background:#4a5470; }
+  #ref-supp-content .rs-fbtn[data-cat="1"].rs-active    { background:#1a7a30; }
+  #ref-supp-content .rs-fbtn[data-cat="2"].rs-active    { background:#7a4a00; }
+  #ref-supp-content .rs-fbtn[data-cat="3"].rs-active    { background:#0a5a8a; }
+  #ref-supp-content .rs-fbtn[data-cat="4"].rs-active    { background:#8a1a50; }
+  #ref-supp-content .rs-fbtn[data-cat="5"].rs-active    { background:#5a28a0; }
+  #ref-supp-content .rs-fbtn[data-cat="current"].rs-active { background:#1a7a30; }
+  #ref-supp-content .rs-table-wrap { max-width:1280px; margin:0 auto; border-radius:8px; border:1px solid #dce0eb; box-shadow:0 2px 8px rgba(0,0,0,0.07); }
+  #ref-supp-content .rs-scroll-top { overflow-x:auto; border-bottom:1px solid #dce0eb; height:14px; }
+  #ref-supp-content .rs-scroll-top-inner { height:1px; }
+  #ref-supp-content .rs-scroll-body { overflow-x:auto; }
+  #ref-supp-content table { width:100%; border-collapse:collapse; font-size:0.82rem; table-layout:fixed; min-width:900px; }
+  #ref-supp-content col.c-name    { width:14%; }
+  #ref-supp-content col.c-ev      { width:8%; }
+  #ref-supp-content col.c-dose    { width:22%; }
+  #ref-supp-content col.c-notes   { width:26%; }
+  #ref-supp-content col.c-product { width:16%; }
+  #ref-supp-content col.c-taking  { width:7%; }
+  #ref-supp-content col.c-plumbs  { width:7%; }
+  #ref-supp-content thead { position:sticky; top:0; z-index:5; }
+  #ref-supp-content th { background:#f0f2f7; padding:9px 10px; text-align:left; font-family:monospace; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.07em; color:#8891aa; border-bottom:1px solid #dce0eb; white-space:normal; overflow-wrap:break-word; word-break:break-word; }
+  #ref-supp-content tbody tr { border-bottom:1px solid #dce0eb; transition:background 0.1s; }
+  #ref-supp-content tbody tr:last-child { border-bottom:none; }
+  #ref-supp-content tbody tr:hover { background:#f5f7fb; }
+  #ref-supp-content tbody tr.rs-taking { background:rgba(26,122,48,0.04); border-left:3px solid #1a7a30; }
+  #ref-supp-content tbody tr.rs-taking:hover { background:rgba(26,122,48,0.07); }
+  #ref-supp-content td { padding:10px 10px; vertical-align:top; line-height:1.5; color:#1a1f2e; overflow-wrap:break-word; word-break:break-word; }
+  #ref-supp-content .rs-sname { font-weight:600; color:#1a1f2e; font-size:0.88rem; overflow-wrap:break-word; word-break:break-word; }
+  #ref-supp-content .rs-catlabel { font-size:0.62rem; font-family:monospace; color:#8891aa; margin-top:2px; text-transform:uppercase; letter-spacing:0.05em; overflow-wrap:break-word; }
+  #ref-supp-content .rs-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:6px; flex-shrink:0; margin-top:4px; }
+  #ref-supp-content .rs-namewrap { display:flex; align-items:flex-start; min-width:0; }
+  #ref-supp-content .rs-namewrap > div { min-width:0; overflow-wrap:break-word; word-break:break-word; }
+  #ref-supp-content .rs-ev { display:inline-flex; align-items:center; padding:3px 7px; border-radius:10px; font-size:0.66rem; font-family:monospace; font-weight:500; white-space:normal; overflow-wrap:break-word; }
+  #ref-supp-content .rs-ev-rct    { background:rgba(26,122,48,0.1);  color:#1a7a30; border:1px solid rgba(26,122,48,0.25); }
+  #ref-supp-content .rs-ev-strong { background:rgba(122,74,0,0.1);   color:#7a4a00; border:1px solid rgba(122,74,0,0.25); }
+  #ref-supp-content .rs-ev-good   { background:rgba(10,90,138,0.1);  color:#0a5a8a; border:1px solid rgba(10,90,138,0.25); }
+  #ref-supp-content .rs-ev-mixed  { background:rgba(90,40,160,0.1);  color:#5a28a0; border:1px solid rgba(90,40,160,0.25); }
+  #ref-supp-content .rs-ev-anec   { background:rgba(74,84,112,0.08); color:#4a5470; border:1px solid #dce0eb; }
+  #ref-supp-content .rs-dose-cell { font-family:monospace; font-size:0.78rem; color:#1a1f2e; overflow-wrap:break-word; word-break:break-word; }
+  #ref-supp-content .rs-dose-val  { color:#1a5a8a; font-weight:500; display:block; }
+  #ref-supp-content .rs-dose-note { color:#4a5470; font-size:0.71rem; margin-top:3px; font-family:Georgia,sans-serif; line-height:1.45; }
+  #ref-supp-content .rs-his-dose  { margin-top:5px; display:block; background:rgba(26,122,48,0.08); border:1px solid rgba(26,122,48,0.2); border-radius:4px; padding:2px 7px; font-size:0.68rem; font-family:monospace; color:#1a7a30; overflow-wrap:break-word; word-break:break-word; }
+  #ref-supp-content .rs-mech      { color:#4a5470; font-size:0.78rem; overflow-wrap:break-word; word-break:break-word; }
+  #ref-supp-content .rs-notes     { font-size:0.78rem; color:#4a5470; overflow-wrap:break-word; word-break:break-word; }
+  #ref-supp-content .rs-warn-tag  { display:inline-block; background:rgba(184,26,26,0.08); color:#b81a1a; border:1px solid rgba(184,26,26,0.2); border-radius:4px; font-size:0.65rem; padding:2px 6px; font-family:monospace; margin-top:3px; white-space:normal; overflow-wrap:break-word; }
+  #ref-supp-content .rs-good-tag  { display:inline-block; background:rgba(26,122,48,0.08); color:#1a7a30; border:1px solid rgba(26,122,48,0.2); border-radius:4px; font-size:0.65rem; padding:2px 6px; font-family:monospace; margin-top:3px; white-space:normal; overflow-wrap:break-word; }
+  #ref-supp-content .rs-prod-cell { font-size:0.78rem; overflow-wrap:break-word; word-break:break-word; }
+  #ref-supp-content .rs-prod-link { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:6px; background:#fff; border:1px solid #dce0eb; color:#1a5a8a; font-size:0.7rem; font-weight:500; text-decoration:none; margin-bottom:4px; transition:all 0.12s; white-space:normal; overflow-wrap:break-word; word-break:break-word; }
+  #ref-supp-content .rs-prod-link:hover { border-color:#1a5a8a; background:rgba(26,90,138,0.04); }
+  #ref-supp-content .rs-prod-name { font-size:0.66rem; color:#8891aa; margin-top:2px; line-height:1.4; overflow-wrap:break-word; }
+  #ref-supp-content .rs-taking-cell { text-align:center; }
+  #ref-supp-content .rs-taking-yes { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:rgba(26,122,48,0.15); color:#1a7a30; font-size:0.9rem; border:1px solid rgba(26,122,48,0.35); cursor:help; }
+  #ref-supp-content .rs-taking-no  { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:rgba(74,84,112,0.07); color:#8891aa; font-size:0.9rem; border:1px solid #dce0eb; }
+  #ref-supp-content .rs-plumbs-cell { text-align:center; }
+  #ref-supp-content .rs-plumbs-yes { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:rgba(26,90,138,0.12); color:#0a5a8a; font-size:0.9rem; border:1px solid rgba(26,90,138,0.3); cursor:help; }
+  #ref-supp-content .rs-plumbs-partial { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:rgba(122,74,0,0.1); color:#7a4a00; font-size:0.78rem; border:1px solid rgba(122,74,0,0.3); font-family:monospace; font-weight:600; cursor:help; }
+  #ref-supp-content .rs-plumbs-no  { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:rgba(74,84,112,0.07); color:#8891aa; font-size:0.9rem; border:1px solid #dce0eb; cursor:help; }
+  #ref-supp-content .rs-legend { max-width:1280px; margin:18px auto 0; display:flex; gap:20px; flex-wrap:wrap; padding:16px; background:#fff; border-radius:8px; border:1px solid #dce0eb; }
+  #ref-supp-content .rs-leg-group h4 { font-size:0.65rem; color:#8891aa; font-family:monospace; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:7px; }
+  #ref-supp-content .rs-leg-item { display:flex; align-items:center; gap:7px; font-size:0.78rem; color:#4a5470; margin-bottom:4px; }
+  #ref-supp-content .rs-ldot { display:inline-block; width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  #ref-supp-content .rs-cnt { background:#f0f2f7; border:1px solid #dce0eb; border-radius:10px; font-size:0.65rem; font-family:monospace; color:#8891aa; padding:1px 8px; margin-left:4px; }
+</style>
+
+<style id="ref-trig-styles">
+  #ref-trig-content { background:#f8f9fc; color:#1a1f2e; font-family:'DM Sans',Georgia,sans-serif; padding:20px 16px 48px; }
+  #ref-trig-content .rt-header { max-width:1200px; margin:0 auto 22px; border-bottom:1px solid #dce0eb; padding-bottom:18px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:14px; }
+  #ref-trig-content .rt-title { font-size:clamp(1.4rem,4vw,2rem); font-style:italic; color:#1a1f2e; font-family:Georgia,serif; }
+  #ref-trig-content .rt-title span { color:#1a72b8; font-style:normal; }
+  #ref-trig-content .rt-meta { font-size:0.7rem; color:#8891aa; font-family:monospace; text-transform:uppercase; letter-spacing:0.06em; margin-top:4px; }
+  #ref-trig-content .rt-stats { display:flex; gap:16px; flex-wrap:wrap; }
+  #ref-trig-content .rt-stat { text-align:center; padding:10px 14px; background:#fff; border:1px solid #dce0eb; border-radius:8px; min-width:80px; }
+  #ref-trig-content .rt-stat-num { font-family:Georgia,serif; font-size:1.5rem; color:#1a72b8; display:block; line-height:1; }
+  #ref-trig-content .rt-stat-label { font-size:0.6rem; color:#8891aa; font-family:monospace; text-transform:uppercase; letter-spacing:0.06em; margin-top:3px; }
+  #ref-trig-content .rt-controls { max-width:1200px; margin:0 auto 16px; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  #ref-trig-content .rt-clabel { font-size:0.72rem; color:#8891aa; font-family:monospace; text-transform:uppercase; letter-spacing:0.08em; margin-right:2px; }
+  #ref-trig-content .rt-fbtn { padding:5px 12px; border-radius:20px; border:1px solid #dce0eb; background:#fff; color:#4a5470; font-size:0.75rem; cursor:pointer; transition:all 0.12s; white-space:nowrap; display:flex; align-items:center; gap:5px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+  #ref-trig-content .rt-fbtn:hover { border-color:#b8becc; color:#1a1f2e; background:#f0f2f7; }
+  #ref-trig-content .rt-fbtn.rt-active { color:#fff; border-color:transparent; font-weight:500; }
+  #ref-trig-content .rt-table-wrap { max-width:1200px; margin:0 auto; border-radius:8px; border:1px solid #dce0eb; box-shadow:0 2px 8px rgba(0,0,0,0.07); }
+  #ref-trig-content .rt-scroll-top { overflow-x:auto; border-bottom:1px solid #dce0eb; height:14px; }
+  #ref-trig-content .rt-scroll-top-inner { height:1px; }
+  #ref-trig-content .rt-scroll-body { overflow-x:auto; }
+  #ref-trig-content table { width:100%; border-collapse:collapse; font-size:0.82rem; table-layout:fixed; min-width:900px; }
+  #ref-trig-content col.rt-c-name   { width:16%; }
+  #ref-trig-content col.rt-c-cat    { width:13%; }
+  #ref-trig-content col.rt-c-ev     { width:8%; }
+  #ref-trig-content col.rt-c-lag    { width:9%; }
+  #ref-trig-content col.rt-c-detail { width:27%; }
+  #ref-trig-content col.rt-c-manage { width:27%; }
+  #ref-trig-content thead { position:sticky; top:0; z-index:5; }
+  #ref-trig-content th { background:#f0f2f7; padding:9px 10px; text-align:left; font-family:monospace; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.07em; color:#8891aa; border-bottom:1px solid #dce0eb; white-space:normal; overflow-wrap:break-word; word-break:break-word; }
+  #ref-trig-content tbody tr { border-bottom:1px solid #dce0eb; transition:background 0.1s; }
+  #ref-trig-content tbody tr:last-child { border-bottom:none; }
+  #ref-trig-content tbody tr:hover { background:#f5f7fb; }
+  #ref-trig-content td { padding:10px 10px; vertical-align:top; line-height:1.5; color:#1a1f2e; overflow-wrap:break-word; word-break:break-word; }
+  #ref-trig-content .rt-tname { font-weight:600; color:#1a1f2e; font-size:0.88rem; overflow-wrap:break-word; word-break:break-word; }
+  #ref-trig-content .rt-cat-pill { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:10px; font-size:0.64rem; font-family:monospace; font-weight:500; text-transform:uppercase; letter-spacing:0.03em; white-space:normal; overflow-wrap:break-word; word-break:break-word; margin-top:3px; }
+  #ref-trig-content .rt-dot { width:6px; height:6px; border-radius:50%; display:inline-block; flex-shrink:0; }
+  #ref-trig-content .rt-ev-badge { display:inline-flex; align-items:center; padding:3px 7px; border-radius:8px; font-size:0.66rem; font-family:monospace; white-space:normal; overflow-wrap:break-word; }
+  #ref-trig-content .rt-ev-strong  { background:rgba(26,138,80,0.1);  color:#1a8a50; border:1px solid rgba(26,138,80,0.2); }
+  #ref-trig-content .rt-ev-mod     { background:rgba(196,98,10,0.1);  color:#c4620a; border:1px solid rgba(196,98,10,0.2); }
+  #ref-trig-content .rt-ev-anec    { background:rgba(74,84,112,0.08); color:#4a5470; border:1px solid #dce0eb; }
+  #ref-trig-content .rt-ev-unclear { background:rgba(184,26,26,0.08); color:#b81a1a; border:1px solid rgba(184,26,26,0.2); }
+  #ref-trig-content .rt-lag  { font-family:monospace; font-size:0.78rem; color:#4a5470; white-space:normal; overflow-wrap:break-word; word-break:break-word; }
+  #ref-trig-content .rt-detail { color:#4a5470; font-size:0.78rem; overflow-wrap:break-word; word-break:break-word; line-height:1.5; }
+  #ref-trig-content .rt-manage { font-size:0.78rem; color:#4a5470; overflow-wrap:break-word; word-break:break-word; }
+  #ref-trig-content .rt-note-tag { display:inline-block; padding:2px 5px; border-radius:3px; font-size:0.62rem; font-family:monospace; margin-top:3px; white-space:normal; overflow-wrap:break-word; }
+  #ref-trig-content .rt-tag-warn { background:rgba(184,26,26,0.08);  color:#b81a1a; border:1px solid rgba(184,26,26,0.2); }
+  #ref-trig-content .rt-tag-tip  { background:rgba(26,138,80,0.08);  color:#1a8a50; border:1px solid rgba(26,138,80,0.2); }
+  #ref-trig-content .rt-tag-your { background:rgba(26,114,184,0.1);   color:#1a72b8; border:1px solid rgba(26,114,184,0.25); }
+  #ref-trig-content .rt-legend { max-width:1200px; margin:18px auto 0; display:flex; gap:18px; flex-wrap:wrap; padding:16px; background:#fff; border-radius:8px; border:1px solid #dce0eb; }
+  #ref-trig-content .rt-leg-group h4 { font-size:0.65rem; color:#8891aa; font-family:monospace; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:7px; }
+  #ref-trig-content .rt-leg-item { display:flex; align-items:center; gap:6px; font-size:0.78rem; color:#4a5470; margin-bottom:4px; }
+</style>
 </head>
 <body>
 <div id="sandbox-warning" style="display:none;background:#3b0000;border-bottom:2px solid #dc2626;padding:14px 20px;font-family:Georgia,serif;font-size:12px;color:#fca5a5;line-height:1.8;text-align:center">
@@ -79,6 +207,8 @@ code{background:#0b1a12;padding:2px 6px;border-radius:3px;font-size:11px;color:#
       <div class="tab"        data-tab="validation">Trigger Validation</div>
       <div class="tab"        data-tab="supplements">Supplement Protocol</div>
       <div class="tab"        data-tab="summary">Model Summary</div>
+      <div class="tab"        data-tab="ref-supplements">Canine Epilepsy Supplements</div>
+      <div class="tab"        data-tab="ref-triggers">Canine Epilepsy Triggers</div>
     </div>
     <div id="panel-forecast"    class="panel active"><div id="fc-content"   class="loading">Loading forecast…</div></div>
     <div id="panel-history"     class="panel">      <div id="hist-content" class="loading">Loading seizure log…</div></div>
@@ -86,6 +216,8 @@ code{background:#0b1a12;padding:2px 6px;border-radius:3px;font-size:11px;color:#
     <div id="panel-validation"  class="panel">      <div id="val-content"  class="loading">Click tab to load validation…</div></div>
     <div id="panel-supplements" class="panel">      <div id="supp-content" class="loading">Loading supplement table…</div></div>
     <div id="panel-summary"     class="panel">      <div id="sum-content"  class="loading">Click tab to load model summary…</div></div>
+    <div id="panel-ref-supplements" class="panel"><div id="ref-supp-content"></div></div>
+    <div id="panel-ref-triggers"    class="panel"><div id="ref-trig-content"></div></div>
   </div>
 </div>
 
@@ -167,14 +299,12 @@ function getCycleAlert() {
 }
 
 
-// Raw ASOS altimeter readings have sharper drops than ERA5 model smoothing.
-// Thresholds are computed live by the validation tab from actual KHAO data.
-// These defaults are used for forecast risk coloring until validation runs.
-// After running validation, update HIGH_THRESH and MOD_THRESH accordingly.
-// Initial values set to last known calibrated result from KHAO data so the
-// Forecast tab is correct on first load without needing to run Validation first.
-let HIGH_THRESH = 0.030;  // updated live from validation
-let MOD_THRESH  = 0.050;  // updated live from validation
+// Thresholds hardcoded to calibrated KHAO ASOS values — 100% sensitivity on all 7 clusters.
+// HIGH ≥ 0.050"/3hr · filters: consecutive · floor ≤30.25" · 6hr cumulative ≥0.06" (waived for drops ≥0.05")
+// MODERATE ≥ 0.050"/3hr · consecutive only (safety net, no floor filter)
+// Afternoon exclusion removed — 3/5 real seizure drops started in afternoon window.
+let HIGH_THRESH = 0.050;
+let MOD_THRESH  = 0.050;
 
 const COLORS = {
   HIGH:    {bg:'#3b0000',border:'#dc2626',text:'#fca5a5',pill:'#7f1d1d'},
@@ -430,7 +560,7 @@ function dropRiskLabel(drop) {
 }
 
 // ─── Tab switching ────────────────────────────────────────────────────────────
-const loaded = {forecast:false,history:false,validation:false,supplements:false};
+const loaded = {forecast:false,history:false,validation:false,supplements:false,'ref-supplements':false,'ref-triggers':false};
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     const name = tab.dataset.tab;
@@ -441,7 +571,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     if (!loaded[name]) { loaded[name]=true; LOADERS[name](); }
   });
 });
-const LOADERS = {forecast:loadForecast,history:loadHistory,intervals:loadIntervals,validation:loadValidation,supplements:loadSupplements,summary:loadSummary};
+const LOADERS = {forecast:loadForecast,history:loadHistory,intervals:loadIntervals,validation:loadValidation,supplements:loadSupplements,summary:loadSummary,'ref-supplements':loadRefSupplements,'ref-triggers':loadRefTriggers};
 
 // ─── FORECAST — KHAO-anchored hybrid ─────────────────────────────────────────
 // Strategy:
@@ -840,7 +970,13 @@ async function loadForecast() {
 function renderForecast(out, days, currentP, rapid, meta={}) {
   // meta: {source, khaoLive, offset, nwsError}
 
-  // ── Temperature drop alert (frontal passage co-trigger) ────────────────────
+  // ── Calibration banner ─────────────────────────────────────────────────────
+  out.append(el('div',{style:{marginTop:'12px',padding:'9px 14px',background:'#001a10',border:'1px solid #0f6e56',borderRadius:'7px',fontSize:'11px',color:'#6ee7b7',lineHeight:'1.8'}},
+    el('strong',{style:{color:'#34d399'}},'🎯 Hardcoded thresholds — calibrated from KHAO ASOS data · 100% sensitivity on all 7 clusters: '),
+    `HIGH ≥ ${HIGH_THRESH.toFixed(3)}"/3hr · MODERATE ≥ ${MOD_THRESH.toFixed(3)}"/3hr · `,
+    `HIGH filters: consecutive · floor ≤${PRESSURE_FLOOR}" · 6hr cumulative ≥${MIN_6HR_DROP}" (waived for drops ≥0.05"). `,
+    `Afternoon exclusion removed — 3/5 real seizure drops started in afternoon window. MODERATE: consecutive only.`
+  ));
   const tempAlert = meta.tempAlert || null;
   if (tempAlert) {
     out.append(el('div',{style:{marginTop:'12px',padding:'12px 16px',background:'#001a38',border:'1px solid #3b82f6',borderRadius:'8px',fontSize:'12px',color:'#93c5fd',lineHeight:'1.8'}},
@@ -2516,10 +2652,9 @@ function calibrateThresholds(rows) {
 function renderValidation(out, rows, rhRows=[], tempRows=[]) {
   out.innerHTML = '';
 
-  // Run threshold calibration
+  // Thresholds are hardcoded — calibration runs for validation display only
   const calib = calibrateThresholds(rows);
-  HIGH_THRESH = calib.high;
-  MOD_THRESH  = calib.mod;
+  // HIGH_THRESH and MOD_THRESH are hardcoded constants, not updated from calibration
 
   const allDays = [...new Set(rows.map(r=>r.dt.slice(0,10)))].sort();
   const totalDays = allDays.length;
@@ -3379,6 +3514,355 @@ loaded.forecast = true;
 loaded.history  = true;
 loadForecast();
 loadHistory();
+
+// ─── REF SUPPLEMENT TABLE ────────────────────────────────────────────────────
+function loadRefSupplements() {
+  const container = document.getElementById('ref-supp-content');
+
+
+  const RS_CAT_COLORS = { 1:'#1a7a30', 2:'#7a4a00', 3:'#0a5a8a', 4:'#8a1a50', 5:'#5a28a0' };
+  const RS_CAT_NAMES  = { 1:'RCT-Proven', 2:'Neuro / Threshold', 3:'Anti-inflam / Neuroprotect', 4:'Liver / AED Support', 5:'Herb / Lifestyle' };
+
+  function rsEvBadge(level, label) {
+    const map = { rct:'rs-ev-rct', strong:'rs-ev-strong', promising:'rs-ev-good', mixed:'rs-ev-mixed', anecdotal:'rs-ev-anec', caution:'rs-ev-anec' };
+    return `<span class="rs-ev ${map[level]||'rs-ev-anec'}">${label}</span>`;
+  }
+  function rsPlumbsBadge(val, note) {
+    const t = note ? ` title="${note}"` : '';
+    if (val==='yes')     return `<span class="rs-plumbs-yes"${t}>✓</span>`;
+    if (val==='partial') return `<span class="rs-plumbs-partial"${t}>~</span>`;
+    return `<span class="rs-plumbs-no"${t}>—</span>`;
+  }
+  function rsTakingBadge(val, detail) {
+    const t = detail ? ` title="${detail}"` : '';
+    if (val) return `<span class="rs-taking-yes"${t}>✓</span>`;
+    return `<span class="rs-taking-no">—</span>`;
+  }
+  function rsProductHtml(products) {
+    if (!products || !products.length) return '<span style="color:#8891aa;font-size:0.75rem">—</span>';
+    return products.map(p => `
+      <div style="margin-bottom:5px">
+        <a class="rs-prod-link" href="${p.url}" target="_blank" rel="noopener">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          ${p.store}
+        </a>
+        <div class="rs-prod-name">${p.name}</div>
+      </div>`).join('');
+  }
+
+  const RS_DATA = [
+  { cat:1, name:'MCT Oil', evLevel:'rct', evLabel:'RCT ✓', dose:'~3–4 tbsp/day (split 2×)', doseNote:'Start 1 tsp/day; ramp over 3–4 wks to 9% of daily calories.', hisDose:'1 TBSP AM + 1 TBSP PM', freq:'Twice daily with food', mechanism:'C10 decanoic acid inhibits AMPA receptors directly; ketones provide alternate brain fuel; reduces excitatory neurotransmission', notes:'<span class="rs-warn-tag">⚠ GI upset if rushed</span> Use C8/C10 oil. Monitor triglycerides. Purina NeuroCare is a pre-formulated food alternative.', products:[{ store:'Amazon', url:'https://www.amazon.com/dp/B07G2K22X2', name:'Nutiva Organic MCT Oil 32 fl oz' }], taking:true, takingNote:'✓ AM: 1 TBSP + PM: 1 TBSP', plumbs:'no', plumbsNote:'Not listed in Plumb\'s' },
+  { cat:1, name:'CBD Oil (hemp-derived)', evLevel:'rct', evLabel:'RCT ✓', dose:'~26 mg per dose (3 mg/10 lb)', doseNote:'CSU trial used 2.5 mg/kg twice daily. Can increase up to 5× if no response.', hisDose:'1 ml mid-morning + 1 ml late night', freq:'Twice daily (mid-morning + late night)', mechanism:'Modulates CB1/CB2 + GPR55 receptors; reduces neuron over-firing; neuroprotective + anti-inflammatory', notes:'<span class="rs-warn-tag">⚠ THC toxic to dogs — THC-free only</span> ElleVet is a well-studied veterinary brand with published clinical data.', products:[{ store:'ElleVet Sciences', url:'https://www.ellevetsciences.com', name:'ElleVet CBD+CBDA Oil' }], taking:true, takingNote:'✓ Mid-morning: 1ml + Late night: 1ml ElleVet', plumbs:'no', plumbsNote:'Not listed in Plumb\'s (regulatory status)' },
+  { cat:2, name:'Magnesium Glycinate', evLevel:'strong', evLabel:'Strong', dose:'200–400 mg/day', doseNote:'Lunch: 1 cap · PM: 2 caps per his protocol. Glycinate is the gentlest, most bioavailable form.', hisDose:'1 cap lunch + 2 caps PM', freq:'Twice daily (lunch + PM)', mechanism:'NMDA receptor antagonist — blocks excitatory calcium influx; magnesium deficiency directly lowers seizure threshold', notes:'<span class="rs-warn-tag">⚠ Excess → diarrhea/lethargy</span> Split dosing across lunch and PM is smart — more stable serum levels than a single large dose.', products:[{ store:'Amazon', url:'https://www.amazon.com/dp/B076S3CSCB', name:'Magnesium Glycinate (Amazon)' }], taking:true, takingNote:'✓ Lunch: 1 cap + PM: 2 caps', plumbs:'partial', plumbsNote:'Referenced in Plumb\'s in electrolyte replacement context, not specifically as epilepsy supplement' },
+  { cat:2, name:'Melatonin', evLevel:'promising', evLabel:'Promising', dose:'3–6 mg at night', doseNote:'Most relevant for dogs with night-time or circadian-linked seizures. Use plain xylitol-free tablets.', hisDose:'Not currently taking', freq:'Once nightly', mechanism:'Regulates circadian rhythm; may reduce nocturnal seizure threshold; mild GABAergic activity', notes:'<span class="rs-warn-tag">⚠ Many products contain xylitol — fatal to dogs</span> Check label carefully. Consider adding given his circadian seizure tracking.', products:[], taking:false, takingNote:'', plumbs:'yes', plumbsNote:'Full monograph in Plumb\'s — dosing, indications, and interactions documented' },
+  { cat:2, name:'DMG (Dimethylglycine)', evLevel:'mixed', evLabel:'Mixed', dose:'100–200 mg/day', doseNote:'Split into 3–4 smaller doses/day due to rapid absorption. Liquid form easiest.', hisDose:'Not currently taking', freq:'3–4× daily (small doses)', mechanism:'Glycine/GABA pathway modulator; may raise seizure threshold; antioxidant; converts to SAMe', notes:'No documented drug interactions. Case report evidence compelling but RCTs negative. Very low risk.', products:[], taking:false, plumbs:'no', plumbsNote:'Not listed in Plumb\'s' },
+  { cat:2, name:'Taurine', evLevel:'promising', evLabel:'Promising', dose:'500–1000 mg/day', doseNote:'1/32 tsp (~125 mg) AM + PM = ~250 mg/day total. Therapeutic range for epilepsy is 500–1000 mg.', hisDose:'1/32 tsp AM + 1/32 tsp PM (~250 mg/day)', freq:'Twice daily (AM + PM)', mechanism:'Inhibitory amino acid; modulates GABAergic and glycinergic transmission; neuroprotective', notes:'<span class="rs-good-tag">✓ Supports heart too</span> At 250 mg/day total, still below the 500–1000 mg epilepsy target — discuss increasing with vet.', products:[{ store:'iHerb', url:'https://www.iherb.com/pr/now-foods-taurine-pure-powder-8-oz-227-g/7425', name:'NOW Foods Taurine Pure Powder 8 oz' }], taking:true, takingNote:'✓ AM + PM: 1/32 tsp each (~250 mg/day total)', plumbs:'partial', plumbsNote:'Mentioned in Plumb\'s in context of feline taurine deficiency and DCM, not epilepsy specifically' },
+  { cat:2, name:'L-Tryptophan', evLevel:'anecdotal', evLabel:'Anecdotal', dose:'500–1000 mg/day', doseNote:'Use lower end. Best given in the evening.', hisDose:'Not currently taking', freq:'Once daily (evening)', mechanism:'Serotonin precursor; calming; may reduce stress-triggered seizures', notes:'<span class="rs-warn-tag">⚠ Avoid with SSRIs/MAOIs</span> Best for dogs with stress-linked seizure clusters.', products:[], taking:false, plumbs:'no', plumbsNote:'Not listed in Plumb\'s' },
+  { cat:2, name:'Phosphatidylserine', evLevel:'anecdotal', evLabel:'Anecdotal', dose:'200–400 mg/day', doseNote:'Often combined with other neuro-supportive supplements.', hisDose:'Not currently taking', freq:'Once or twice daily', mechanism:'Maintains neuronal membrane integrity; supports neurotransmitter synthesis; anti-cortisol', notes:'Sunflower-derived preferred over soy. Low risk.', products:[], taking:false, plumbs:'no', plumbsNote:'Not listed in Plumb\'s' },
+  { cat:2, name:'Choline', evLevel:'anecdotal', evLabel:'Anecdotal', dose:'250–500 mg/day', doseNote:'Often naturally present in eggs; supplement if diet is limited.', hisDose:'Not currently taking', freq:'Once daily', mechanism:'Acetylcholine precursor; methyl group metabolism; liver support; cognitive function', notes:'Particularly relevant on phenobarbital (depletes choline).', products:[], taking:false, plumbs:'no', plumbsNote:'Not listed in Plumb\'s' },
+  { cat:3, name:'Fish Oil (EPA/DHA Omega-3)', evLevel:'strong', evLabel:'Strong', dose:'2000–3000 mg EPA+DHA/day', doseNote:'3 NOW capsules AM + 3 PM = 6 caps/day. ~4500 mg EPA+DHA/day total.', hisDose:'3 caps AM + 3 caps PM', freq:'Twice daily (AM + PM)', mechanism:'Modulates sodium/calcium ion channels; reduces CNS inflammation and neuronal excitability; supports myelin', notes:'<span class="rs-warn-tag">⚠ High doses → bleeding risk</span> Refrigerate after opening. Good dose for anti-inflammatory benefit.', products:[{ store:'iHerb', url:'https://www.iherb.com/pr/now-foods-ultra-omega-3-fish-oil-500-epa-250-dha-180-softgels/752', name:'NOW Ultra Omega-3 Fish Oil' }], taking:true, takingNote:'✓ AM: 3 caps + PM: 3 caps (~4500 mg EPA+DHA/day)', plumbs:'yes', plumbsNote:'Omega-3 fatty acids listed as nutraceutical in Plumb\'s with dosing and veterinary indications' },
+  { cat:3, name:'PEA (Palmitoylethanolamide)', evLevel:'promising', evLabel:'Promising', dose:'~400 mg twice daily', doseNote:'10 mg/kg twice daily. Use ultramicronized form. Take with fatty food. Allow 8–12 weeks.', hisDose:'Not currently taking', freq:'Twice daily', mechanism:'Activates PPAR-α → reduces neuroinflammation; endocannabinoid-like; calms mast cells and glial cells', notes:'<span class="rs-good-tag">✓ No known drug interactions</span> Works synergistically with CBD.', products:[{ store:"Dr. Judy Morgan", url:'https://drjudymorgan.com/collections/dr-judys-pea/products/dr-judys-pea-palmitoylethanolamide-40g', name:"Dr. Judy's PEA — Palmitoylethanolamide 40g" }], taking:false, plumbs:'no', plumbsNote:"Not listed in Plumb's — too new for current editions" },
+  { cat:3, name:"Lion's Mane / MycoDog Clarity", evLevel:'promising', evLabel:'Emerging', dose:'1 ml AM + 1 ml PM', doseNote:"MycoDog Clarity contains lion's mane + other functional mushrooms.", hisDose:'1 ml AM + 1 ml PM', freq:'Twice daily (AM + PM)', mechanism:'Stimulates Nerve Growth Factor (NGF); promotes neuroregeneration; anti-neuroinflammatory; cognitive support', notes:"<span class='rs-good-tag'>✓ MycoDog Clarity is a veterinary-formulated mushroom blend</span> Excellent for post-ictal brain recovery.", products:[{ store:'MycoDog', url:'https://mycodog.com/products/clarity', name:'MycoDog Clarity Mushroom Extract' }], taking:true, takingNote:'✓ AM: 1 ml + PM: 1 ml', plumbs:'no', plumbsNote:"Not listed in Plumb's" },
+  { cat:3, name:'CoQ10 (Ubiquinol form)', evLevel:'anecdotal', evLabel:'Anecdotal', dose:'2 caps/day (NRC-balanced dose)', doseNote:'Ubiquinol form is significantly more bioavailable than ubiquinone. Given as part of NRC-balanced diet.', hisDose:'2 caps/day (NRC diet)', freq:'Once or twice daily with food', mechanism:'Mitochondrial energy production; powerful antioxidant; reduces oxidative stress post-seizure; depleted by phenobarbital', notes:"<span class='rs-good-tag'>✓ Part of NRC-balanced diet — dose is calibrated</span> Ubiquinol form is the right choice.", products:[], taking:true, takingNote:'✓ 2 caps/day — part of NRC diet', plumbs:'no', plumbsNote:"Not listed in Plumb's" },
+  { cat:3, name:'Vitamin E', evLevel:'anecdotal', evLabel:'Anecdotal', dose:'11 drops/day (NRC-balanced dose)', doseNote:'NOW Foods Vitamin E Liquid. Part of NRC-balanced diet. Give with fat-containing meal.', hisDose:'11 drops/day (NRC diet)', freq:'Once daily with fat', mechanism:'Lipid-soluble antioxidant; protects neuronal cell membranes from oxidative damage post-seizure', notes:"<span class='rs-good-tag'>✓ Part of NRC-balanced diet — dose is calibrated</span> <span class='rs-warn-tag'>⚠ Excess can interfere with Vitamin K (clotting)</span>", products:[{ store:'Amazon', url:'https://www.amazon.com/dp/B000Z90FLU', name:'NOW Foods Vitamin E Liquid' }], taking:true, takingNote:'✓ 11 drops/day — NRC balanced diet', plumbs:'yes', plumbsNote:"Listed in Plumb's as a nutraceutical/antioxidant with veterinary indications" },
+  { cat:3, name:'Vitamin B6 / B-Complex (P5P)', evLevel:'strong', evLabel:'Strong', dose:'½ cap AM + ½ cap PM Thorne B-Complex #6', doseNote:'Split dosing provides steadier B vitamin levels throughout the day.', hisDose:'½ cap AM + ½ cap PM', freq:'Twice daily (AM + PM)', mechanism:'P5P is required cofactor for GABA synthesis; B6 deficiency directly causes seizures; supports serotonin and dopamine production', notes:"<span class='rs-good-tag'>✓ Thorne B-Complex #6 contains P5P — the active form</span> Split dosing is better for sustained neurological support.", products:[{ store:'iHerb', url:'https://www.iherb.com/pr/thorne-b-complex-6-60-capsules/18129', name:'Thorne B-Complex #6 — 60 Capsules' }], taking:true, takingNote:'✓ AM: ½ cap + PM: ½ cap', plumbs:'partial', plumbsNote:"Pyridoxine referenced in Plumb's in deficiency/toxicity context; P5P form not specifically addressed" },
+  { cat:3, name:'Vitamin C', evLevel:'anecdotal', evLabel:'Anecdotal', dose:'Lunch: 2×¼ tsp · PM: ¼ tsp', doseNote:'Split dosing maintains more consistent blood levels for this water-soluble antioxidant.', hisDose:'2×¼ tsp lunch + ¼ tsp PM', freq:'Lunch + PM', mechanism:'Antioxidant; supports glutathione production; anti-inflammatory; seizures deplete Vitamin C rapidly', notes:'Split dosing across the day is the right approach for a water-soluble antioxidant.', products:[], taking:true, takingNote:'✓ Lunch: 2×¼ tsp + PM: ¼ tsp', plumbs:'partial', plumbsNote:"Ascorbic acid mentioned in Plumb's for urinary acidification and antioxidant contexts" },
+  { cat:3, name:'Zinc', evLevel:'promising', evLabel:'Promising', dose:'50 mg/day (NRC-balanced dose)', doseNote:'NOW Foods Zinc 50 mg as part of NRC-balanced diet. Do not add additional zinc on top of this.', hisDose:'50 mg NOW Foods (NRC diet)', freq:'Once daily with food', mechanism:'Zinc deficiency lowers seizure threshold; involved in GABA receptor function and glutamate regulation', notes:"<span class='rs-good-tag'>✓ Part of NRC-balanced diet — dose is calibrated</span> <span class='rs-warn-tag'>⚠ 50 mg is at the upper safe limit — do not add extra zinc</span>", products:[], taking:true, takingNote:'✓ 50 mg/day NOW Foods — NRC balanced diet', plumbs:'yes', plumbsNote:"Listed in Plumb's — zinc supplementation and toxicity both covered" },
+  { cat:3, name:'Turmeric / Curcumin', evLevel:'promising', evLabel:'Promising', dose:'1 cap (lunch) per his protocol', doseNote:'Use a bioavailable form (with piperine/BioPerine or phospholipid complex).', hisDose:'1 cap (lunch)', freq:'Once or twice daily with fat', mechanism:'Potent anti-inflammatory (NF-κB inhibition); antioxidant; crosses blood-brain barrier; reduces neuroinflammation', notes:"<span class='rs-good-tag'>✓ Broad anti-inflammatory and neuroprotective benefits</span> Avoid very high doses — may affect platelet function.", products:[], taking:true, takingNote:'✓ Lunch: 1 cap', plumbs:'no', plumbsNote:"Not listed in Plumb's" },
+  { cat:3, name:'Hemp Seed Oil', evLevel:'anecdotal', evLabel:'Anecdotal', dose:'1 tsp (PM)', doseNote:"Rich in GLA and balanced omega-6/omega-3 ratio. Different from CBD oil — contains no cannabinoids.", hisDose:'1 tsp (PM)', freq:'Once daily (PM)', mechanism:'Anti-inflammatory omega fatty acids; GLA supports skin and nervous system; complements fish oil', notes:"No cannabinoids — this is a nutritional oil, not a CBD product.", products:[], taking:true, takingNote:'✓ PM: 1 tsp', plumbs:'no', plumbsNote:"Not listed in Plumb's" },
+  { cat:4, name:'Milk Thistle (Silymarin)', evLevel:'strong', evLabel:'Strong', dose:'70–140 mg silymarin/day', doseNote:'Use product standardized to 70–80% silymarin. Cycle 3–6 weeks on, 1–2 weeks off for long-term use.', hisDose:'Not currently taking (dedicated)', freq:'Once or twice daily', mechanism:'Silymarin protects hepatocytes from phenobarbital-induced oxidative damage; stimulates liver regeneration', notes:"<span class='rs-warn-tag'>⚠ May alter AED metabolism — space 2+ hours from phenobarbital</span> Highly recommended if on phenobarbital.", products:[{ store:'Wholistic Pet', url:'https://wholisticpetorganics.com/products/wholistic-ester-cr', name:'Wholistic Ester-C® (Vitamin C + bioflavonoids)' }], taking:false, takingNote:"Note: Wholistic Ester-C is Vitamin C, not milk thistle — dedicated silymarin may be worth adding", plumbs:'yes', plumbsNote:"Full silymarin monograph in Plumb's — hepatoprotectant indications, dosing, and drug interactions" },
+  { cat:4, name:'SAMe (S-Adenosylmethionine)', evLevel:'strong', evLabel:'Strong', dose:'400–800 mg/day', doseNote:'Give on empty stomach for best absorption. Denamarin = SAMe + milk thistle in one product.', hisDose:'Not currently taking', freq:'Once daily (fasted)', mechanism:'Methyl donor; boosts hepatic glutathione production; liver cell repair; antidepressant-like effects', notes:"<span class='rs-good-tag'>✓ Veterinary-recommended for phenobarbital dogs</span>", products:[], taking:false, plumbs:'yes', plumbsNote:"Full SAMe monograph in Plumb's — hepatoprotectant, dosing, and veterinary indications covered" },
+  { cat:4, name:'Vitamin B12 (Methylcobalamin)', evLevel:'anecdotal', evLabel:'Anecdotal', dose:'500–1000 mcg/day', doseNote:'Use methylcobalamin form. Thorne B-Complex #6 contains methylcobalamin — he is getting some via his B-complex.', hisDose:'Via Thorne B-Complex #6 (partial)', freq:'Once daily', mechanism:'Myelin synthesis; supports methylation pathways depleted by AEDs; neurological and liver health', notes:'Thorne B-Complex #6 contains B12 as methylcobalamin — covered via his B-complex.', products:[{ store:'iHerb', url:'https://www.iherb.com/pr/thorne-b-complex-6-60-capsules/18129', name:'Thorne B-Complex #6 (contains methylcobalamin B12)' }], taking:true, takingNote:'✓ Via Thorne B-Complex #6 (AM)', plumbs:'partial', plumbsNote:"Cyanocobalamin (injectable B12) listed in Plumb's; methylcobalamin oral form not specifically addressed" },
+  { cat:5, name:'TCVM Di Tan Tang', evLevel:'anecdotal', evLabel:'Anecdotal', dose:'Per TCVM vet prescription', doseNote:'Traditional Chinese herbal formula — "dissolve phlegm and calm the mind." Prescribed by TCVM-trained vet.', hisDose:'AM + PM (per TCVM protocol)', freq:'Twice daily (AM + PM)', mechanism:'Multi-herb formula targeting neurological "wind" patterns in TCVM; anti-inflammatory and neuro-calming', notes:"<span class='rs-good-tag'>✓ Veterinary TCVM formula — not OTC self-prescribed</span>", products:[{ store:'TCVM', url:'https://tcvmherbal.com', name:'Di Tan Tang — TCVM Herbal Formula' }], taking:true, takingNote:'✓ AM + PM (TCVM prescription)', plumbs:'no', plumbsNote:"Not listed in Plumb's" },
+  { cat:5, name:'SP Neuroplex (Standard Process)', evLevel:'anecdotal', evLabel:'Anecdotal', dose:'1 cap lunch + 1 cap PM', doseNote:'Whole-food based neurological support from Standard Process. Twice daily provides steadier nutrient levels.', hisDose:'1 cap lunch + 1 cap PM', freq:'Twice daily (lunch + PM)', mechanism:'Whole-food B vitamins and minerals for neurological function; inositol supports myelin and GABA signaling', notes:'Ensure no excessive B-vitamin overlap with Thorne B-Complex #6 — total daily B6 intake worth monitoring.', products:[{ store:'Standard Process', url:'https://www.standardprocess.com/products/neuroplex', name:'Standard Process Neuroplex' }], taking:true, takingNote:'✓ Lunch: 1 cap + PM: 1 cap', plumbs:'no', plumbsNote:"Not listed in Plumb's" },
+  { cat:5, name:'Gut Support (Adored Beast Healthy Gut)', evLevel:'anecdotal', evLabel:'Anecdotal', dose:'½ of ¾ tsp AM + ½ of ¾ tsp PM', doseNote:'Split AM and PM — twice-daily probiotic dosing supports more consistent gut microbiome colonization.', hisDose:'½ of ¾ tsp AM + ½ of ¾ tsp PM', freq:'Twice daily (AM + PM)', mechanism:'Gut-brain axis: healthy microbiome supports serotonin production, reduces systemic inflammation', notes:"<span class='rs-good-tag'>✓ Gut-brain axis is increasingly linked to seizure threshold</span>", products:[{ store:'Adored Beast', url:'https://adoredbeast.com/products/healthy-gut', name:'Adored Beast Healthy Gut' }], taking:true, takingNote:'✓ AM + PM: ½ of ¾ tsp each', plumbs:'no', plumbsNote:"Not listed in Plumb's" },
+  { cat:5, name:'Acupuncture', evLevel:'promising', evLabel:'Promising', dose:'N/A — professional treatment', doseNote:'Typically 4–6 weekly sessions then monthly. Seek CVA/CVAA certified vet.', hisDose:'Not in current protocol', freq:'Weekly → monthly maintenance', mechanism:'Increases GABA and serotonin; reduces neuroinflammation; improves cerebral microcirculation', notes:'Can be used alongside AEDs. Find a certified vet acupuncturist via IVAS directory.', products:[], taking:false, plumbs:'no', plumbsNote:"Not listed in Plumb's (non-pharmacological)" },
+  { cat:5, name:'Toxin Reduction + Stress Management', evLevel:'strong', evLabel:'Strong (trigger)', dose:'N/A — lifestyle', doseNote:'Remove lawn chemicals, synthetic cleaners, synthetic flea/tick products. Log and minimize documented seizure triggers.', hisDose:'Ongoing', freq:'Ongoing', mechanism:'Toxins and psychological stress lower seizure threshold. Eliminating documented triggers directly reduces frequency.', notes:"<span class='rs-good-tag'>✓ Free and high-impact</span> His seizure monitor app is the ideal tool.", products:[], taking:true, takingNote:'✓ Active seizure monitoring + trigger tracking', plumbs:'no', plumbsNote:"Not listed in Plumb's (non-pharmacological)" },
+  ];
+
+  const EV_ORDER_RS = {rct:0,strong:1,promising:2,mixed:3,anecdotal:4,caution:5};
+  let rsCurrentFilter = 'all';
+  let rsCurrentSort = 'default';
+
+  function rsRenderTable(filterCat, sortBy) {
+    if (filterCat !== undefined) rsCurrentFilter = filterCat;
+    if (sortBy !== undefined) rsCurrentSort = sortBy;
+    const list = container.querySelector('#rs-card-list');
+    list.innerHTML = '';
+    let rows = RS_DATA.filter(row => {
+      if (rsCurrentFilter === 'current' && !row.taking) return false;
+      if (rsCurrentFilter !== 'all' && rsCurrentFilter !== 'current' && row.cat !== parseInt(rsCurrentFilter)) return false;
+      return true;
+    });
+    if (rsCurrentSort === 'evidence') rows = [...rows].sort((a,b) => (EV_ORDER_RS[a.evLevel]??9) - (EV_ORDER_RS[b.evLevel]??9));
+    else if (rsCurrentSort === 'name') rows = [...rows].sort((a,b) => a.name.localeCompare(b.name));
+    else if (rsCurrentSort === 'taking') rows = [...rows].sort((a,b) => (b.taking?1:0) - (a.taking?1:0));
+    rows.forEach(row => {
+      const isTaking = row.taking;
+      const card = document.createElement('div');
+      card.style.cssText = `background:${isTaking?'rgba(26,122,48,0.04)':'#fff'};border:1px solid ${isTaking?'rgba(26,122,48,0.25)':'#dce0eb'};border-left:4px solid ${RS_CAT_COLORS[row.cat]};border-radius:8px;padding:14px 16px;margin-bottom:10px;`;
+      card.innerHTML = `
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+          <div>
+            <div style="font-weight:700;font-size:1rem;color:#1a1f2e;">${row.name}</div>
+            <div style="font-size:0.65rem;font-family:monospace;color:${RS_CAT_COLORS[row.cat]};text-transform:uppercase;letter-spacing:0.05em;margin-top:2px;">${RS_CAT_NAMES[row.cat]}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            ${rsEvBadge(row.evLevel, row.evLabel)}
+            ${isTaking?`<span style="background:rgba(26,122,48,0.12);color:#1a7a30;border:1px solid rgba(26,122,48,0.3);border-radius:4px;font-size:0.65rem;font-family:monospace;padding:2px 8px;">✓ TAKING</span>`:''}
+            <span style="background:${row.plumbs==='yes'?'rgba(26,90,138,0.1)':row.plumbs==='partial'?'rgba(122,74,0,0.1)':'rgba(74,84,112,0.07)'};color:${row.plumbs==='yes'?'#0a5a8a':row.plumbs==='partial'?'#7a4a00':'#8891aa'};border:1px solid ${row.plumbs==='yes'?'rgba(26,90,138,0.3)':row.plumbs==='partial'?'rgba(122,74,0,0.3)':'#dce0eb'};border-radius:4px;font-size:0.65rem;font-family:monospace;padding:2px 8px;" title="${row.plumbsNote||''}">Plumb's: ${row.plumbs==='yes'?'✓':row.plumbs==='partial'?'~':'—'}</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;">
+          <div>
+            <div style="font-size:0.62rem;font-family:monospace;color:#8891aa;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Dose &amp; Frequency</div>
+            <div style="font-size:0.85rem;color:#1a5a8a;font-weight:600;">${row.dose}</div>
+            <div style="font-size:0.75rem;color:#0a5a8a;margin-top:2px;">⏱ ${row.freq}</div>
+            ${row.doseNote?`<div style="font-size:0.75rem;color:#4a5470;margin-top:4px;line-height:1.5;">${row.doseNote}</div>`:''}
+            ${row.hisDose&&isTaking?`<div style="margin-top:6px;background:rgba(26,122,48,0.08);border:1px solid rgba(26,122,48,0.2);border-radius:4px;padding:3px 8px;font-size:0.72rem;font-family:monospace;color:#1a7a30;">▶ ${row.hisDose}</div>`:''}
+          </div>
+          <div>
+            <div style="font-size:0.62rem;font-family:monospace;color:#8891aa;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Key Notes / Cautions</div>
+            <div style="font-size:0.8rem;color:#4a5470;line-height:1.55;">${row.notes}</div>
+          </div>
+          <div>
+            <div style="font-size:0.62rem;font-family:monospace;color:#8891aa;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Mechanism</div>
+            <div style="font-size:0.78rem;color:#4a5470;line-height:1.5;">${row.mechanism}</div>
+          </div>
+          <div>
+            <div style="font-size:0.62rem;font-family:monospace;color:#8891aa;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Product / Buy</div>
+            <div style="font-size:0.78rem;">${rsProductHtml(row.products)}</div>
+          </div>
+        </div>`;
+      list.appendChild(card);
+    });
+    container.querySelector('#rs-cnt').textContent = rows.length;
+    // Update sort button active states
+    container.querySelectorAll('.rs-sort-btn').forEach(b => {
+      b.style.background = b.dataset.sort === rsCurrentSort ? '#4a5470' : '';
+      b.style.color = b.dataset.sort === rsCurrentSort ? '#fff' : '';
+    });
+  }
+
+  container.innerHTML = `
+  <div style="max-width:1100px;margin:0 auto;padding:20px 16px 48px;font-family:Georgia,sans-serif;color:#1a1f2e;">
+    <div style="border-bottom:1px solid #dce0eb;padding-bottom:18px;margin-bottom:20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;">
+      <div>
+        <div style="font-size:1.8rem;font-style:italic;font-family:Georgia,serif;"><span style="color:#1a7a30;font-style:normal;">Supplement</span> Reference — Canine Epilepsy</div>
+        <div style="font-size:0.72rem;color:#8891aa;font-family:monospace;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;">Idiopathic Epilepsy · ~87 lb (40 kg) · All as adjuncts to vet care</div>
+      </div>
+      <div style="background:rgba(184,26,26,0.06);border:1px solid rgba(184,26,26,0.2);border-radius:6px;padding:10px 14px;font-size:0.8rem;color:#8a1010;line-height:1.55;max-width:380px;">⚠ Not a substitute for veterinary guidance. Confirm all supplements with your vet. Green border = currently in his protocol.</div>
+    </div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+      <span style="font-size:0.72rem;color:#8891aa;font-family:monospace;text-transform:uppercase;">Filter:</span>
+      <button class="rs-fbtn rs-active" data-cat="all">All <span id="rs-cnt"></span></button>
+      <button class="rs-fbtn" data-cat="current">✅ Currently Taking</button>
+      <button class="rs-fbtn" data-cat="1">🟢 RCT-Proven</button>
+      <button class="rs-fbtn" data-cat="2">🟡 Neuro / Threshold</button>
+      <button class="rs-fbtn" data-cat="3">🔵 Anti-inflam / Neuroprotect</button>
+      <button class="rs-fbtn" data-cat="4">🌸 Liver / AED Support</button>
+      <button class="rs-fbtn" data-cat="5">🟣 Herbs / Lifestyle</button>
+    </div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:16px;">
+      <span style="font-size:0.72rem;color:#8891aa;font-family:monospace;text-transform:uppercase;">Sort:</span>
+      <button class="rs-sort-btn" data-sort="default" style="padding:4px 12px;border-radius:20px;border:1px solid #dce0eb;background:#4a5470;color:#fff;font-size:0.75rem;cursor:pointer;">Default</button>
+      <button class="rs-sort-btn" data-sort="evidence" style="padding:4px 12px;border-radius:20px;border:1px solid #dce0eb;background:#fff;color:#4a5470;font-size:0.75rem;cursor:pointer;">By Evidence Strength</button>
+      <button class="rs-sort-btn" data-sort="name" style="padding:4px 12px;border-radius:20px;border:1px solid #dce0eb;background:#fff;color:#4a5470;font-size:0.75rem;cursor:pointer;">A → Z</button>
+      <button class="rs-sort-btn" data-sort="taking" style="padding:4px 12px;border-radius:20px;border:1px solid #dce0eb;background:#fff;color:#4a5470;font-size:0.75rem;cursor:pointer;">Currently Taking First</button>
+    </div>
+    <div id="rs-card-list"></div>
+  </div>`;
+
+  container.querySelectorAll('.rs-fbtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.rs-fbtn').forEach(b => b.classList.remove('rs-active'));
+      btn.classList.add('rs-active');
+      rsRenderTable(btn.dataset.cat);
+    });
+  });
+  container.querySelectorAll('.rs-sort-btn').forEach(btn => {
+    btn.addEventListener('click', () => rsRenderTable(undefined, btn.dataset.sort));
+  });
+  rsRenderTable('all', 'default');
+}
+
+// ─── REF TRIGGER TABLE ────────────────────────────────────────────────────────
+function loadRefTriggers() {
+  const container = document.getElementById('ref-trig-content');
+
+  const RT_CATS = {
+    1:{label:'Psychosocial / Stress',color:'#c4620a'},
+    2:{label:'Environmental / Weather',color:'#1a72b8'},
+    3:{label:'Biological / Hormonal',color:'#6a28c8'},
+    4:{label:'Sleep / Circadian',color:'#1a8a50'},
+    5:{label:'Chemical / Toxic',color:'#b81a1a'},
+    6:{label:'Dietary / Metabolic',color:'#8a6e00'},
+    7:{label:'Sensory / Reflex',color:'#0a7a8a'},
+    8:{label:'Medical / Iatrogenic',color:'#b81a80'},
+  };
+  const RT_EV_CLASS = { strong:'rt-ev-strong', mod:'rt-ev-mod', anec:'rt-ev-anec', unclear:'rt-ev-unclear' };
+
+  const RT_DATA = [
+  {cat:1,name:'Visitors / Houseguests',ev:'strong',evLabel:'Strong',lag:'< 24 hrs',detail:'Most commonly cited single stress trigger in the Forsgård 2019 study. Social novelty activates the HPA axis → elevated cortisol → proconvulsant effect on excitatory neurons.',manage:'Allow dog to retreat to a quiet space during visits. Gradual desensitization. Pre-visit melatonin or L-theanine may blunt stress response.',tags:['tip']},
+  {cat:1,name:'Change in Daily Routine',ev:'strong',evLabel:'Strong',lag:'< 24 hrs',detail:'Schedule disruptions (feeding time, walk time, owner schedule changes) ranked among the most frequent triggers. Predictability is neuroprotective.',manage:'Maintain strict daily schedule. Feed, walk, and medicate at the same times daily.',tags:['tip']},
+  {cat:1,name:'Change in Life Situation',ev:'strong',evLabel:'Strong',lag:'1–48 hrs',detail:'Moving homes, new family members, loss of companion animal, owner returning after absence — any major environmental change.',manage:'Slow introductions of changes. Provide familiar scent objects. Maintain consistent medication schedule.',tags:[]},
+  {cat:1,name:'Unfamiliar Places',ev:'strong',evLabel:'Strong',lag:'< 24 hrs',detail:'Novel environments trigger neophobia and cortisol spikes. Veterinary clinics, grooming facilities, and boarding kennels specifically documented in two separate canine studies.',manage:'Minimize boarding. Request vet visits during quieter hours. Use familiar bedding/toys in new environments.',tags:['tip']},
+  {cat:1,name:'Excitement / Arousal',ev:'strong',evLabel:'Strong',lag:'Minutes to hours',detail:'Positive excitement (playtime, greeting owner) as well as negative stress both lower threshold. Sympathetic nervous system activation is the shared mechanism.',manage:'Temper high-arousal greetings. Avoid overly intense play sessions. Wind-down routines before bed.',tags:['tip']},
+  {cat:1,name:'Owner Stress / Anxiety',ev:'mod',evLabel:'Moderate',lag:'Variable',detail:'Border Collie case studies in Mandigers & Santifort 2023 showed direct correlation between owner\'s work stress, presence, and seizure frequency. Dogs mirror owner emotional state.',manage:'Owner stress management is part of the treatment plan. Mindful handling; avoid transmitting anxiety to dog.',tags:[]},
+  {cat:1,name:'Veterinary / Grooming / Boarding Visits',ev:'strong',evLabel:'Strong',lag:'Same day to 24 hrs',detail:'Specifically documented in Forsgård 2019 and an earlier case series. All three settings involve novel smells, handling by strangers, and high arousal.',manage:'Inform groomers and boarding staff. Keep visits brief. Request sedative pre-medication from vet for high-stress procedures if cluster risk.',tags:['warn']},
+  {cat:1,name:'Intellectual Under-stimulation / Boredom',ev:'anec',evLabel:'Anecdotal',lag:'Variable',detail:'One Border Collie case study documented consistent improvement when the dog was given more cognitive challenges.',manage:'Puzzle feeders, nose work, calm enrichment activities. Avoid overstimulation but prevent complete boredom.',tags:[]},
+  {cat:2,name:'Weather / Atmospheric Changes',ev:'strong',evLabel:'Strong',lag:'< 24 hrs',detail:'Ranked among top 4 triggers in the Forsgård 2019 clinical study. Mechanism may involve barometric pressure effects on brain vasculature, temperature stress, or electrolyte shifts.',manage:'Track weather data alongside seizure diary (which you are already doing). Pre-empt high-risk weather windows.',tags:['your']},
+  {cat:2,name:'Barometric Pressure Changes',ev:'mod',evLabel:'Moderate',lag:'0–24 hrs',detail:'Reported by owners and well-established in human epilepsy literature. Rapid drops in barometric pressure are specifically tracked in your seizure monitor.',manage:'Your KHAO barometric pressure monitoring app directly addresses this. Rising alerts = implement pre-seizure calm protocols.',tags:['your']},
+  {cat:2,name:'Hot Weather / Heat',ev:'strong',evLabel:'Strong',lag:'Minutes to hours',detail:'Specifically identified by owners as a top trigger in open-ended questioning in Forsgård 2019. Heat increases metabolic rate and may elevate core brain temperature reducing threshold.',manage:'Restrict intense exercise in hot weather. Indoor rest during peak heat. Cooling mats. Ensure hydration.',tags:['your','tip']},
+  {cat:2,name:'Temperature Drops (Cold Fronts)',ev:'mod',evLabel:'Moderate',lag:'0–12 hrs',detail:'Rapid temperature drops tracked in your seizure monitor app. Sudden cold exposure can trigger stress response and hypothalamic activation with proconvulsant downstream effects.',manage:'Monitor your temperature drop threshold (≥5°C/3hr per your app settings). Keep dog warm during rapid cold fronts.',tags:['your']},
+  {cat:2,name:'Storms (Thunder / Lightning / Wind)',ev:'mod',evLabel:'Moderate',lag:'Minutes to 24 hrs',detail:'Documented by RVC owner survey — fireworks and storms specifically mentioned. Multiple simultaneous triggers: barometric pressure change, loud noise, electrical charge, owner anxiety.',manage:'Stormphobia protocol: white noise, thunder shirts, safe space. Pre-storm calming supplements.',tags:['your','tip']},
+  {cat:2,name:'Seasonal / Circannual Patterns',ev:'mod',evLabel:'Moderate',lag:'Days to weeks',detail:'Multiday periodicities documented in dogs via implanted EEG (Gregg et al. 2020). Subject-specific monthly and ~5-week cycles independent of medication timing.',manage:'Long-term seizure diary analysis can reveal individual seasonal patterns. Adjust vigilance during historically high-risk seasons.',tags:['your']},
+  {cat:3,name:'Estrus / Heat Cycle (intact females)',ev:'strong',evLabel:'Strong',lag:'Days to weeks',detail:'Intact females with IE cluster during estrus and for 1–3 months after. Progesterone fluctuations alter GABA-A receptor sensitivity.',manage:'Spaying is strongly recommended for intact female dogs with IE.',tags:['warn']},
+  {cat:3,name:'Testosterone Fluctuations (intact males)',ev:'mod',evLabel:'Moderate',lag:'Variable',detail:'Testosterone has complex effects on neuronal excitability. Intact males may show cycle-related variability.',manage:'Neutering is generally recommended — discuss timing with veterinary neurologist.',tags:['warn']},
+  {cat:3,name:'Endogenous Circadian Rhythm',ev:'strong',evLabel:'Strong',lag:'Hours (time-of-day specific)',detail:'Gregg et al. 2020 confirmed subject-specific circadian seizure patterns in 3 of 6 dogs via continuous intracranial EEG. These are intrinsic biological rhythms, not random.',manage:'Your seizure diary circadian heatmap directly addresses this. Identify peak seizure hours for Theodulf.',tags:['your']},
+  {cat:3,name:'7-Day / Weekly Periodicities',ev:'mod',evLabel:'Moderate',lag:'Days',detail:'Gregg et al. 2020 found one dog with a consistent 7-day seizure cycle via implanted EEG. Independent of medication schedule.',manage:'Look for weekly patterns in your seizure log. Identify if high-risk days correlate with routine changes.',tags:['your']},
+  {cat:3,name:'Monthly / ~30-Day Periodicities',ev:'mod',evLabel:'Moderate',lag:'Days to weeks',detail:'Two dogs in Gregg et al. 2020 had approximately monthly seizure cycles confirmed by EEG. Consistent with your CYCLE_MODERATE_DAYS = 30 and CYCLE_HIGH_DAYS = 45 constants.',manage:'Your app\'s interval tracking is designed exactly for this. Forecast high-risk windows based on cycle length.',tags:['your']},
+  {cat:3,name:'Infectious Illness / Fever',ev:'mod',evLabel:'Moderate',lag:'12–48 hrs',detail:'Fever and systemic infection both lower seizure threshold. Hyperthermia directly increases neuronal excitability.',manage:'Treat infections promptly. Monitor temperature during illness. Notify vet immediately if fever and breakthrough seizures co-occur.',tags:['warn']},
+  {cat:3,name:'Hypothyroidism',ev:'mod',evLabel:'Moderate',lag:'Chronic',detail:'Thyroid hormone deficiency can trigger or worsen seizures. Dogs with idiopathic epilepsy should be screened for hypothyroidism — it is a reversible cause.',manage:'Request thyroid panel (T4, TSH) at next vet visit if not already done.',tags:['warn']},
+  {cat:4,name:'Sleep Deprivation / Disruption',ev:'strong',evLabel:'Strong',lag:'< 24 hrs',detail:'Among top 4 triggers in Forsgård 2019. Disrupted sleep reduces seizure threshold directly via GABAergic system depletion.',manage:'Consistent sleep schedule. Protect dog\'s sleep from household disruption. Melatonin supplementation may help.',tags:['tip']},
+  {cat:4,name:'Altered Sleep Patterns',ev:'strong',evLabel:'Strong',lag:'< 24 hrs',detail:'Not just total sleep loss — changes to normal sleep architecture (sleeping later, shorter naps, disrupted nighttime sleep) all documented as triggers.',manage:'Keep dog\'s sleep location, timing and bedding consistent. Avoid schedule changes that shift sleep timing.',tags:['tip']},
+  {cat:4,name:'Nocturnal / Early Morning Seizure Timing',ev:'strong',evLabel:'Strong',lag:'During sleep / waking',detail:'Circadian seizure clustering during sleep or shortly after waking is documented in dogs and humans. Sleep-to-wake transitions involve rapid shifts in cortical excitability.',manage:'Note Theodulf\'s specific time-of-day pattern in the seizure diary. Your circadian heatmap visualizes this.',tags:['your','tip']},
+  {cat:5,name:'Lawn / Garden Chemicals',ev:'mod',evLabel:'Moderate',lag:'Hours to days',detail:'Organophosphate and carbamate pesticides are direct neurotoxins that inhibit acetylcholinesterase. Even sub-toxic exposures can lower seizure threshold.',manage:'Eliminate chemical lawn treatments. Keep dog off treated grass for at least 72 hours.',tags:['tip']},
+  {cat:5,name:'Household Cleaning Products',ev:'mod',evLabel:'Moderate',lag:'Hours',detail:'Specifically documented in RVC owner survey. Aerosol sprays, air fresheners, synthetic fragrances, and solvent-based cleaners cited.',manage:'Switch to fragrance-free, enzyme-based, or vinegar/baking soda cleaners. Ventilate thoroughly.',tags:['tip']},
+  {cat:5,name:'Air Fresheners / Synthetic Fragrances',ev:'anec',evLabel:'Anecdotal',lag:'Minutes to hours',detail:'Plugin air fresheners, scented candles, essential oil diffusers, and spray fresheners specifically mentioned by owners. VOCs are neurotoxic at higher concentrations.',manage:'Remove all plug-in fresheners and synthetic fragrance products. Use beeswax candles or open windows instead.',tags:['tip']},
+  {cat:5,name:'Flea / Tick / Heartworm Preventatives',ev:'mod',evLabel:'Moderate',lag:'Hours to days post-application',detail:'Documented in RVC study. Isoxazoline class flea/tick products carry FDA black-box warning for neurological events in some dogs.',manage:'Discuss alternatives with vet. If using, monitor closely for 48–72 hrs post-application.',tags:['warn']},
+  {cat:5,name:'Food Toxins (chocolate, xylitol, caffeine)',ev:'strong',evLabel:'Strong',lag:'Minutes to hours',detail:'These cause reactive seizures via direct CNS toxicity. Theobromine (chocolate), xylitol (hypoglycemia → seizures), methylxanthines (caffeine).',manage:'Strict household food security. Check all medications and supplements for xylitol.',tags:['warn']},
+  {cat:5,name:'Heavy Metals / Environmental Contaminants',ev:'mod',evLabel:'Moderate',lag:'Chronic exposure',detail:'Lead, mercury, and aluminum accumulate in brain tissue and are neurotoxic. Old paint, certain plumbing, some dog bowls/toys can be sources.',manage:'Use stainless steel or ceramic food/water bowls. Filter tap water. Avoid old painted surfaces.',tags:[]},
+  {cat:6,name:'Low Blood Glucose (Hypoglycemia)',ev:'strong',evLabel:'Strong',lag:'Minutes',detail:'Brain requires continuous glucose supply. Hypoglycemia directly triggers reactive seizures. Missed meals, prolonged exercise, or metabolic disease can cause drops.',manage:'Never skip meals. Consistent feeding schedule. Keep honey or corn syrup accessible for emergency rubbing on gums.',tags:['warn']},
+  {cat:6,name:'Irregular / Missed Feeding',ev:'mod',evLabel:'Moderate',lag:'< 6 hrs',detail:'Blood sugar variability between meals can lower threshold. Large gaps between feeding and medication can also alter drug levels.',manage:'Feed 2–3× daily at consistent times. Time medications with meals (as directed).',tags:['tip']},
+  {cat:6,name:'High-Glutamate Foods',ev:'anec',evLabel:'Anecdotal',lag:'Hours',detail:'Glutamate is the primary excitatory neurotransmitter. High-glutamate foods theoretically increase excitatory load. Soy, peanuts, processed meats, MSG-containing ingredients implicated.',manage:'Avoid peanut butter, soy-based foods. Choose lamb (lowest glutamate content) over beef or chicken.',tags:[]},
+  {cat:6,name:'Electrolyte Imbalances',ev:'strong',evLabel:'Strong',lag:'Hours to days',detail:'Hypo/hypernatremia, hypocalcemia, and hypomagnesemia all directly alter neuronal firing thresholds. Can be caused by diarrhea, vomiting, poor diet, or certain medications.',manage:'Maintain consistent diet and salt intake. Supplement magnesium if deficient. Regular bloodwork to monitor electrolytes.',tags:['warn']},
+  {cat:6,name:'Rapid Diet Change',ev:'mod',evLabel:'Moderate',lag:'Days',detail:'Abrupt food changes disrupt gut microbiome, alter electrolyte balance, and can affect bromide levels if chloride intake changes dramatically.',manage:'Transition foods over 7–14 days minimum. Especially critical if on KBr — dietary chloride changes affect serum bromide levels.',tags:['warn']},
+  {cat:7,name:'Loud Noises (fireworks, thunder)',ev:'mod',evLabel:'Moderate',lag:'During or within hours',detail:'Specifically documented in RVC study. Acoustic stress triggers catecholamine release. Fireworks = pressure wave + flash + smell + noise.',manage:'Prepare ahead of known events (July 4th, New Year). White noise machines. Melatonin + CBD combination pre-event.',tags:['tip']},
+  {cat:7,name:'Photosensitivity / Flashing Lights',ev:'mod',evLabel:'Moderate',lag:'Seconds to minutes',detail:'Photosensitive epilepsy is documented in dogs. TV flicker, fluorescent lighting, sunlight through trees, and strobe effects implicated.',manage:'Reduce exposure to flickering lights. Switch to LED lighting. Monitor reaction to TV/screens.',tags:[]},
+  {cat:7,name:'Extreme Physical Exertion / Overheating',ev:'mod',evLabel:'Moderate',lag:'During or within hours',detail:'Hyperthermia from exercise raises core temperature and directly increases neuronal excitability. Electrolyte loss further lowers threshold.',manage:'Moderate exercise. Avoid intense activity in heat. Cool-down periods. Fresh water always available.',tags:['tip']},
+  {cat:8,name:'Missed or Late Medication Doses',ev:'strong',evLabel:'Strong',lag:'Hours',detail:'For phenobarbital: a missed dose drops serum levels within hours, directly triggering breakthrough seizures.',manage:'Set phone alarms. Use a pill organizer. If dose is missed by >2 hours: notify vet. Never double-dose.',tags:['warn']},
+  {cat:8,name:'Abrupt Medication Change / Dose Reduction',ev:'strong',evLabel:'Strong',lag:'Hours to days',detail:'Abrupt reduction of phenobarbital, KBr, or other AEDs can precipitate rebound seizures or status epilepticus.',manage:'NEVER reduce AED doses without veterinary supervision. Taper slowly (25% reduction per month maximum).',tags:['warn']},
+  {cat:8,name:'Vaccination',ev:'anec',evLabel:'Anecdotal',lag:'Hours to 2 days',detail:'Documented in RVC study by owner report. Systemic immune activation post-vaccination may transiently increase neuroinflammation.',manage:'Discuss titer testing as alternative to routine boosters. Monitor closely for 48 hrs post-vaccine.',tags:['warn']},
+  {cat:8,name:'Anesthesia / Surgery',ev:'mod',evLabel:'Moderate',lag:'Hours to days',detail:'General anesthesia can alter seizure threshold via multiple mechanisms: hypoxia risk, drug interactions, physiological stress, medication timing disruption.',manage:'Alert anesthesiologist to epilepsy diagnosis. Maintain medication schedule perioperatively.',tags:['warn']},
+  {cat:8,name:'Drug Interactions (reducing AED efficacy)',ev:'strong',evLabel:'Strong',lag:'Days to weeks',detail:'Certain supplements and foods affect AED metabolism. High chloride/salt reduces KBr levels. Low protein reduces phenobarbital serum levels.',manage:'Inform vet of ALL supplements before adding them. Monitor serum drug levels at regular intervals.',tags:['warn']},
+  {cat:8,name:'Pain / Unmanaged Physical Discomfort',ev:'mod',evLabel:'Moderate',lag:'Hours',detail:'Chronic pain activates the stress response and HPA axis. Any source of pain (dental, orthopedic, GI) can chronically lower seizure threshold.',manage:'Regular pain assessment. Dental cleanings. Address any limping or discomfort promptly.',tags:[]},
+  ];
+
+  const EV_ORDER_RT = {strong:0,mod:1,anec:2,unclear:3};
+  const EV_COLORS_RT = {strong:'#1a8a50',mod:'#c4620a',anec:'#4a5470',unclear:'#b81a1a'};
+  const EV_BG_RT = {strong:'rgba(26,138,80,0.08)',mod:'rgba(196,98,10,0.08)',anec:'rgba(74,84,112,0.06)',unclear:'rgba(184,26,26,0.08)'};
+  let rtCurrentFilter = 'all';
+  let rtCurrentSort = 'default';
+
+  function rtRenderTable(filterCat, sortBy) {
+    if (filterCat !== undefined) rtCurrentFilter = filterCat;
+    if (sortBy !== undefined) rtCurrentSort = sortBy;
+    const list = container.querySelector('#rt-card-list');
+    list.innerHTML = '';
+    let rows = RT_DATA.filter(row => rtCurrentFilter === 'all' || row.cat === parseInt(rtCurrentFilter));
+    if (rtCurrentSort === 'evidence') rows = [...rows].sort((a,b) => (EV_ORDER_RT[a.ev]??9) - (EV_ORDER_RT[b.ev]??9));
+    else if (rtCurrentSort === 'name') rows = [...rows].sort((a,b) => a.name.localeCompare(b.name));
+    else if (rtCurrentSort === 'yourdog') rows = [...rows].sort((a,b) => (b.tags.includes('your')?1:0) - (a.tags.includes('your')?1:0));
+    rows.forEach(row => {
+      const cat = RT_CATS[row.cat];
+      const evColor = EV_COLORS_RT[row.ev]||'#4a5470';
+      const evBg = EV_BG_RT[row.ev]||'rgba(74,84,112,0.06)';
+      const tagsHtml = row.tags.map(t => {
+        if (t==='your') return `<span style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:0.65rem;font-family:monospace;background:rgba(26,114,184,0.1);color:#1a72b8;border:1px solid rgba(26,114,184,0.25);">★ YOUR DOG</span>`;
+        if (t==='warn') return `<span style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:0.65rem;font-family:monospace;background:rgba(184,26,26,0.08);color:#b81a1a;border:1px solid rgba(184,26,26,0.2);">⚠ Caution</span>`;
+        if (t==='tip')  return `<span style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:0.65rem;font-family:monospace;background:rgba(26,138,80,0.08);color:#1a8a50;border:1px solid rgba(26,138,80,0.2);">✓ Actionable</span>`;
+        return '';
+      }).join(' ');
+      const card = document.createElement('div');
+      card.style.cssText = `background:#fff;border:1px solid #dce0eb;border-left:4px solid ${cat.color};border-radius:8px;padding:14px 16px;margin-bottom:10px;`;
+      card.innerHTML = `
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+          <div>
+            <div style="font-weight:700;font-size:1rem;color:#1a1f2e;">${row.name}</div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;">
+              <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:0.64rem;font-family:monospace;font-weight:500;text-transform:uppercase;background:${cat.color}18;color:${cat.color};border:1px solid ${cat.color}30;"><span style="width:6px;height:6px;border-radius:50%;background:${cat.color};display:inline-block;"></span>${cat.label}</span>
+              ${tagsHtml}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="display:inline-flex;align-items:center;padding:3px 9px;border-radius:8px;font-size:0.7rem;font-family:monospace;background:${evBg};color:${evColor};border:1px solid ${evColor}30;">${row.evLabel}</span>
+            <span style="font-family:monospace;font-size:0.75rem;color:#4a5470;background:#f0f2f7;border-radius:4px;padding:2px 8px;">⏱ ${row.lag}</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;">
+          <div>
+            <div style="font-size:0.62rem;font-family:monospace;color:#8891aa;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Detail / Mechanism</div>
+            <div style="font-size:0.82rem;color:#4a5470;line-height:1.55;">${row.detail}</div>
+          </div>
+          <div>
+            <div style="font-size:0.62rem;font-family:monospace;color:#8891aa;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;">Management Strategy</div>
+            <div style="font-size:0.82rem;color:#4a5470;line-height:1.55;">${row.manage}</div>
+          </div>
+        </div>`;
+      list.appendChild(card);
+    });
+    container.querySelector('#rt-cnt').textContent = `(${rows.length})`;
+    container.querySelectorAll('.rt-sort-btn').forEach(b => {
+      b.style.background = b.dataset.sort === rtCurrentSort ? '#4a5470' : '';
+      b.style.color = b.dataset.sort === rtCurrentSort ? '#fff' : '';
+    });
+  }
+
+  container.innerHTML = `
+  <div style="max-width:1100px;margin:0 auto;padding:20px 16px 48px;font-family:Georgia,sans-serif;color:#1a1f2e;">
+    <div style="border-bottom:1px solid #dce0eb;padding-bottom:18px;margin-bottom:20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;align-items:flex-start;">
+      <div>
+        <div style="font-size:1.8rem;font-style:italic;font-family:Georgia,serif;">Canine Epilepsy <span style="color:#1a72b8;font-style:normal;">Trigger</span> Reference</div>
+        <div style="font-size:0.72rem;color:#8891aa;font-family:monospace;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;">All documented seizure-precipitating factors · Research-based</div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="text-align:center;padding:10px 14px;background:#fff;border:1px solid #dce0eb;border-radius:8px;min-width:80px;"><span style="font-family:Georgia,serif;font-size:1.5rem;color:#1a72b8;display:block;line-height:1;">74%</span><span style="font-size:0.6rem;color:#8891aa;font-family:monospace;text-transform:uppercase;">Dogs have ≥1 trigger</span></div>
+        <div style="text-align:center;padding:10px 14px;background:#fff;border:1px solid #dce0eb;border-radius:8px;min-width:80px;"><span style="font-family:Georgia,serif;font-size:1.5rem;color:#1a72b8;display:block;line-height:1;">8</span><span style="font-size:0.6rem;color:#8891aa;font-family:monospace;text-transform:uppercase;">Trigger categories</span></div>
+        <div style="text-align:center;padding:10px 14px;background:#fff;border:1px solid #dce0eb;border-radius:8px;min-width:80px;"><span style="font-family:Georgia,serif;font-size:1.5rem;color:#1a72b8;display:block;line-height:1;">24h</span><span style="font-size:0.6rem;color:#8891aa;font-family:monospace;text-transform:uppercase;">Typical lag</span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+      <span style="font-size:0.72rem;color:#8891aa;font-family:monospace;text-transform:uppercase;">Filter:</span>
+      <button class="rt-fbtn rt-active" data-cat="all">All <span id="rt-cnt"></span></button>
+      <button class="rt-fbtn" data-cat="1">Psychosocial/Stress</button>
+      <button class="rt-fbtn" data-cat="2">Environmental/Weather</button>
+      <button class="rt-fbtn" data-cat="3">Biological/Hormonal</button>
+      <button class="rt-fbtn" data-cat="4">Sleep/Circadian</button>
+      <button class="rt-fbtn" data-cat="5">Chemical/Toxic</button>
+      <button class="rt-fbtn" data-cat="6">Dietary/Metabolic</button>
+      <button class="rt-fbtn" data-cat="7">Sensory/Reflex</button>
+      <button class="rt-fbtn" data-cat="8">Medical/Iatrogenic</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:16px;">
+      <span style="font-size:0.72rem;color:#8891aa;font-family:monospace;text-transform:uppercase;">Sort:</span>
+      <button class="rt-sort-btn" data-sort="default" style="padding:4px 12px;border-radius:20px;border:1px solid #dce0eb;background:#4a5470;color:#fff;font-size:0.75rem;cursor:pointer;">Default</button>
+      <button class="rt-sort-btn" data-sort="evidence" style="padding:4px 12px;border-radius:20px;border:1px solid #dce0eb;background:#fff;color:#4a5470;font-size:0.75rem;cursor:pointer;">By Evidence Strength</button>
+      <button class="rt-sort-btn" data-sort="name" style="padding:4px 12px;border-radius:20px;border:1px solid #dce0eb;background:#fff;color:#4a5470;font-size:0.75rem;cursor:pointer;">A → Z</button>
+      <button class="rt-sort-btn" data-sort="yourdog" style="padding:4px 12px;border-radius:20px;border:1px solid #dce0eb;background:#fff;color:#4a5470;font-size:0.75rem;cursor:pointer;">★ Your Dog First</button>
+    </div>
+    <div id="rt-card-list"></div>
+  </div>`;
+
+  container.querySelectorAll('.rt-fbtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.rt-fbtn').forEach(b => {
+        b.classList.remove('rt-active');
+        b.style.background = b.style.color = b.style.borderColor = '';
+      });
+      btn.classList.add('rt-active');
+      const cat = btn.dataset.cat;
+      const color = cat !== 'all' ? RT_CATS[parseInt(cat)]?.color : null;
+      if (color) { btn.style.background = color; btn.style.color = '#fff'; btn.style.borderColor = 'transparent'; }
+      else { btn.style.background = '#4a5470'; btn.style.color = '#fff'; btn.style.borderColor = 'transparent'; }
+      rtRenderTable(cat);
+    });
+  });
+  container.querySelectorAll('.rt-sort-btn').forEach(btn => {
+    btn.addEventListener('click', () => rtRenderTable(undefined, btn.dataset.sort));
+  });
+  rtRenderTable('all', 'default');
+}
 </script>
 </body>
 </html>
