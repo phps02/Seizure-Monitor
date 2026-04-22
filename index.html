@@ -331,38 +331,64 @@ function el(tag, attrs={}, ...kids) {
 // Returns array of {dt, pressure, rh}
 // IEM data=alti,relh returns: station,valid,alti,relh
 async function fetchKHAOWithHumidity(startDate, endDate) {
+  // Fetch RH only — separate query to avoid combined-params issues on IEM.
+  // Pressure is already fetched separately by fetchKHAO, so we don't need it here.
   const [y1,m1,d1] = startDate.split('-');
   const endDt = new Date(endDate+'T23:59:00');
   endDt.setDate(endDt.getDate()+1);
   const ey = endDt.getFullYear(), em = String(endDt.getMonth()+1).padStart(2,'0'), ed = String(endDt.getDate()).padStart(2,'0');
 
   const url = `https://mesonet.agron.iastate.edu/cgi-bin/request/asos.py?` +
-    `station=${STATION}&data=alti&data=relh` +
+    `station=${STATION}&data=relh` +
     `&year1=${y1}&month1=${m1}&day1=${d1}` +
     `&year2=${ey}&month2=${em}&day2=${ed}` +
     `&tz=America%2FNew_York&format=comma&latlon=no&direct=no&report_type=3`;
 
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`IEM humidity fetch HTTP ${r.status}`);
-  const text = await r.text();
-  if (text.includes('ERROR') || text.includes('No data')) throw new Error('No KHAO humidity data');
+  // Retry up to 3 times with backoff — IEM rate limiter may reject bursts
+  let text = null;
+  let lastErr = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      if (attempt > 0) await new Promise(r => setTimeout(r, 1500 * attempt));
+      const r = await fetch(url);
+      if (!r.ok) { lastErr = new Error(`IEM HTTP ${r.status}`); continue; }
+      const t = await r.text();
+      if (t.includes('ERROR') || t.includes('No data')) { lastErr = new Error('IEM returned no data'); continue; }
+      text = t;
+      break;
+    } catch(e) { lastErr = e; }
+  }
+  if (!text) throw lastErr || new Error('IEM humidity fetch failed');
+
+  // Parse with header detection — IEM can return columns in varying order
+  const lines = text.split('\n');
+  let relhCol = -1, validCol = -1;
+  for (const line of lines) {
+    if (!line || line.startsWith('#')) continue;
+    if (line.startsWith('station')) {
+      const cols = line.split(',').map(c => c.trim().toLowerCase());
+      validCol = cols.indexOf('valid');
+      relhCol  = cols.indexOf('relh');
+      break;
+    }
+  }
+  if (validCol === -1) validCol = 1;
+  if (relhCol === -1)  relhCol  = 2;
 
   const rows = [];
-  for (const line of text.split('\n')) {
+  for (const line of lines) {
     if (!line || line.startsWith('#') || line.startsWith('station')) continue;
     const parts = line.split(',');
-    if (parts.length < 4) continue;
-    const dtRaw  = parts[1].trim();
-    const altiRaw = parts[2].trim();
-    const rhRaw  = parts[3].trim();
-    if (!dtRaw || altiRaw === 'M' || altiRaw === '') continue;
-    const pressure = parseFloat(parseFloat(altiRaw).toFixed(4));
-    if (pressure < 27 || pressure > 32) continue;
+    if (parts.length <= Math.max(validCol, relhCol)) continue;
+    const dtRaw  = parts[validCol].trim();
+    const rhRaw  = parts[relhCol].trim();
+    if (!dtRaw) continue;
     const rh = (rhRaw === 'M' || rhRaw === '') ? null : parseFloat(rhRaw);
-    rows.push({ dt: dtRaw, pressure, rh });
+    if (rh === null || isNaN(rh)) continue;
+    rows.push({ dt: dtRaw, pressure: null, rh });
   }
 
-  // Deduplicate to hourly (same logic as fetchKHAO)
+  // Deduplicate to hourly
   const byHour = {};
   for (const row of rows) {
     const d = new Date(row.dt.replace(' ','T'));
@@ -371,7 +397,7 @@ async function fetchKHAOWithHumidity(startDate, endDate) {
     rounded.setMinutes(0,0,0);
     if (d.getMinutes() >= 30) rounded.setHours(rounded.getHours()+1);
     const key = rounded.toISOString().slice(0,16).replace('T',' ');
-    if (!byHour[key]) byHour[key] = { dt: key, pressure: row.pressure, rh: row.rh };
+    if (!byHour[key]) byHour[key] = { dt: key, pressure: null, rh: row.rh };
   }
   return Object.values(byHour)
     .sort((a,b) => a.dt.localeCompare(b.dt))
@@ -2448,19 +2474,20 @@ async function loadValidation() {
 
     out.innerHTML = `<div class="loading">Step ${chunks.length+1}/${chunks.length+3}: Fetching humidity data…</div>`;
 
-    // Fetch humidity in matching chunks
+    // Fetch humidity in matching chunks — per-chunk try/catch so one failure doesn't wipe all data
+    // Longer sleep (1500ms) than pressure chunks to avoid IEM rate limiter tripping after pressure burst
     let rhRows = [];
-    try {
-      for (let i = 0; i < chunks.length; i++) {
-        const [s, e] = chunks[i];
-        if (i > 0) await sleep(350);
+    for (let i = 0; i < chunks.length; i++) {
+      const [s, e] = chunks[i];
+      await sleep(i === 0 ? 1000 : 1500);
+      try {
         const rh = await fetchKHAOWithHumidity(s, e);
         rhRows = rhRows.concat(rh);
+      } catch(e) {
+        // chunk failed — continue with what we have
       }
-      rhRows.sort((a,b) => a.dt.localeCompare(b.dt));
-    } catch(e) {
-      rhRows = [];
     }
+    rhRows.sort((a,b) => a.dt.localeCompare(b.dt));
 
     out.innerHTML = `<div class="loading">Step ${chunks.length+2}/${chunks.length+3}: Fetching temperature archive (Open-Meteo ERA5)…</div>`;
 
@@ -3184,10 +3211,14 @@ function renderValidation(out, rows, rhRows=[], tempRows=[]) {
   const rhDiv = el('div',{style:{marginTop:'28px'}});
   rhDiv.append(el('div',{class:'section-head'},'Relative Humidity Correlation — Seizure vs Non-Seizure Days (KHAO)'));
 
-  if (!rhRows || rhRows.length < 50) {
-    rhDiv.append(el('div',{class:'err',style:{marginTop:'10px'}},
-      'Humidity data unavailable — IEM fetch may have failed. Reload the Validation tab to retry.'
-    ));
+  const validRhCount = rhRows ? rhRows.filter(r => r.rh !== null).length : 0;
+  if (!rhRows || rhRows.length < 50 || validRhCount < 50) {
+    const msg = !rhRows || rhRows.length === 0
+      ? 'IEM humidity fetch returned no data. Network issue or IEM server unavailable — reload the Validation tab to retry.'
+      : validRhCount < 50
+      ? `IEM returned ${rhRows.length} rows but only ${validRhCount} had valid humidity values (rest marked 'M' / missing). Not enough data for correlation analysis.`
+      : `Only ${rhRows.length} humidity rows fetched — expected hundreds. Partial fetch failure, reload the Validation tab to retry.`;
+    rhDiv.append(el('div',{class:'err',style:{marginTop:'10px'}}, msg));
     out.append(rhDiv);
     return;
   }
