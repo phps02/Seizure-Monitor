@@ -13,6 +13,65 @@ header{background:#0b1a12;border-bottom:1px solid #1c3326;padding:24px 20px 16px
 h1{font-size:22px;color:#f0ebe2;letter-spacing:1px}
 .sub{font-size:11px;color:#4a7a58;margin-top:4px}
 .upd{font-size:10px;color:#2e5040;margin-top:3px}
+.sync-bar{display:flex;align-items:center;gap:10px;margin-top:8px;padding:6px 10px;background:#0b1a12;border:1px solid #1c3326;border-radius:6px;font-size:10px;flex-wrap:wrap}
+.sync-mode{color:#fbbf24;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+.sync-mode.live{color:#34d399}
+.sync-time{color:#4a7a58;flex:1;font-family:monospace}
+.sync-btn{background:#0e1e14;border:1px solid #1c3326;color:#34d399;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-family:inherit}
+.sync-btn:hover{background:#1c3326;color:#34d399}
+.sync-btn:disabled{opacity:0.5;cursor:wait}
+.lock-indicator{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#fbbf24;font-weight:600;padding:0 4px}
+.lock-indicator.unlocked{color:#34d399}
+.lock-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;padding:20px}
+.lock-modal-bg.show{display:flex}
+.lock-modal{background:#0b1a12;border:1px solid #1c3326;border-radius:10px;padding:28px 30px;max-width:380px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,0.6)}
+.lock-modal h2{color:#34d399;font-size:18px;margin-bottom:8px;letter-spacing:1px}
+.lock-modal p{color:#6a9472;font-size:13px;line-height:1.6;margin-bottom:16px}
+.lock-modal input[type="password"]{width:100%;padding:10px 14px;background:#060e09;border:1px solid #1c3326;border-radius:5px;color:#34d399;font-family:inherit;font-size:14px;letter-spacing:2px;margin-bottom:14px}
+.lock-modal input[type="password"]:focus{outline:none;border-color:#34d399}
+.lock-modal.shake{animation:shake 0.4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.lock-modal-buttons{display:flex;gap:8px;justify-content:flex-end}
+.lock-modal button{padding:9px 18px;border-radius:5px;cursor:pointer;font-family:inherit;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:600;border:none}
+.lock-btn-primary{background:#34d399;color:#000}
+.lock-btn-primary:hover{background:#4ade80}
+.lock-btn-secondary{background:transparent;color:#4a7a58;border:1px solid #1c3326}
+.lock-btn-secondary:hover{background:#0e1e14;color:#34d399}
+.lock-error{color:#fca5a5;font-size:11px;margin-top:-8px;margin-bottom:14px;min-height:14px}
+.add-form.locked,.new-entries.locked{opacity:0.6;position:relative}
+.add-form.locked input,.add-form.locked textarea,.add-form.locked .add-btn{pointer-events:none;filter:grayscale(0.5)}
+.locked-overlay{display:none;position:absolute;inset:0;background:rgba(11,26,18,0.5);border-radius:8px;align-items:center;justify-content:center;z-index:5;pointer-events:none}
+.add-form.locked .locked-overlay,.new-entries.locked .locked-overlay{display:flex;pointer-events:auto}
+.unlock-cta{background:#34d399;color:#000;border:none;padding:10px 22px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700;box-shadow:0 4px 12px rgba(52,211,153,0.4);pointer-events:auto}
+.unlock-cta:hover{background:#4ade80}
+.del-btn[disabled]{opacity:0.3;cursor:not-allowed}
+.new-entries:not(.locked) .del-btn{cursor:pointer;position:relative;z-index:10}
+.add-form{margin-top:16px;padding:14px 16px;background:#0b1a12;border:1px solid #1c3326;border-radius:8px}
+.add-form h3{color:#34d399;letter-spacing:2px;font-size:11px;text-transform:uppercase;margin-bottom:10px}
+.add-form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+@media (max-width:600px){.add-form-row{grid-template-columns:1fr}}
+.add-form label{display:block;font-size:9px;color:#4a7a58;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.add-form input,.add-form textarea{width:100%;padding:7px 10px;background:#060e09;border:1px solid #1c3326;border-radius:4px;color:#34d399;font-family:inherit;font-size:12px}
+.add-form textarea{resize:vertical;min-height:42px}
+.add-form input:focus,.add-form textarea:focus{outline:none;border-color:#34d399}
+.add-form-actions{display:flex;gap:8px;margin-top:8px}
+.add-btn{flex:1;padding:8px 14px;background:#34d399;color:#000;border:none;border-radius:4px;cursor:pointer;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:bold;font-family:inherit}
+.add-btn:hover{background:#4ade80}
+.add-btn:disabled{opacity:0.5;cursor:wait}
+.add-btn.secondary{background:transparent;color:#4a7a58;border:1px solid #1c3326;flex:0}
+.add-btn.secondary:hover{background:#0b1a12;color:#34d399}
+.new-entries{margin-top:16px;padding:14px 16px;background:#0b1a12;border:1px solid #1c3326;border-radius:8px}
+.new-entries h3{color:#34d399;letter-spacing:2px;font-size:11px;text-transform:uppercase;margin-bottom:10px}
+.new-entry{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;padding:8px 0;border-bottom:1px solid #0e1e14;font-size:12px}
+.new-entry:last-child{border-bottom:none}
+.new-entry-date{color:#34d399;font-family:monospace;font-weight:600}
+.new-entry-body{color:#6a9472;line-height:1.5}
+.new-entry-body .meta{color:#4a7a58;font-size:11px;margin-top:2px}
+.del-btn{background:transparent;border:1px solid #1c3326;color:#fca5a5;padding:3px 8px;border-radius:3px;cursor:pointer;font-size:10px;font-family:inherit}
+.del-btn:hover{background:#3b0000;border-color:#dc2626}
+.toast-msg{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(120%);background:#0e1e14;color:#34d399;padding:10px 18px;border-radius:6px;font-size:12px;border:1px solid #34d399;z-index:1000;transition:transform 0.3s}
+.toast-msg.show{transform:translateX(-50%) translateY(0)}
+.toast-msg.error{color:#fca5a5;border-color:#dc2626}
 .body{padding:0 16px}
 .tabs{display:flex;gap:0;margin-top:16px;border-bottom:1px solid #1c3326;flex-wrap:wrap}
 .tab{padding:10px 18px;cursor:pointer;font-size:11px;color:#4a7a58;border-bottom:3px solid transparent;letter-spacing:1px;text-transform:uppercase;white-space:nowrap}
@@ -174,6 +233,21 @@ code{background:#0b1a12;padding:2px 6px;border-radius:3px;font-size:11px;color:#
 </style>
 </head>
 <body>
+
+<!-- Password unlock modal -->
+<div class="lock-modal-bg" id="lock-modal-bg">
+  <div class="lock-modal" id="lock-modal">
+    <h2>🔒 Unlock Editing</h2>
+    <p>Enter the password to enable adding and deleting seizure entries. Read-only viewing doesn't require a password.</p>
+    <input type="password" id="lock-password" placeholder="Password" autocomplete="off"/>
+    <div class="lock-error" id="lock-error"></div>
+    <div class="lock-modal-buttons">
+      <button class="lock-btn-secondary" onclick="closeLockModal()">Cancel</button>
+      <button class="lock-btn-primary" onclick="tryUnlock()">Unlock</button>
+    </div>
+  </div>
+</div>
+
 <div id="sandbox-warning" style="display:none;background:#3b0000;border-bottom:2px solid #dc2626;padding:14px 20px;font-family:Georgia,serif;font-size:12px;color:#fca5a5;line-height:1.8;text-align:center">
   <strong style="color:#fff;font-size:13px">&#9888; Open this file locally — do not preview inside Claude.ai</strong><br>
   Download the file, then open it in Chrome, Firefox, or Safari (<em>File &rarr; Open File</em>, or drag it onto the browser window).<br>
@@ -198,6 +272,13 @@ code{background:#0b1a12;padding:2px 6px;border-radius:3px;font-size:11px;color:#
     <h1>West Chester, OH 45069</h1>
     <div class="sub">87 lb · Idiopathic Epilepsy · Physical Station Data · Butler County Regional Airport (KHAO) ~10 mi N</div>
     <div class="upd" id="updated"></div>
+    <div class="sync-bar" id="sync-bar">
+      <span class="sync-mode" id="sync-mode">DEMO MODE — entries save locally</span>
+      <span class="sync-time" id="sync-time"></span>
+      <span class="lock-indicator" id="lock-indicator">🔒 Read-only</span>
+      <button class="sync-btn" id="lock-btn" onclick="toggleLock()">Unlock</button>
+      <button class="sync-btn" id="sync-btn" onclick="loadFromBackend(true)">↻ Refresh</button>
+    </div>
   </header>
   <div class="body">
     <div class="tabs">
@@ -232,7 +313,144 @@ const STATION_LABEL = 'KHAO — Butler County Regional (Hamilton, OH)';
 // Forecast still uses Open-Meteo (KHAO has no forecast product)
 const LAT = 39.34, LON = -84.39;
 
-const SEIZURES = [
+// ─── Sheet API config (set this to enable live mode) ─────────────────────────
+// Demo mode: leave empty → new entries save to browser localStorage.
+// Live mode: paste your Google Apps Script Web App URL → entries sync to sheet.
+const SHEET_API = 'https://script.google.com/macros/s/AKfycbzSnTKRMgsetCnyMIVKbV_MdKkHTKn6P1ogaAamoqzAzfK21mlUrLMdIIFZWLjC9xtLaw/exec';
+
+// ─── Edit Lock Configuration ─────────────────────────────────────────────────
+// Password required to add/delete entries. Change this to your own password.
+// Note: This is client-side only protection — prevents accidental deletes,
+// not technical bypass. For real access control, add server-side token validation.
+const EDIT_PASSWORD = 'theo2026';
+const AUTO_LOCK_MINUTES = 30; // auto-locks after this many minutes of inactivity
+let _editUnlocked = false;
+let _lastActivityAt = Date.now();
+
+// ─── Edit Lock Functions ─────────────────────────────────────────────────────
+function isEditUnlocked() {
+  if (!_editUnlocked) return false;
+  // Auto-lock after inactivity
+  const minutesSinceActivity = (Date.now() - _lastActivityAt) / 60000;
+  if (minutesSinceActivity > AUTO_LOCK_MINUTES) {
+    _editUnlocked = false;
+    updateLockUI();
+    return false;
+  }
+  return true;
+}
+
+function recordActivity() {
+  if (_editUnlocked) _lastActivityAt = Date.now();
+}
+
+function toggleLock() {
+  if (isEditUnlocked()) {
+    // Lock it
+    _editUnlocked = false;
+    updateLockUI();
+    toast('Locked');
+  } else {
+    // Show unlock modal
+    openLockModal();
+  }
+}
+
+function openLockModal() {
+  const bg = document.getElementById('lock-modal-bg');
+  const input = document.getElementById('lock-password');
+  const err = document.getElementById('lock-error');
+  bg.classList.add('show');
+  input.value = '';
+  err.textContent = '';
+  setTimeout(() => input.focus(), 50);
+}
+
+function closeLockModal() {
+  document.getElementById('lock-modal-bg').classList.remove('show');
+}
+
+function tryUnlock() {
+  const input = document.getElementById('lock-password');
+  const err = document.getElementById('lock-error');
+  const modal = document.getElementById('lock-modal');
+  if (input.value === EDIT_PASSWORD) {
+    _editUnlocked = true;
+    _lastActivityAt = Date.now();
+    closeLockModal();
+    updateLockUI();
+    toast('Unlocked — editing enabled');
+  } else {
+    err.textContent = 'Incorrect password — try again';
+    modal.classList.add('shake');
+    setTimeout(() => modal.classList.remove('shake'), 400);
+    input.value = '';
+    input.focus();
+  }
+}
+
+function updateLockUI() {
+  const indicator = document.getElementById('lock-indicator');
+  const btn = document.getElementById('lock-btn');
+  if (isEditUnlocked()) {
+    if (indicator) {
+      indicator.textContent = '🔓 Edit mode';
+      indicator.classList.add('unlocked');
+    }
+    if (btn) btn.textContent = 'Lock';
+  } else {
+    if (indicator) {
+      indicator.textContent = '🔒 Read-only';
+      indicator.classList.remove('unlocked');
+    }
+    if (btn) btn.textContent = 'Unlock';
+  }
+  // Re-render the form/list to apply locked state visuals
+  applyLockStateToForm();
+}
+
+function applyLockStateToForm() {
+  const form = document.querySelector('.add-form');
+  const entries = document.querySelector('.new-entries');
+  const unlocked = isEditUnlocked();
+  if (form) {
+    form.classList.toggle('locked', !unlocked);
+  }
+  if (entries) {
+    // Rebuild the entries list to ensure delete buttons + listeners are correct for new state
+    const newList = buildNewEntriesList();
+    if (newList && entries.parentNode) {
+      entries.parentNode.replaceChild(newList, entries);
+    }
+  }
+}
+
+// Wire up Enter key in password modal
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('lock-password');
+  if (input) {
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') tryUnlock();
+      if (e.key === 'Escape') closeLockModal();
+    });
+  }
+});
+
+// Auto-lock check every minute
+setInterval(() => {
+  if (_editUnlocked) {
+    const wasUnlocked = isEditUnlocked();
+    if (!wasUnlocked) {
+      toast('Auto-locked after inactivity');
+      updateLockUI();
+    }
+  }
+}, 60000);
+
+
+// ─── Hardcoded historical seizures (7 clusters, 17 events) ───────────────────
+// These are locked — validated against pressure data. Use the form to add new ones.
+const SEIZURES_HARDCODED = [
   {dt:'2025-07-15T10:00'},{dt:'2025-07-15T14:00'},
   {dt:'2025-09-02T13:00'},
   {dt:'2025-09-25T23:44'},{dt:'2025-09-26T02:45'},{dt:'2025-09-26T05:30'},
@@ -242,10 +460,8 @@ const SEIZURES = [
   {dt:'2026-02-05T08:00'},{dt:'2026-02-05T14:40'},{dt:'2026-02-05T19:50'},
   {dt:'2026-03-17T10:50'},{dt:'2026-03-17T12:43'},{dt:'2026-03-17T16:00'},{dt:'2026-03-17T22:00'},
 ];
-const SEIZURE_DATES = new Set(SEIZURES.map(s => s.dt.slice(0,10)));
-const SEIZURE_TS    = SEIZURES.map(s => new Date(s.dt).getTime());
 
-const CLUSTERS = [
+const CLUSTERS_HARDCODED = [
   {id:'jul15', label:'Jul 15, 2025',    seizures:['2025-07-15T10:00','2025-07-15T14:00']},
   {id:'sep2',  label:'Sep 2, 2025',     seizures:['2025-09-02T13:00']},
   {id:'sep25', label:'Sep 25–27, 2025', seizures:['2025-09-25T23:44','2025-09-26T02:45','2025-09-26T05:30','2025-09-26T13:00','2025-09-27T06:15']},
@@ -254,6 +470,307 @@ const CLUSTERS = [
   {id:'feb5',  label:'Feb 5, 2026',     seizures:['2026-02-05T08:00','2026-02-05T14:40','2026-02-05T19:50']},
   {id:'mar17', label:'Mar 17, 2026',    seizures:['2026-03-17T10:50','2026-03-17T12:43','2026-03-17T16:00','2026-03-17T22:00']},
 ];
+
+// New seizures (loaded from sheet or localStorage). Each has: {id, dt, duration, notes}
+let SEIZURES_NEW = [];
+let LAST_SYNC = null;
+
+// These get rebuilt on every data load — do NOT make them const
+let SEIZURES = [...SEIZURES_HARDCODED];
+let SEIZURE_DATES = new Set(SEIZURES.map(s => s.dt.slice(0,10)));
+let SEIZURE_TS    = SEIZURES.map(s => new Date(s.dt).getTime());
+let CLUSTERS = [...CLUSTERS_HARDCODED];
+
+// Auto-cluster new seizures into existing or new clusters based on date proximity (within 3 days)
+function rebuildSeizureData() {
+  // Merge hardcoded + new, sorted chronologically
+  const newAsLegacy = SEIZURES_NEW.map(s => ({dt: s.dt, _newId: s.id, duration: s.duration, notes: s.notes}));
+  SEIZURES = [...SEIZURES_HARDCODED, ...newAsLegacy].sort((a,b) => a.dt.localeCompare(b.dt));
+  SEIZURE_DATES = new Set(SEIZURES.map(s => s.dt.slice(0,10)));
+  SEIZURE_TS = SEIZURES.map(s => new Date(s.dt).getTime());
+
+  // Rebuild clusters: start with hardcoded, then add new entries to existing/new clusters
+  const clusters = CLUSTERS_HARDCODED.map(c => ({...c, seizures: [...c.seizures]}));
+  const CLUSTER_GAP_DAYS = 3; // entries within 3 days = same cluster
+  const MS_PER_DAY = 86400000;
+
+  for (const sz of SEIZURES_NEW) {
+    const szTs = new Date(sz.dt).getTime();
+    let matched = false;
+    for (const c of clusters) {
+      const minDiff = Math.min(...c.seizures.map(s => Math.abs(new Date(s).getTime() - szTs)));
+      if (minDiff <= CLUSTER_GAP_DAYS * MS_PER_DAY) {
+        c.seizures.push(sz.dt);
+        c.seizures.sort();
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      const d = new Date(sz.dt);
+      const monAbbr = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+      clusters.push({
+        id: monAbbr.toLowerCase() + d.getDate(),
+        label: `${monAbbr} ${d.getDate()}, ${d.getFullYear()}`,
+        seizures: [sz.dt]
+      });
+    }
+  }
+  CLUSTERS = clusters.sort((a,b) => a.seizures[0].localeCompare(b.seizures[0]));
+
+  // Update window globals so any code referencing them gets the new values
+  window.SEIZURES = SEIZURES;
+  window.SEIZURE_DATES = SEIZURE_DATES;
+  window.SEIZURE_TS = SEIZURE_TS;
+  window.CLUSTERS = CLUSTERS;
+}
+
+// ─── Data Backend (Sheets API or localStorage) ───────────────────────────────
+const STORE_KEY = 'theo:seizures-new';
+const DEMO_MODE = !SHEET_API;
+
+async function fetchFromSheet() {
+  if (DEMO_MODE) {
+    try {
+      const raw = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+      // Ensure every entry has a unique id (backfill old records)
+      let needsSave = false;
+      raw.forEach((entry, i) => {
+        if (entry.id === undefined || entry.id === null) {
+          entry.id = Date.now() + i;
+          needsSave = true;
+        }
+      });
+      if (needsSave) localStorage.setItem(STORE_KEY, JSON.stringify(raw));
+      return raw;
+    }
+    catch { return []; }
+  }
+  // Cache-busting via timestamp param
+  const url = SHEET_API + '?action=list&t=' + Date.now();
+  const r = await fetch(url, {cache: 'no-store'});
+  if (!r.ok) throw new Error('Sheet fetch failed: ' + r.status);
+  return await r.json();
+}
+
+async function addToSheet(record) {
+  if (DEMO_MODE) {
+    const all = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+    // Use Date.now() + small random to avoid collision on rapid adds
+    const id = Date.now() + Math.floor(Math.random() * 1000);
+    all.push({...record, id});
+    localStorage.setItem(STORE_KEY, JSON.stringify(all));
+    return true;
+  }
+  const r = await fetch(SHEET_API, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    body: JSON.stringify({action: 'add', ...record})
+  });
+  if (!r.ok) throw new Error('Sheet add failed');
+  return true;
+}
+
+async function deleteFromSheet(id) {
+  if (DEMO_MODE) {
+    const all = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+    // Coerce both sides to string for safe comparison (handles type mismatch)
+    const idStr = String(id);
+    const filtered = all.filter(x => String(x.id) !== idStr);
+    if (filtered.length === all.length) {
+      console.warn('Delete: no entry matched id', id, 'against', all.map(x => x.id));
+      throw new Error('Entry not found (id=' + id + ')');
+    }
+    localStorage.setItem(STORE_KEY, JSON.stringify(filtered));
+    return true;
+  }
+  const r = await fetch(SHEET_API, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain;charset=utf-8'},
+    body: JSON.stringify({action: 'delete', id})
+  });
+  if (!r.ok) throw new Error('Sheet delete failed');
+  return true;
+}
+
+async function loadFromBackend(showToastOnSuccess) {
+  const btn = document.getElementById('sync-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '↻ Loading…'; }
+  try {
+    SEIZURES_NEW = await fetchFromSheet();
+    LAST_SYNC = new Date();
+    rebuildSeizureData();
+    updateSyncBar();
+    // Re-render any visible panel
+    const activePanel = document.querySelector('.panel.active');
+    if (activePanel) {
+      const tabName = activePanel.id.replace('panel-', '');
+      rerenderTab(tabName);
+    }
+    if (showToastOnSuccess) toast(`Synced — ${SEIZURES_NEW.length} new ${SEIZURES_NEW.length === 1 ? 'entry' : 'entries'}`);
+  } catch (e) {
+    console.error('Sync failed:', e);
+    toast('Sync failed: ' + e.message, true);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '↻ Refresh'; }
+  }
+}
+
+function updateSyncBar() {
+  const mode = document.getElementById('sync-mode');
+  const time = document.getElementById('sync-time');
+  if (mode) {
+    if (DEMO_MODE) {
+      mode.textContent = 'DEMO MODE — entries save locally';
+      mode.classList.remove('live');
+    } else {
+      mode.textContent = 'LIVE — synced to Google Sheet';
+      mode.classList.add('live');
+    }
+  }
+  if (time && LAST_SYNC) {
+    time.textContent = `Last sync: ${LAST_SYNC.toLocaleTimeString()} · ${SEIZURES_NEW.length} new entries`;
+  }
+}
+
+function rerenderTab(name) {
+  // Re-trigger the tab's load function so it picks up new SEIZURES/CLUSTERS
+  if (name === 'forecast' && typeof loadForecast === 'function') return loadForecast();
+  if (name === 'history' && typeof loadHistory === 'function') return loadHistory();
+  if (name === 'intervals' && typeof loadIntervals === 'function') return loadIntervals();
+  if (name === 'validation' && typeof loadValidation === 'function') return loadValidation();
+  if (name === 'summary' && typeof loadSummary === 'function') return loadSummary();
+}
+
+async function submitNewSeizure() {
+  if (!isEditUnlocked()) {
+    openLockModal();
+    return;
+  }
+  recordActivity();
+  const dt = document.getElementById('new-dt').value;
+  if (!dt) { toast('Date and time required', true); return; }
+  const duration = document.getElementById('new-duration').value;
+  const notes = document.getElementById('new-notes').value.trim();
+  const btn = document.getElementById('add-submit-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await addToSheet({dt, duration, notes});
+    document.getElementById('new-dt').value = '';
+    document.getElementById('new-duration').value = '';
+    document.getElementById('new-notes').value = '';
+    await loadFromBackend(false);
+    toast('Seizure logged');
+  } catch (e) {
+    toast('Save failed: ' + e.message, true);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Seizure';
+  }
+}
+
+async function deleteNewSeizure(id) {
+  if (!isEditUnlocked()) {
+    openLockModal();
+    return;
+  }
+  recordActivity();
+  if (!confirm('Delete this entry? This only removes new entries — historical data is locked.')) return;
+  try {
+    await deleteFromSheet(id);
+    await loadFromBackend(false);
+    toast('Entry deleted');
+  } catch (e) {
+    toast('Delete failed: ' + e.message, true);
+  }
+}
+
+function toast(msg, isError) {
+  let t = document.getElementById('toast-msg');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast-msg';
+    t.className = 'toast-msg';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.className = 'toast-msg show' + (isError ? ' error' : '');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function buildAddSeizureForm() {
+  const form = document.createElement('div');
+  form.className = 'add-form' + (isEditUnlocked() ? '' : ' locked');
+  form.innerHTML = `
+    <h3>+ Log New Seizure</h3>
+    <div class="add-form-row">
+      <div>
+        <label for="new-dt">Date &amp; Time</label>
+        <input type="datetime-local" id="new-dt"/>
+      </div>
+      <div>
+        <label for="new-duration">Duration (sec)</label>
+        <input type="number" id="new-duration" min="0" placeholder="e.g. 90"/>
+      </div>
+    </div>
+    <div>
+      <label for="new-notes">Notes</label>
+      <textarea id="new-notes" placeholder="Pre-ictal signs, recovery, what helped..."></textarea>
+    </div>
+    <div class="add-form-actions">
+      <button class="add-btn" id="add-submit-btn" onclick="submitNewSeizure()">Save Seizure</button>
+    </div>
+    <div class="locked-overlay">
+      <button class="unlock-cta" onclick="openLockModal()">🔒 Unlock to Add Entries</button>
+    </div>
+  `;
+  return form;
+}
+
+function buildNewEntriesList() {
+  if (!SEIZURES_NEW.length) return null;
+  const div = document.createElement('div');
+  div.className = 'new-entries' + (isEditUnlocked() ? '' : ' locked');
+  const sorted = [...SEIZURES_NEW].sort((a,b) => b.dt.localeCompare(a.dt));
+  const unlocked = isEditUnlocked();
+  div.innerHTML = `<h3>📝 Your Logged Entries (${sorted.length})</h3>` +
+    sorted.map(s => {
+      const d = new Date(s.dt);
+      const dateStr = d.toLocaleString('en-US', {month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit'});
+      const dur = s.duration ? ` · ${s.duration}s` : '';
+      const notes = s.notes ? `<div class="meta">${escapeHtml(s.notes)}</div>` : '';
+      // Use data-id attribute so we can wire up listeners after innerHTML
+      const safeId = String(s.id);
+      const delBtn = unlocked
+        ? `<button class="del-btn" data-delete-id="${escapeHtml(safeId)}">× Delete</button>`
+        : `<button class="del-btn" disabled style="display:none">× Delete</button>`;
+      return `<div class="new-entry">
+        <div class="new-entry-date">${dateStr}</div>
+        <div class="new-entry-body">${dur ? '<strong>Duration:</strong>' + dur : 'Logged'}${notes}</div>
+        ${delBtn}
+      </div>`;
+    }).join('') + (unlocked ? '' : '<div class="locked-overlay"><button class="unlock-cta" onclick="openLockModal()">🔒 Unlock to Delete</button></div>');
+
+  // Wire up delete listeners (more reliable than inline onclick — survives overlay/CSS issues)
+  if (unlocked) {
+    div.querySelectorAll('button[data-delete-id]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const id = btn.getAttribute('data-delete-id');
+        // Try to parse as number first, fall back to string
+        const parsed = Number(id);
+        deleteNewSeizure(isNaN(parsed) ? id : parsed);
+      });
+    });
+  }
+  return div;
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
 
 // Merged dataset for Jul 15 cluster:
 // Dog was in Dayton (45417) Jul 13 00:00 – Jul 14 19:00 → use KDAY (Dayton Intl)
@@ -327,6 +844,66 @@ function el(tag, attrs={}, ...kids) {
 }
 
 // ─── IEM Mesonet ASOS fetch — pressure + humidity ────────────────────────────
+
+// Rate limiter: serializes all IEM requests with minimum gap to avoid 429s.
+// IEM rate-limits at ~10 req/min — we keep gap to be safe.
+const IEM_MIN_GAP_MS = 2000;
+let _iemLastRequestAt = 0;
+let _iemQueue = Promise.resolve();
+
+function iemThrottledFetch(url) {
+  // Chain onto the queue so requests are serialized
+  _iemQueue = _iemQueue.then(async () => {
+    const now = Date.now();
+    const sinceLast = now - _iemLastRequestAt;
+    if (sinceLast < IEM_MIN_GAP_MS) {
+      await new Promise(r => setTimeout(r, IEM_MIN_GAP_MS - sinceLast));
+    }
+    _iemLastRequestAt = Date.now();
+
+    // Try up to 3 times with exponential backoff on 429
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const r = await fetch(url, {cache: 'no-store'});
+      if (r.status === 429) {
+        const waitMs = 5000 * (attempt + 1) * (attempt + 1); // 5s, 20s, 45s
+        console.warn(`IEM 429 — waiting ${waitMs}ms before retry ${attempt+1}/3`);
+        await new Promise(r => setTimeout(r, waitMs));
+        _iemLastRequestAt = Date.now();
+        continue;
+      }
+      if (!r.ok) throw new Error(`IEM HTTP ${r.status}`);
+      return r;
+    }
+    throw new Error('IEM rate-limited (429) — please wait 1-2 minutes and try again');
+  });
+  return _iemQueue;
+}
+
+// Validation tab cache — full datasets are expensive to fetch
+const VAL_CACHE_KEY = 'theo:validation-cache';
+const VAL_CACHE_HOURS = 4; // refresh validation data every 4 hours
+
+function getValidationCache() {
+  try {
+    const cached = JSON.parse(localStorage.getItem(VAL_CACHE_KEY) || 'null');
+    if (!cached) return null;
+    const ageMs = Date.now() - cached.cachedAt;
+    if (ageMs > VAL_CACHE_HOURS * 60 * 60 * 1000) return null;
+    return cached;
+  } catch { return null; }
+}
+
+function setValidationCache(allRows, rhRows, tempRows) {
+  try {
+    localStorage.setItem(VAL_CACHE_KEY, JSON.stringify({
+      allRows, rhRows, tempRows, cachedAt: Date.now()
+    }));
+  } catch (e) {
+    // Quota exceeded — silently skip caching
+    console.warn('Validation cache write failed:', e);
+  }
+}
+
 // Fetches altimeter (inHg) AND relative humidity (%) from KHAO.
 // Returns array of {dt, pressure, rh}
 // IEM data=alti,relh returns: station,valid,alti,relh
@@ -344,21 +921,17 @@ async function fetchKHAOWithHumidity(startDate, endDate) {
     `&year2=${ey}&month2=${em}&day2=${ed}` +
     `&tz=America%2FNew_York&format=comma&latlon=no&direct=no&report_type=3`;
 
-  // Retry up to 3 times with backoff — IEM rate limiter may reject bursts
-  let text = null;
-  let lastErr = null;
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      if (attempt > 0) await new Promise(r => setTimeout(r, 1500 * attempt));
-      const r = await fetch(url);
-      if (!r.ok) { lastErr = new Error(`IEM HTTP ${r.status}`); continue; }
-      const t = await r.text();
-      if (t.includes('ERROR') || t.includes('No data')) { lastErr = new Error('IEM returned no data'); continue; }
-      text = t;
-      break;
-    } catch(e) { lastErr = e; }
+  // Use the global rate-limited fetch (handles 429 with backoff)
+  let text;
+  try {
+    const r = await iemThrottledFetch(url);
+    text = await r.text();
+    if (text.includes('ERROR') || text.includes('No data')) {
+      throw new Error('IEM returned no data');
+    }
+  } catch (e) {
+    throw e;
   }
-  if (!text) throw lastErr || new Error('IEM humidity fetch failed');
 
   // Parse with header detection — IEM can return columns in varying order
   const lines = text.split('\n');
@@ -425,8 +998,7 @@ async function fetchStation(station, startDate, endDate) {
     `&year2=${ey}&month2=${em}&day2=${ed}` +
     `&tz=America%2FNew_York&format=comma&latlon=no&direct=no&report_type=3`;
 
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`IEM returned HTTP ${r.status}`);
+  const r = await iemThrottledFetch(url);
   const text = await r.text();
   if (text.includes('ERROR') || text.includes('No data')) throw new Error(`No data returned for station ${station} for this period`);
 
@@ -678,8 +1250,7 @@ async function fetchRecentKHAORH() {
     `&year1=${y1}&month1=${m1}&day1=${d1}` +
     `&year2=${y2}&month2=${m2}&day2=${d2}` +
     `&tz=America%2FNew_York&format=comma&latlon=no&direct=no&report_type=3`;
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`IEM RH HTTP ${r.status}`);
+  const r = await iemThrottledFetch(url);
   const text = await r.text();
   const readings = [];
   for (const line of text.split('\n')) {
@@ -2089,33 +2660,364 @@ function hcRows(arr) {
   return arr.map(r => ({dt:r.dt, pressure:r.p, rh:r.rh ?? null}));
 }
 
+// ─── Cache for fetched weather data on new clusters ─────────────────────────
+const NEW_CLUSTER_CACHE_KEY = 'theo:cluster-weather-cache';
+
+function getCachedClusterWeather(clusterId) {
+  try {
+    const cache = JSON.parse(localStorage.getItem(NEW_CLUSTER_CACHE_KEY) || '{}');
+    const entry = cache[clusterId];
+    if (!entry) return null;
+    // Cache valid for 6 hours for recent data, indefinitely for older data
+    const ageMs = Date.now() - (entry.cachedAt || 0);
+    const clusterEnd = new Date(entry.lastSeizure || 0).getTime();
+    const isRecent = (Date.now() - clusterEnd) < 7 * 24 * 60 * 60 * 1000; // < 7 days old
+    if (isRecent && ageMs > 6 * 60 * 60 * 1000) return null; // refresh recent data after 6hr
+    return entry;
+  } catch { return null; }
+}
+
+function setCachedClusterWeather(clusterId, lastSeizure, rows, rhRows) {
+  try {
+    const cache = JSON.parse(localStorage.getItem(NEW_CLUSTER_CACHE_KEY) || '{}');
+    cache[clusterId] = { rows, rhRows, lastSeizure, cachedAt: Date.now() };
+    localStorage.setItem(NEW_CLUSTER_CACHE_KEY, JSON.stringify(cache));
+  } catch {}
+}
+
+async function fetchWeatherForNewCluster(cluster) {
+  // Determine date window: 3 days before earliest seizure, 1 day after latest
+  const sortedDates = [...cluster.seizures].sort();
+  const firstDate = sortedDates[0].slice(0, 10);
+  const lastDate = sortedDates[sortedDates.length - 1].slice(0, 10);
+
+  const startDt = new Date(firstDate + 'T00:00:00');
+  startDt.setDate(startDt.getDate() - 3);
+  const endDt = new Date(lastDate + 'T00:00:00');
+  endDt.setDate(endDt.getDate() + 1);
+
+  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const startStr = fmt(startDt);
+  const endStr = fmt(endDt);
+
+  // Fetch pressure first, then humidity (throttler handles rate-limit gaps automatically)
+  let pressureRows = [];
+  let humidityRows = [];
+  try {
+    pressureRows = await fetchStation('HAO', startStr, endStr);
+  } catch (e) {
+    throw new Error(`Could not fetch pressure: ${e.message}`);
+  }
+
+  try {
+    humidityRows = await fetchKHAOWithHumidity(startStr, endStr);
+  } catch (e) {
+    // Humidity is optional — proceed with pressure only
+    humidityRows = [];
+  }
+
+  // Merge pressure + humidity by datetime to match the hardcoded data shape
+  const rhMap = {};
+  humidityRows.forEach(r => { rhMap[r.dt] = r.rh; });
+
+  const merged = pressureRows.map(r => ({
+    dt: r.dt,
+    pressure: r.pressure,
+    rh: rhMap[r.dt] !== undefined ? rhMap[r.dt] : null
+  }));
+
+  // rhRows mirror the format used by hardcoded data
+  const rhRowsMerged = merged.map(r => ({dt: r.dt, pressure: null, rh: r.rh}));
+
+  return { rows: merged, rhRows: rhRowsMerged, lastSeizure: sortedDates[sortedDates.length - 1] };
+}
+
+function buildClusterSkeleton(cluster) {
+  const div = document.createElement('div');
+  div.style.cssText = 'margin-top:20px;padding:16px;background:#0b1a12;border:1px solid #1c3326;border-radius:8px';
+  div.innerHTML = `
+    <div style="font-size:13px;color:#34d399;font-weight:600;margin-bottom:6px">${cluster.label} <span style="color:#fbbf24;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-left:8px">📡 Loading weather data…</span></div>
+    <div style="font-size:11px;color:#4a7a58">Fetching from KHAO ASOS via IEM Mesonet for cluster window…</div>
+  `;
+  return div;
+}
+
+function buildClusterError(cluster, errMsg) {
+  const div = document.createElement('div');
+  div.style.cssText = 'margin-top:20px;padding:16px;background:#3b0000;border:1px solid #dc2626;border-radius:8px';
+  div.innerHTML = `
+    <div style="font-size:13px;color:#fca5a5;font-weight:600;margin-bottom:6px">${cluster.label} <span style="font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-left:8px">⚠ Weather data unavailable</span></div>
+    <div style="font-size:11px;color:#fca5a5;line-height:1.6">
+      ${escapeHtml(errMsg)}<br>
+      <span style="color:#c4b9a8">This may resolve on next refresh — IEM data has a 1–6 hour publishing delay for recent dates.</span>
+    </div>
+    <div style="margin-top:8px;padding-top:8px;border-top:1px solid #5b1010;font-size:11px;color:#fca5a5">
+      <strong>Logged seizures in this cluster:</strong>
+      ${cluster.seizures.map(s => {
+        const d = new Date(s);
+        return d.toLocaleString('en-US', {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+      }).join(' · ')}
+    </div>
+  `;
+  return div;
+}
+
 async function loadHistory() {
   const out = document.getElementById('hist-content');
   out.innerHTML = '';
 
-  const windows = [
-    {label:'Jul 15',    cluster:CLUSTERS[0], rows:hcRows(HC_JUL15_MERGED), rhRows:hcRows(HC_JUL15_KHAO), isJul15:true},
-    {label:'Sep 2',     cluster:CLUSTERS[1], rows:hcRows(HC_SEP2),  rhRows:hcRows(HC_SEP2)},
-    {label:'Sep 25–27', cluster:CLUSTERS[2], rows:hcRows(HC_SEP25), rhRows:hcRows(HC_SEP25)},
-    {label:'Dec 19',    cluster:CLUSTERS[3], rows:hcRows(HC_DEC19), rhRows:hcRows(HC_DEC19)},
-    {label:'Jan 11',    cluster:CLUSTERS[4], rows:hcRows(HC_JAN11), rhRows:hcRows(HC_JAN11)},
-    {label:'Feb 5',     cluster:CLUSTERS[5], rows:hcRows(HC_FEB5),  rhRows:hcRows(HC_FEB5)},
-    {label:'Mar 17',    cluster:CLUSTERS[6], rows:hcRows(HC_MAR17), rhRows:hcRows(HC_MAR17)},
-  ];
+  // Inject the add-seizure form at the top
+  out.appendChild(buildAddSeizureForm());
+
+  // Inject list of new (sheet-backed) entries if any
+  const newList = buildNewEntriesList();
+  if (newList) out.appendChild(newList);
+
+  // ─── Build the windows array dynamically ──────────────────────────────────
+  // Map hardcoded cluster IDs to their pre-fetched weather data
+  const HC_DATA = {
+    'jul15': {rows: hcRows(HC_JUL15_MERGED), rhRows: hcRows(HC_JUL15_KHAO), isJul15: true},
+    'sep2':  {rows: hcRows(HC_SEP2),  rhRows: hcRows(HC_SEP2)},
+    'sep25': {rows: hcRows(HC_SEP25), rhRows: hcRows(HC_SEP25)},
+    'dec19': {rows: hcRows(HC_DEC19), rhRows: hcRows(HC_DEC19)},
+    'jan11': {rows: hcRows(HC_JAN11), rhRows: hcRows(HC_JAN11)},
+    'feb5':  {rows: hcRows(HC_FEB5),  rhRows: hcRows(HC_FEB5)},
+    'mar17': {rows: hcRows(HC_MAR17), rhRows: hcRows(HC_MAR17)},
+  };
 
   out.append(el('div',{style:{marginTop:'12px',padding:'10px 14px',background:'#001a38',border:'1px solid #3b82f6',borderRadius:'8px',fontSize:'11px',color:'#93c5fd',lineHeight:'1.7'}},
-    `📡 Pressure data from KHAO ASOS physical station (Butler County Regional Airport, Hamilton OH). Raw altimeter readings in inHg. Station elevation 631 ft MSL, ~10 miles NNW of West Chester. Data hardcoded April 2026 from IEM Mesonet.`
+    `📡 Pressure data from KHAO ASOS physical station (Butler County Regional Airport, Hamilton OH). Raw altimeter readings in inHg. Station elevation 631 ft MSL, ~10 miles NNW of West Chester. Historical clusters use cached data; new entries fetched live from IEM Mesonet.`
   ));
 
-  for (const w of windows) {
-    const section = el('div',{style:{marginTop:'20px'}});
-    const rows = w.rows;
-    const isJul15 = w.isJul15 || false;
-
-    if (rows.length < 5) {
-      section.append(el('div',{style:{color:'#fca5a5'}},`Insufficient data for ${w.label}`));
-      out.append(section); continue;
+  // Process clusters in order — historical render immediately, new ones get skeleton placeholders
+  // then fetch in parallel and replace skeletons as they resolve
+  const clusterEntries = [];
+  for (const cluster of CLUSTERS) {
+    const isHardcoded = HC_DATA[cluster.id] !== undefined;
+    if (isHardcoded) {
+      clusterEntries.push({
+        cluster,
+        label: cluster.label.replace(/, \d{4}$/, '').replace(/^([A-Z][a-z]{2}) /, (m, p) => p),
+        rows: HC_DATA[cluster.id].rows,
+        rhRows: HC_DATA[cluster.id].rhRows,
+        isJul15: HC_DATA[cluster.id].isJul15 || false,
+        isNew: false
+      });
+    } else {
+      // New cluster — needs to fetch
+      clusterEntries.push({cluster, isNew: true, label: cluster.label});
     }
+  }
+
+  // First pass: render hardcoded synchronously, insert skeletons for new ones
+  const newClusterPlaceholders = {};
+  for (const entry of clusterEntries) {
+    if (!entry.isNew) {
+      const section = renderClusterWindow(entry);
+      out.appendChild(section);
+    } else {
+      const skeleton = buildClusterSkeleton(entry.cluster);
+      out.appendChild(skeleton);
+      newClusterPlaceholders[entry.cluster.id] = skeleton;
+    }
+  }
+
+  // Second pass: fetch weather for new clusters in parallel and replace skeletons
+  const newEntries = clusterEntries.filter(e => e.isNew);
+  for (const entry of newEntries) {
+    // Try cache first
+    const cached = getCachedClusterWeather(entry.cluster.id);
+    if (cached) {
+      const fullEntry = {
+        cluster: entry.cluster,
+        label: entry.label,
+        rows: cached.rows,
+        rhRows: cached.rhRows,
+        isJul15: false,
+        isNew: true
+      };
+      const section = renderClusterWindow(fullEntry);
+      const placeholder = newClusterPlaceholders[entry.cluster.id];
+      if (placeholder && placeholder.parentNode) {
+        placeholder.parentNode.replaceChild(section, placeholder);
+      }
+      continue;
+    }
+
+    // Otherwise fetch live (don't await — let them run in parallel via Promise)
+    (async () => {
+      try {
+        const result = await fetchWeatherForNewCluster(entry.cluster);
+        setCachedClusterWeather(entry.cluster.id, result.lastSeizure, result.rows, result.rhRows);
+
+        const fullEntry = {
+          cluster: entry.cluster,
+          label: entry.label,
+          rows: result.rows,
+          rhRows: result.rhRows,
+          isJul15: false,
+          isNew: true
+        };
+        const section = renderClusterWindow(fullEntry);
+        const placeholder = newClusterPlaceholders[entry.cluster.id];
+        if (placeholder && placeholder.parentNode) {
+          placeholder.parentNode.replaceChild(section, placeholder);
+        }
+      } catch (err) {
+        const errBox = buildClusterError(entry.cluster, err.message);
+        const placeholder = newClusterPlaceholders[entry.cluster.id];
+        if (placeholder && placeholder.parentNode) {
+          placeholder.parentNode.replaceChild(errBox, placeholder);
+        }
+      }
+    })();
+  }
+
+  // Append the cluster timing breakdown (tree-indented list of all events)
+  appendClusterTimingTree(out);
+
+  // Append the analysis notes block at the bottom (independent of cluster rendering)
+  appendSeizureLogNotes(out);
+}
+
+// ─── Cluster Timing Tree ─────────────────────────────────────────────────────
+// Renders a compact tree-indented list of all clusters and seizures with gap timing
+function appendClusterTimingTree(out) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'margin-top:24px;padding:0';
+
+  const header = document.createElement('h3');
+  header.style.cssText = 'color:#34d399;letter-spacing:2px;font-size:13px;text-transform:uppercase;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid #1c3326';
+  header.textContent = 'All Cluster Timings';
+  wrap.appendChild(header);
+
+  const desc = document.createElement('div');
+  desc.style.cssText = 'font-size:11px;color:#6a9472;margin-bottom:12px;font-style:italic';
+  desc.textContent = `${SEIZURES.length} total events across ${CLUSTERS.length} clusters · gap timings show interval to next seizure within cluster`;
+  wrap.appendChild(desc);
+
+  const tree = document.createElement('div');
+  tree.style.cssText = 'background:#0b1a12;border:1px solid #1c3326;border-radius:8px;padding:14px 16px;font-family:"SF Mono",Monaco,monospace;font-size:13px';
+
+  // Sort clusters chronologically
+  const sortedClusters = [...CLUSTERS].sort((a, b) => a.seizures[0].localeCompare(b.seizures[0]));
+
+  sortedClusters.forEach((cluster, ci) => {
+    const seizures = [...cluster.seizures].sort();
+    const isLast = ci === sortedClusters.length - 1;
+
+    // Cluster row container
+    const clusterDiv = document.createElement('div');
+    clusterDiv.style.cssText = `padding:8px 0;${isLast ? '' : 'border-bottom:1px solid #0e1e14;'}`;
+
+    // Cluster header
+    const headRow = document.createElement('div');
+    headRow.style.cssText = 'display:flex;justify-content:space-between;align-items:center;color:#34d399;font-weight:600;flex-wrap:wrap;gap:8px';
+
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = cluster.label;
+    headRow.appendChild(labelSpan);
+
+    // Compute total cluster duration
+    const meta = document.createElement('span');
+    meta.style.cssText = 'font-size:11px;color:#6a9472;font-weight:normal';
+    if (seizures.length === 1) {
+      meta.textContent = '1 event · isolated';
+    } else {
+      const firstTs = new Date(seizures[0]).getTime();
+      const lastTs = new Date(seizures[seizures.length - 1]).getTime();
+      meta.textContent = `${seizures.length} events · ${formatDuration(lastTs - firstTs)} total`;
+    }
+    headRow.appendChild(meta);
+    clusterDiv.appendChild(headRow);
+
+    // Individual seizure rows
+    seizures.forEach((dt, si) => {
+      const isLastEvent = si === seizures.length - 1;
+      const isOnlyEvent = seizures.length === 1;
+      const d = new Date(dt);
+
+      const row = document.createElement('div');
+      row.style.cssText = 'padding:4px 0 4px 28px;color:#9dc4a8;font-size:12px;display:flex;justify-content:space-between;align-items:center;position:relative;flex-wrap:wrap;gap:8px';
+
+      // Tree branch character
+      const branchChar = document.createElement('span');
+      branchChar.style.cssText = 'position:absolute;left:8px;color:#1c3326';
+      branchChar.textContent = isLastEvent ? '└─' : '├─';
+      row.appendChild(branchChar);
+
+      // Event label
+      const label = document.createElement('span');
+      const dateStr = d.toLocaleString('en-US', {
+        month: 'short', day: 'numeric',
+        hour: 'numeric', minute: '2-digit', hour12: false
+      });
+      let suffix = '';
+      if (isOnlyEvent) suffix = ' — single event';
+      else if (si === 0) suffix = ' — first event';
+      else if (isLastEvent) suffix = ' — final event';
+      label.textContent = dateStr + suffix;
+      row.appendChild(label);
+
+      // Gap to next event
+      if (!isLastEvent) {
+        const gap = document.createElement('span');
+        gap.style.cssText = 'color:#fcd34d;font-size:10px;font-style:italic';
+        const nextTs = new Date(seizures[si + 1]).getTime();
+        const thisTs = d.getTime();
+        gap.textContent = `+${formatDuration(nextTs - thisTs)} →`;
+        row.appendChild(gap);
+      }
+
+      clusterDiv.appendChild(row);
+    });
+
+    tree.appendChild(clusterDiv);
+  });
+
+  wrap.appendChild(tree);
+  out.appendChild(wrap);
+}
+
+// Format a duration in ms as "Xh Ym" or "Xd Yh Zm"
+function formatDuration(ms) {
+  const totalMin = Math.round(ms / 60000);
+  const days = Math.floor(totalMin / (60 * 24));
+  const hours = Math.floor((totalMin % (60 * 24)) / 60);
+  const mins = totalMin % 60;
+  if (days > 0) return `${days}d ${hours}h ${mins}m`;
+  return `${hours}h ${mins}m`;
+}
+
+// Renders a single cluster window — extracted from the original loop body
+// Takes an entry of shape: {cluster, label, rows, rhRows, isJul15, isNew}
+function renderClusterWindow(w) {
+  const section = el('div',{style:{marginTop:'20px'}});
+  const rows = w.rows;
+  const isJul15 = w.isJul15 || false;
+
+  if (rows.length < 5) {
+    section.append(el('div',{style:{color:'#fca5a5'}},`Insufficient data for ${w.label}`));
+    return section;
+  }
+
+  // Recency note for new clusters with seizures < 6 hours old
+  if (w.isNew) {
+    const lastSeizureTs = Math.max(...w.cluster.seizures.map(s => new Date(s).getTime()));
+    const ageHours = (Date.now() - lastSeizureTs) / (1000 * 60 * 60);
+    if (ageHours < 6) {
+      section.append(el('div',{style:{padding:'8px 12px',background:'#332100',border:'1px solid #fbbf24',borderRadius:'6px',fontSize:'11px',color:'#fbbf24',marginBottom:'6px'}},
+        `⏱ This event is recent (< 6 hr old). IEM Mesonet typically has a 1–6 hour delay — weather analysis may be incomplete. Click ↻ Refresh in a few hours for complete data.`));
+    }
+  }
+
+  return _renderClusterBody(section, w);
+}
+
+// Renders the full body of a cluster window — extracted from original for-loop body
+function _renderClusterBody(section, w) {
+  const rows = w.rows;
+  const isJul15 = w.isJul15 || false;
 
     const clusterDrop = peakDrop(rows, w.cluster.seizures[0]);
     const rl = dropRiskLabel(clusterDrop.drop);
@@ -2390,12 +3292,14 @@ async function loadHistory() {
       }
     } catch(e) { /* temp section failed */ }
 
-    out.append(section);
-  }
+    return section;
+}
 
+// Append the analysis notes block to the seizure log (called once after all clusters render)
+function appendSeizureLogNotes(out) {
   out.append(el('div',{class:'notes',style:{marginTop:'16px'}},
     el('h3',{},'Seizure Log Analysis'),
-    el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Source: '),'KHAO ASOS physical station. Raw altimeter readings — sharper drops than ERA5 model data. Data hardcoded April 2026.'),
+    el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Source: '),'KHAO ASOS physical station. Raw altimeter readings — sharper drops than ERA5 model data. Historical clusters use cached data; new entries fetched live from IEM Mesonet.'),
     el('p',{style:{marginBottom:'6px'}},el('strong',{style:{color:'#9dc4a8'}},'Pressure-independent clusters: '),
       'Sep 2 shows no qualifying barometric drop in the 48h prior at KHAO independent of the afternoon filter removal. ',
       'Captured by the cycle-length and humidity pathways rather than the drop model.'
@@ -2413,6 +3317,34 @@ async function loadHistory() {
 // ─── VALIDATION ───────────────────────────────────────────────────────────────
 async function loadValidation() {
   const out = document.getElementById('val-content');
+
+  // Check cache first — validation data is expensive to fetch
+  const cached = getValidationCache();
+  if (cached) {
+    out.innerHTML = `<div class="loading">Loading from cache (saved ${Math.round((Date.now() - cached.cachedAt)/60000)} min ago)…</div>`;
+    setTimeout(() => {
+      try {
+        renderValidation(out, cached.allRows, cached.rhRows, cached.tempRows);
+        // Show small banner indicating cached data
+        const banner = el('div',{style:{padding:'8px 12px',background:'#0b1a12',border:'1px solid #34d399',borderRadius:'6px',fontSize:'11px',color:'#34d399',marginBottom:'12px',display:'flex',alignItems:'center',gap:'10px',justifyContent:'space-between',flexWrap:'wrap'}},
+          el('span',{},`✓ Cached data — saved ${Math.round((Date.now() - cached.cachedAt)/60000)} min ago. Cache expires after ${VAL_CACHE_HOURS} hours.`),
+          el('button',{
+            style:{background:'#0e1e14',border:'1px solid #1c3326',color:'#34d399',padding:'4px 10px',borderRadius:'4px',cursor:'pointer',fontSize:'10px',letterSpacing:'1px',textTransform:'uppercase',fontFamily:'inherit'},
+            onclick: () => {
+              localStorage.removeItem(VAL_CACHE_KEY);
+              loadValidation();
+            }
+          }, '↻ Force Refresh')
+        );
+        out.insertBefore(banner, out.firstChild);
+      } catch (e) {
+        // Cache rendering failed — clear and refetch
+        localStorage.removeItem(VAL_CACHE_KEY);
+        loadValidation();
+      }
+    }, 50);
+    return;
+  }
 
   // Always fetch from first seizure date through TODAY — no hardcoded end date.
   // This means non-seizure days accumulate automatically as time passes.
@@ -2440,7 +3372,6 @@ async function loadValidation() {
   }
 
   const chunks = dateChunks(START_DATE, todayStr);
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
   out.innerHTML = `<div class="loading">Fetching KHAO ASOS pressure data (${START_DATE} → ${todayStr}, ${chunks.length} chunks)…</div>`;
 
   try {
@@ -2448,7 +3379,6 @@ async function loadValidation() {
     for (let i = 0; i < chunks.length; i++) {
       const [s, e] = chunks[i];
       out.innerHTML = `<div class="loading">Step ${i+1}/${chunks.length}: Fetching pressure ${s} → ${e}…</div>`;
-      if (i > 0) await sleep(350);
       const chunk = await fetchKHAO(s, e);
       allRows = allRows.concat(chunk);
     }
@@ -2461,7 +3391,6 @@ async function loadValidation() {
     const KDAY_END   = '2025-07-14 19:00';
     try {
       out.innerHTML = `<div class="loading">Fetching KDAY (Dayton) data for Jul 13–14 (dog location)…</div>`;
-      await sleep(350);
       const kdayChunk = await fetchStation('DAY', '2025-07-13', '2025-07-14');
       const kdaySplice = kdayChunk.filter(r => r.dt >= KDAY_START && r.dt <= KDAY_END);
       // Remove KHAO rows for that window and replace with KDAY
@@ -2475,11 +3404,10 @@ async function loadValidation() {
     out.innerHTML = `<div class="loading">Step ${chunks.length+1}/${chunks.length+3}: Fetching humidity data…</div>`;
 
     // Fetch humidity in matching chunks — per-chunk try/catch so one failure doesn't wipe all data
-    // Longer sleep (1500ms) than pressure chunks to avoid IEM rate limiter tripping after pressure burst
+    // The throttler enforces minimum gaps automatically — no manual sleep needed
     let rhRows = [];
     for (let i = 0; i < chunks.length; i++) {
       const [s, e] = chunks[i];
-      await sleep(i === 0 ? 1000 : 1500);
       try {
         const rh = await fetchKHAOWithHumidity(s, e);
         rhRows = rhRows.concat(rh);
@@ -2515,18 +3443,39 @@ async function loadValidation() {
 
     out.innerHTML = `<div class="loading">Step ${chunks.length+3}/${chunks.length+3}: Calibrating thresholds…</div>`;
     if (allRows.length < 100) throw new Error(`Only ${allRows.length} KHAO rows — possible data gap`);
+
+    // Save to cache before rendering so we can quickly reload next time
+    setValidationCache(allRows, rhRows, tempRows);
+
     renderValidation(out, allRows, rhRows, tempRows);
   } catch(e) {
-    out.innerHTML = `<div class="err"><strong>KHAO validation error:</strong> ${e.message}<br>
-      <div style="margin-top:8px;font-size:11px;color:#c4b9a8">
-        Possible causes:<br>
-        • KHAO (HAO) data gap in IEM archive<br>
-        • Network / CORS issue fetching mesonet.agron.iastate.edu<br>
-        • Try opening browser console for details<br><br>
-        You can manually verify data at: 
-        <a href="https://mesonet.agron.iastate.edu/request/download.phtml" target="_blank" style="color:#34d399">mesonet.agron.iastate.edu</a>
-      </div>
-    </div>`;
+    const is429 = (e.message || '').includes('429') || (e.message || '').toLowerCase().includes('rate-limit');
+    if (is429) {
+      out.innerHTML = `<div class="err"><strong>⏳ IEM Rate Limited</strong><br>
+        <div style="margin-top:8px;font-size:12px;color:#c4b9a8;line-height:1.6">
+          IEM Mesonet has temporarily rate-limited your IP (HTTP 429). This happens when too many requests are made in a short window.<br><br>
+          <strong style="color:#fbbf24">What to do:</strong>
+          <ul style="margin:6px 0 0 18px;padding:0">
+            <li>Wait <strong>1–2 minutes</strong> for the rate limit to reset</li>
+            <li>Avoid switching tabs rapidly between Seizure Log and Validation</li>
+            <li>The page will use a cached dataset for up to ${VAL_CACHE_HOURS} hours after a successful fetch</li>
+          </ul>
+          <br>
+          <button onclick="loadValidation()" style="background:#0e1e14;border:1px solid #34d399;color:#34d399;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px;letter-spacing:1px;text-transform:uppercase;font-family:inherit">↻ Try Again Now</button>
+        </div>
+      </div>`;
+    } else {
+      out.innerHTML = `<div class="err"><strong>KHAO validation error:</strong> ${e.message}<br>
+        <div style="margin-top:8px;font-size:11px;color:#c4b9a8">
+          Possible causes:<br>
+          • KHAO (HAO) data gap in IEM archive<br>
+          • Network / CORS issue fetching mesonet.agron.iastate.edu<br>
+          • Try opening browser console for details<br><br>
+          You can manually verify data at: 
+          <a href="https://mesonet.agron.iastate.edu/request/download.phtml" target="_blank" style="color:#34d399">mesonet.agron.iastate.edu</a>
+        </div>
+      </div>`;
+    }
   }
 }
 
@@ -3543,8 +4492,15 @@ function renderSupplementTable(container) {
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 loaded.forecast = true;
 loaded.history  = true;
-loadForecast();
-loadHistory();
+
+// Initial sync: load any new entries from sheet/storage, then render
+(async () => {
+  updateSyncBar();
+  updateLockUI();  // initialize lock state visuals
+  await loadFromBackend(false);
+  loadForecast();
+  loadHistory();
+})();
 
 // ─── REF SUPPLEMENT TABLE ────────────────────────────────────────────────────
 function loadRefSupplements() {
