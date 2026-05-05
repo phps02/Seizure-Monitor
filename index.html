@@ -283,21 +283,21 @@ code{background:#0b1a12;padding:2px 6px;border-radius:3px;font-size:11px;color:#
   <div class="body">
     <div class="tabs">
       <div class="tab active" data-tab="forecast">7-Day Forecast</div>
-      <div class="tab"        data-tab="history">Seizure Log</div>
       <div class="tab"        data-tab="intervals">Intervals</div>
+      <div class="tab"        data-tab="history">Seizure Log</div>
       <div class="tab"        data-tab="validation">Trigger Validation</div>
-      <div class="tab"        data-tab="supplements">Supplement Protocol</div>
+      <div class="tab"        data-tab="supplements">Surge Supplement Protocol</div>
+      <div class="tab"        data-tab="ref-supplements">Theo's Supplements</div>
       <div class="tab"        data-tab="summary">Model Summary</div>
-      <div class="tab"        data-tab="ref-supplements">Canine Epilepsy Supplements</div>
       <div class="tab"        data-tab="ref-triggers">Canine Epilepsy Triggers</div>
     </div>
     <div id="panel-forecast"    class="panel active"><div id="fc-content"   class="loading">Loading forecast…</div></div>
-    <div id="panel-history"     class="panel">      <div id="hist-content" class="loading">Loading seizure log…</div></div>
     <div id="panel-intervals"   class="panel">      <div id="int-content"  class="loading">Click tab to load intervals…</div></div>
+    <div id="panel-history"     class="panel">      <div id="hist-content" class="loading">Loading seizure log…</div></div>
     <div id="panel-validation"  class="panel">      <div id="val-content"  class="loading">Click tab to load validation…</div></div>
     <div id="panel-supplements" class="panel">      <div id="supp-content" class="loading">Loading supplement table…</div></div>
-    <div id="panel-summary"     class="panel">      <div id="sum-content"  class="loading">Click tab to load model summary…</div></div>
     <div id="panel-ref-supplements" class="panel"><div id="ref-supp-content"></div></div>
+    <div id="panel-summary"     class="panel">      <div id="sum-content"  class="loading">Click tab to load model summary…</div></div>
     <div id="panel-ref-triggers"    class="panel"><div id="ref-trig-content"></div></div>
   </div>
 </div>
@@ -601,11 +601,18 @@ async function loadFromBackend(showToastOnSuccess) {
     LAST_SYNC = new Date();
     rebuildSeizureData();
     updateSyncBar();
+    // Invalidate cache for any tab whose content depends on seizure data,
+    // so the next tab switch forces a re-render. The currently active panel
+    // is re-rendered immediately below.
+    if (typeof loaded === 'object') {
+      ['history','intervals','validation','forecast','summary'].forEach(t => { loaded[t] = false; });
+    }
     // Re-render any visible panel
     const activePanel = document.querySelector('.panel.active');
     if (activePanel) {
       const tabName = activePanel.id.replace('panel-', '');
       rerenderTab(tabName);
+      if (typeof loaded === 'object') loaded[tabName] = true;
     }
     if (showToastOnSuccess) toast(`Synced — ${SEIZURES_NEW.length} new ${SEIZURES_NEW.length === 1 ? 'entry' : 'entries'}`);
   } catch (e) {
@@ -1908,38 +1915,9 @@ function loadIntervals() {
 
   out.append(barWrap);
 
-  // ── Per-cluster detail table ───────────────────────────────────────────────
-  out.append(el('div',{class:'section-head',style:{marginTop:'20px'}},'All Clusters — Detail'));
-
-  const tbl = el('table');
-  const thead = el('thead'), tr0 = el('tr');
-  ['Cluster','First Seizure','Last Seizure','# Seizures','Cluster Span','Gap From Previous'].forEach(h => tr0.append(el('th',{},h)));
-  thead.append(tr0); tbl.append(thead);
-  const tbody = el('tbody');
-
-  clusterList.forEach((c, idx) => {
-    const spanMs   = new Date(c.lastDt).getTime() - new Date(c.firstDt).getTime();
-    const spanH    = Math.round(spanMs / 3600000);
-    const spanStr  = spanH < 24 ? spanH+'h' : (spanH/24).toFixed(1)+'d';
-    const gapStr   = idx === 0 ? '—' : intervals[idx-1].gapDays.toFixed(0)+' days';
-    const gapColor = idx === 0 ? '#4a7a58'
-                   : intervals[idx-1].gapDays < CYCLE_MODERATE_DAYS ? '#fca5a5'
-                   : intervals[idx-1].gapDays < CYCLE_HIGH_DAYS     ? '#fcd34d'
-                   : '#34d399';
-
-    const tr = el('tr',{style:{background:idx%2===0?'#0c1810':'#091410'}});
-    tr.append(
-      el('td',{style:{color:'#e8e4dc',fontWeight:'bold'}},c.label),
-      el('td',{style:{fontFamily:'monospace',color:'#90c4a0',fontSize:'11px'}},c.firstDt.replace('T',' ')),
-      el('td',{style:{fontFamily:'monospace',color:'#90c4a0',fontSize:'11px'}},c.count>1?c.lastDt.replace('T',' '):'—'),
-      el('td',{style:{color:'#fcd34d',textAlign:'center'}},c.count),
-      el('td',{style:{color:'#93c5fd',fontFamily:'monospace'}},c.count>1?spanStr:'single event'),
-      el('td',{style:{color:gapColor,fontFamily:'monospace',fontWeight:'bold'}},gapStr)
-    );
-    tbody.append(tr);
-  });
-  tbl.append(tbody);
-  out.append(el('div',{style:{overflowX:'auto',marginTop:'10px'}},tbl));
+  // ── Cluster timing breakdown (tree-indented list of all events) ───────────
+  // Replaces the prior "All Clusters — Detail" table; see appendClusterTimingTree below.
+  appendClusterTimingTree(out);
 
   // ── Notes ─────────────────────────────────────────────────────────────────
   out.append(el('div',{class:'notes',style:{marginTop:'20px'}},
@@ -2872,9 +2850,6 @@ async function loadHistory() {
       }
     })();
   }
-
-  // Append the cluster timing breakdown (tree-indented list of all events)
-  appendClusterTimingTree(out);
 
   // Append the analysis notes block at the bottom (independent of cluster rendering)
   appendSeizureLogNotes(out);
@@ -4424,23 +4399,37 @@ function loadSupplements() {
 
 function renderSupplementTable(container) {
   const SUPPS = [
-    {name:'ElleVet CBD',              daily:'~79 mg CBD twice daily\n(with food, AM & PM)',         surge:'No change — maintain\nconsistent schedule',         timing:'AM + PM (~12 hrs apart)',          priority:'HIGH'},
-    {name:'Magnesium Bisglycinate',   daily:'200–400 mg/day\n(split AM & PM with food)',            surge:'Add 100–200 mg midday\ndose on drop day + next day', timing:'AM · Midday (surge) · PM',         priority:'HIGH'},
-    {name:'MCT Oil (Nutiva)',         daily:'1 tbsp twice daily with food\n(build up slowly)',       surge:'Add 1 tsp midday dose\nduring risk window',           timing:'AM meal · Midday (surge) · PM meal',priority:'HIGH'},
-    {name:'Taurine',                  daily:'500–1,000 mg once daily\nwith AM meal',                 surge:'Add 500 mg PM dose\nduring 48-hr risk window',        timing:'AM · PM (surge only)',             priority:'HIGH'},
-    {name:'Vitamin C',                daily:'500–1,000 mg once daily\nwith AM meal',                 surge:'Add 500 mg PM dose\nduring risk window',              timing:'AM · PM (surge only)',             priority:'MODERATE'},
-    {name:'Thorne B-Complex #6',      daily:'1 capsule with AM meal',                               surge:'Add 1 capsule PM dose\nduring 24–48 hr risk window',  timing:'AM · PM (surge only)',             priority:'MODERATE'},
-    {name:'Omega-3 Fish Oil',         daily:'2,000–3,000 mg EPA+DHA\nwith largest meal',            surge:'No surge — consistency\nis the goal',                 timing:'With largest meal (PM preferred)', priority:'FOUNDATION'},
-    {name:'Standard Process Neuroplex',daily:'2–3 capsules twice daily\nwith food',                 surge:'No change needed',                                    timing:'AM + PM with food',                priority:'FOUNDATION'},
-    {name:'Turmeric (Curcumin)',      daily:'100–200 mg extract\nwith MCT oil or fish oil',         surge:'No change — effects\nare cumulative',                 timing:'With AM or PM fat-containing meal', priority:'FOUNDATION'},
-    {name:'Mycodog Clarity',          daily:'Per label (1 scoop/day)',                              surge:'No change needed',                                    timing:'AM meal',                          priority:'FOUNDATION'},
-    {name:'Adored Beast Healthy Gut', daily:'Per label directions',                                 surge:'No change needed',                                    timing:'AM meal, 2+ hrs from antibiotics', priority:'FOUNDATION'},
+    {name:'ElleVet CBD',              daily:'~79 mg CBD twice daily\n(with food, AM & PM)',         surge:'No change — maintain\nconsistent schedule',         timing:'AM + PM (~12 hrs apart)',          priority:'HIGH',
+      doseFlag:'check', doseNote:'~4 mg/kg BID for an 87 lb dog. ElleVet pivotal trial (McGrath 2019) used ~2.5 mg/kg BID. This is at the high end — confirm titration with your neurologist and monitor liver enzymes (ALP/ALT) every 6 months given CBD\u2009+\u2009AED stack.'},
+    {name:'Magnesium Bisglycinate',   daily:'200–400 mg/day\n(split AM & PM with food)',            surge:'Add 100–200 mg midday\ndose on drop day + next day', timing:'AM · Midday (surge) · PM',         priority:'HIGH',
+      doseFlag:'ok', doseNote:'≈5–10 mg/kg/day elemental Mg — within standard integrative range. Surge add-on stays under the diarrhea threshold. Contraindicated if any kidney insufficiency.'},
+    {name:'MCT Oil (Nutiva)',         daily:'1 tbsp twice daily with food\n(build up slowly)',       surge:'Add 1 tsp midday dose\nduring risk window',           timing:'AM meal · Midday (surge) · PM meal',priority:'HIGH',
+      doseFlag:'ok', doseNote:'≈28 g/day baseline. Law 2015 (Br J Nutr) MCT-supplemented diet trial used ~9% of metabolizable energy from MCT — this dose is in range. Build up slowly to avoid GI upset; back off if loose stools.'},
+    {name:'Taurine',                  daily:'500–1,000 mg once daily\nwith AM meal',                 surge:'Add 500 mg PM dose\nduring 48-hr risk window',        timing:'AM · PM (surge only)',             priority:'HIGH',
+      doseFlag:'ok', doseNote:'Conservative for an 87 lb dog. Cardiology references commonly use 500–1,000 mg BID. No upper-limit concern at this dose.'},
+    {name:'Vitamin C',                daily:'500–1,000 mg once daily\nwith AM meal',                 surge:'Add 500 mg PM dose\nduring risk window',              timing:'AM · PM (surge only)',             priority:'MODERATE',
+      doseFlag:'ok', doseNote:'Well within tolerance. Excess vitamin C is excreted; loose stools are the practical upper bound.'},
+    {name:'Thorne B-Complex #6',      daily:'1 capsule with AM meal',                               surge:'Add 1 capsule PM dose\nduring 24–48 hr risk window',  timing:'AM · PM (surge only)',             priority:'MODERATE',
+      doseFlag:'check', doseNote:'⚠ B-Complex #6 contains ~100 mg pyridoxine (B6) per cap. Surge dose pushes daily B6 to ~200 mg AND it stacks with B6 already in Neuroplex. Chronic high-dose pyridoxine (>200 mg/day for weeks) is linked to peripheral neuropathy in humans. Consider limiting surge to ½ cap or skip if Neuroplex covers the daily B6 floor — discuss with vet.'},
+    {name:'Omega-3 Fish Oil',         daily:'2,000–3,000 mg EPA+DHA\nwith largest meal',            surge:'No surge — consistency\nis the goal',                 timing:'With largest meal (PM preferred)', priority:'FOUNDATION',
+      doseFlag:'ok', doseNote:'≈50–75 mg/kg EPA+DHA — within NRC safe upper limit (~370 mg/kg). Anti-inflammatory dose, well below the 2,800 mg/100 kcal diet ceiling.'},
+    {name:'Standard Process Neuroplex',daily:'2–3 capsules twice daily\nwith food',                 surge:'No change needed',                                    timing:'AM + PM with food',                priority:'FOUNDATION',
+      doseFlag:'ok', doseNote:'Per label. Note: contains B6 — see B-Complex #6 stacking flag above.'},
+    {name:'Turmeric (Curcumin)',      daily:'100–200 mg extract\nwith MCT oil or fish oil',         surge:'No change — effects\nare cumulative',                 timing:'With AM or PM fat-containing meal', priority:'FOUNDATION',
+      doseFlag:'ok', doseNote:'Conservative dose. Mild anti-platelet effect — note if any future surgery or bleeding concern.'},
+    {name:'Mycodog Clarity',          daily:'Per label (1 scoop/day)',                              surge:'No change needed',                                    timing:'AM meal',                          priority:'FOUNDATION',
+      doseFlag:'ok', doseNote:'Per label.'},
+    {name:'Adored Beast Healthy Gut', daily:'Per label directions',                                 surge:'No change needed',                                    timing:'AM meal, 2+ hrs from antibiotics', priority:'FOUNDATION',
+      doseFlag:'ok', doseNote:'Per label. Space from any antibiotic by 2+ hrs.'},
   ];
   const PCOL={HIGH:'#dc2626',MODERATE:'#d97706',FOUNDATION:'#10b981'};
   const PBG ={HIGH:'#3b0000',MODERATE:'#2d1a00',FOUNDATION:'#001a0e'};
+  const FCOL={ok:'#34d399', check:'#fcd34d', warn:'#dc2626'};
+  const FBG ={ok:'#0e2419', check:'#2d1a00', warn:'#3b0000'};
+  const FLAB={ok:'OK',       check:'CHECK',  warn:'WARN'};
 
   const wrap = el('div',{style:{marginTop:'20px'}});
-  wrap.append(el('div',{style:{fontSize:'10px',letterSpacing:'3px',color:'#34d399',textTransform:'uppercase',padding:'8px 0 6px',borderBottom:'1px solid #1c3326',marginBottom:'6px'}},'Supplement Protocol — Daily & Surge'));
+  wrap.append(el('div',{style:{fontSize:'10px',letterSpacing:'3px',color:'#34d399',textTransform:'uppercase',padding:'8px 0 6px',borderBottom:'1px solid #1c3326',marginBottom:'6px'}},'Surge Supplement Protocol — Daily & Surge'));
   wrap.append(el('div',{style:{fontSize:'11px',color:'#6a9472',marginBottom:'10px',lineHeight:'1.6'}},
     '⚡ Surge protocol activates when monitor flags ',
     el('span',{style:{color:'#dc2626',fontWeight:'bold'}},'HIGH'),
@@ -4451,7 +4440,7 @@ function renderSupplementTable(container) {
 
   const tbl=el('table',{style:{fontSize:'11px'}});
   const thead=el('thead'),tr0=el('tr');
-  ['Supplement','Priority','Daily Dose','Surge Dose (HIGH/MOD alert)','Timing'].forEach(h=>
+  ['Supplement','Priority','Daily Dose','Surge Dose (HIGH/MOD alert)','Timing','Dose Check'].forEach(h=>
     tr0.append(el('th',{style:{padding:'9px 10px',textAlign:'left',borderBottom:'1px solid #1c3326',background:'#0b1a12',color:'#34d399',fontSize:'10px',letterSpacing:'2px',textTransform:'uppercase',whiteSpace:'nowrap'}},h))
   );
   thead.append(tr0);tbl.append(thead);
@@ -4472,6 +4461,17 @@ function renderSupplementTable(container) {
     tr.append(mkTd(s.daily,'#90c4a0'));
     tr.append(mkTd(s.surge,isSurge?'#fcd34d':'#4a7a58'));
     tr.append(mkTd(s.timing,'#93c5fd'));
+    // Dose Check cell — pill + note underneath
+    const flag=s.doseFlag||'ok';
+    const fc=FCOL[flag], fb=FBG[flag];
+    const checkTd=el('td',{style:{padding:'9px 10px',borderBottom:'1px solid #0e1e14',lineHeight:'1.55',minWidth:'220px',maxWidth:'320px'}});
+    checkTd.append(el('span',{style:{padding:'2px 8px',background:fb,border:`1px solid ${fc}`,borderRadius:'4px',color:fc,fontSize:'10px',fontWeight:'bold',letterSpacing:'1px',marginRight:'6px'}},FLAB[flag]));
+    if (s.doseNote) {
+      const noteDiv=el('div',{style:{color:'#9dc4a8',fontSize:'10.5px',marginTop:'4px',whiteSpace:'normal'}});
+      noteDiv.textContent=s.doseNote;
+      checkTd.append(noteDiv);
+    }
+    tr.append(checkTd);
     tbody.append(tr);
   });
   tbl.append(tbody);
@@ -4480,8 +4480,8 @@ function renderSupplementTable(container) {
   const warns=el('div',{style:{marginTop:'12px',padding:'12px 14px',background:'#1a1400',border:'1px solid #78350f',borderRadius:'8px',fontSize:'11px',color:'#fcd34d',lineHeight:'1.8'}});
   warns.innerHTML=`<strong style="color:#d97706;letter-spacing:1px">⚠ KEY INTERACTIONS — DISCUSS WITH VET:</strong><br>
     <span style="color:#c4b9a8">
-    • <strong>CBD + Phenobarbital/KBr/Zonisamide:</strong> CBD inhibits CYP450 — can raise drug blood levels. Monitor liver enzymes every 6 months.<br>
-    • <strong>B6 overlap:</strong> Neuroplex + B-Complex #6 together — confirm combined daily B6 is not excessive.<br>
+    • <strong>CBD + Phenobarbital/KBr/Zonisamide:</strong> CBD inhibits CYP450 — can raise drug blood levels. Monitor liver enzymes every 6 months. Theo's CBD is at the high end of the ElleVet pivotal trial dose; flagged in row above.<br>
+    • <strong>B6 stacking (Neuroplex + B-Complex #6):</strong> Surge protocol pushes daily B6 toward ~200 mg. Chronic high-dose pyridoxine is linked to peripheral neuropathy. Consider ½ surge cap or skipping B-Complex on Neuroplex days.<br>
     • <strong>Magnesium + kidney disease:</strong> Do not use if any kidney insufficiency present.<br>
     • <strong>Turmeric + blood thinners:</strong> Curcumin has mild anti-platelet activity.<br>
     • <strong>Iron in Neuroplex:</strong> Do not combine with other iron-containing supplements.</span>`;
@@ -4635,7 +4635,7 @@ function loadRefSupplements() {
   <div style="max-width:1100px;margin:0 auto;padding:20px 16px 48px;font-family:Georgia,sans-serif;color:#1a1f2e;">
     <div style="border-bottom:1px solid #dce0eb;padding-bottom:18px;margin-bottom:20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;">
       <div>
-        <div style="font-size:1.8rem;font-style:italic;font-family:Georgia,serif;"><span style="color:#1a7a30;font-style:normal;">Supplement</span> Reference — Canine Epilepsy</div>
+        <div style="font-size:1.8rem;font-style:italic;font-family:Georgia,serif;"><span style="color:#1a7a30;font-style:normal;">Theo's</span> Supplements</div>
         <div style="font-size:0.72rem;color:#8891aa;font-family:monospace;text-transform:uppercase;letter-spacing:0.06em;margin-top:4px;">Idiopathic Epilepsy · ~87 lb (40 kg) · All as adjuncts to vet care</div>
       </div>
       <div style="background:rgba(184,26,26,0.06);border:1px solid rgba(184,26,26,0.2);border-radius:6px;padding:10px 14px;font-size:0.8rem;color:#8a1010;line-height:1.55;max-width:380px;">⚠ Not a substitute for veterinary guidance. Confirm all supplements with your vet. Green border = currently in his protocol.</div>
